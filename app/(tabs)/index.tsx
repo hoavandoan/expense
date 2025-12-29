@@ -43,8 +43,8 @@ export default function HomeScreen() {
       {/* Header (Image 0) */}
       <View className="px-6 pt-4 pb-4 flex-row items-center justify-between">
         <View className="flex-row items-center gap-3">
-          <PressableFeedback>
-            <Avatar size="md" alt="User profile">
+          <PressableFeedback onPress={() => router.push('/settings')} className='rounded-full'>
+            <Avatar size="md" alt="User profile" className='bg-surface size-12'>
               <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=minhanh' }} />
               <Avatar.Fallback>MA</Avatar.Fallback>
             </Avatar>
@@ -55,10 +55,10 @@ export default function HomeScreen() {
           </View>
         </View>
         <View className="flex-row gap-2">
-          <PressableFeedback className="w-10 h-10 rounded-full bg-surface items-center justify-center shadow-sm">
+          <PressableFeedback className="w-10 h-10 rounded-full bg-surface items-center justify-center">
             <IconSymbol name="magnifyingglass" size={20} color="black" />
           </PressableFeedback>
-          <PressableFeedback className="w-10 h-10 rounded-full bg-surface items-center justify-center shadow-sm">
+          <PressableFeedback className="w-10 h-10 rounded-full bg-surface items-center justify-center">
             <IconSymbol name="bell" size={20} color="black" />
             <View className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-surface" />
           </PressableFeedback>
@@ -120,7 +120,7 @@ export default function HomeScreen() {
       </View>
 
       {/* Horizontal Groups Section */}
-      <View className="mb-8">
+      <View className="mb-8 w-full">
         <View className="px-6 flex-row items-center justify-between mb-4">
           <AppText className="text-lg font-bold">Nhóm của bạn</AppText>
           <PressableFeedback>
@@ -151,9 +151,9 @@ export default function HomeScreen() {
       <View className="px-6 mb-10">
         <AppText className="text-lg font-bold mb-4">Hoạt động gần đây</AppText>
         <View className="gap-3">
-          <Card variant="default" className="p-4 rounded-3xl border border-divider/5">
+          <Card variant="default" className="p-4 rounded-2xl border border-divider/5">
             <View className="flex-row items-center gap-3">
-              <Avatar size="md" alt="Nam">
+              <Avatar size="md" alt="Nam" className='rounded-full'>
                 <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=nam' }} />
                 <Avatar.Fallback>N</Avatar.Fallback>
               </Avatar>
@@ -167,9 +167,9 @@ export default function HomeScreen() {
               </View>
             </View>
           </Card>
-          <Card variant="default" className="p-4 rounded-3xl border border-divider/5">
+          <Card variant="default" className="p-4 rounded-2xl border border-divider/5">
             <View className="flex-row items-center gap-3">
-              <Avatar size="md" alt="Me" className="bg-yellow-100">
+              <Avatar size="md" alt="Me" className="rounded-full bg-yellow-100">
                 <Avatar.Fallback>B</Avatar.Fallback>
               </Avatar>
               <View className="flex-1">

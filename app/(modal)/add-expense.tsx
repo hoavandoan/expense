@@ -2,23 +2,23 @@ import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useRouter } from 'expo-router';
-import { Avatar, Button, Card, Checkbox, cn, FormField, PressableFeedback, TextField, useThemeColor } from 'heroui-native';
+import { Avatar, Button, Card, Checkbox, cn, Divider, PressableFeedback, TextField, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 
 const MOCK_MEMBERS = [
-  { id: '1', name: 'Bạn' },
-  { id: '2', name: 'An' },
-  { id: '3', name: 'Bình' },
-  { id: '4', name: 'Chi' },
+  { id: '1', name: 'Bạn', avatarUrl: 'https://i.pravatar.cc/150?u=1' },
+  { id: '2', name: 'Hương', avatarUrl: 'https://i.pravatar.cc/150?u=2' },
+  { id: '3', name: 'Minh', avatarUrl: 'https://i.pravatar.cc/150?u=3' },
+  { id: '4', name: 'Tuấn', avatarUrl: 'https://i.pravatar.cc/150?u=4', isPlaceholder: true },
 ];
 
 export default function AddExpenseScreen() {
   const router = useRouter();
   const accent = useThemeColor('accent');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState('150.000');
   const [description, setDescription] = useState('');
-  const [selectedMembers, setSelectedMembers] = useState<string[]>(MOCK_MEMBERS.map(m => m.id));
+  const [selectedMembers, setSelectedMembers] = useState<string[]>(['1', '2', '3']);
 
   const toggleMember = (id: string) => {
     setSelectedMembers(prev =>
@@ -26,85 +26,144 @@ export default function AddExpenseScreen() {
     );
   };
 
+  const totalAmount = 150000;
+  const splitAmount = selectedMembers.length > 0 ? Math.floor(totalAmount / selectedMembers.length) : 0;
+
   return (
     <ScreenScrollView className="bg-background">
-      <View className="px-6 py-6">
-        <View className="flex-row items-center justify-between mb-10 pt-4">
-          <AppText className="text-3xl font-bold">Thêm chi tiêu</AppText>
-          <PressableFeedback onPress={() => router.back()} className="bg-surface-secondary p-2 rounded-full">
-            <IconSymbol name="xmark" size={20} color="gray" />
-          </PressableFeedback>
-        </View>
+      {/* Header */}
+      <View className="flex-row items-center justify-between px-4 py-3 border-b border-divider/5 bg-surface">
+        <PressableFeedback onPress={() => router.back()}>
+          <IconSymbol name="xmark" size={24} color="gray" />
+        </PressableFeedback>
+        <AppText className="text-lg font-bold">Tạo khoản chi</AppText>
+        <PressableFeedback onPress={() => router.back()}>
+          <AppText className="text-accent font-bold text-base">Lưu</AppText>
+        </PressableFeedback>
+      </View>
 
-        {/* Amount Input Section */}
-        <View className="items-center mb-10 bg-accent/5 py-8 rounded-[40px] border border-accent/10">
-          <AppText className="text-muted font-bold uppercase tracking-widest text-xs mb-4">Số tiền chi ra</AppText>
-          <View className="flex-row items-center">
-            <TextField className="bg-transparent border-0 w-48">
+      <View className="px-5 pt-8">
+        {/* Amount Section */}
+        <View className="items-center mb-8">
+          <View className="flex-row items-center justify-center mb-2">
+            <IconSymbol name="dongsign" size={24} color="#94A3B8" className="mr-3" />
+            <TextField className="bg-transparent border-0 w-64 h-16">
               <TextField.Input
                 placeholder="0"
                 value={amount}
                 onChangeText={setAmount}
                 keyboardType="numeric"
-                className="text-5xl font-bold text-center text-foreground"
+                className="text-[56px] font-bold text-center text-[#1E293B]"
               />
             </TextField>
-            <AppText className="text-3xl font-bold text-accent ml-2">đ</AppText>
           </View>
+          <AppText className="text-[#94A3B8] text-sm font-medium">Nhập số tiền</AppText>
         </View>
 
-        <FormField className="mb-8">
-          <FormField.Label className="text-base font-bold mb-3">Nội dung</FormField.Label>
-          <TextField className="bg-surface-secondary rounded-2xl h-14 px-4">
+        {/* Description Card */}
+        <Card variant="default" className="p-4 rounded-2xl border border-divider/5 flex-row items-center mb-6">
+          <View className="w-10 h-10 rounded-lg bg-success-soft items-center justify-center mr-3">
+            <IconSymbol name="doc.text.fill" size={20} color={accent} />
+          </View>
+          <TextField className="bg-transparent flex-1 border-0 h-10">
             <TextField.Input
-              placeholder="Ăn trưa, cafe, mua sắm..."
+              placeholder="Nhập mô tả (ví dụ: Ăn tối)"
               value={description}
               onChangeText={setDescription}
+              className="text-base text-foreground font-medium"
             />
           </TextField>
-        </FormField>
+          <IconSymbol name="triangle.fill" size={12} color="#64748B" className="rotate-0 ml-2" />
+        </Card>
 
-        {/* Split Section */}
-        <View className="mb-10">
-          <View className="flex-row items-center justify-between mb-4">
-            <AppText className="text-lg font-bold">Chia tiền với</AppText>
-            <AppText className="text-accent text-sm font-bold">CHỌN TẤT CẢ</AppText>
-          </View>
-          <Card variant="default" className="p-3 gap-3 rounded-[32px] border border-divider/5 shadow-sm">
-            {MOCK_MEMBERS.map((member) => (
-              <PressableFeedback key={member.id} onPress={() => toggleMember(member.id)}>
-                <View
-                  className={cn(
-                    'p-4 flex-row items-center justify-between rounded-2xl',
-                    selectedMembers.includes(member.id) ? 'bg-accent/10' : 'bg-surface-secondary/50'
-                  )}
-                >
-                  <View className="flex-row items-center">
-                    <Avatar size="sm" alt={member.name} className="mr-4 border border-surface shadow-sm">
-                      <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
-                    </Avatar>
-                    <AppText className="font-bold text-base">{member.name}</AppText>
-                  </View>
-                  <Checkbox
-                    isSelected={selectedMembers.includes(member.id)}
-                    onSelectedChange={() => toggleMember(member.id)}
-                  >
-                    <Checkbox.Indicator />
-                  </Checkbox>
-                </View>
-              </PressableFeedback>
-            ))}
+        {/* Details Section */}
+        <View className="mb-6">
+          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">CHI TIẾT</AppText>
+          <Card variant="default" className="rounded-2xl overflow-hidden border border-divider/5">
+            <PressableFeedback className="flex-row items-center p-4">
+              <View className="w-10 h-10 rounded-lg bg-accent/10 items-center justify-center mr-4">
+                <IconSymbol name="calendar" size={20} color={accent} />
+              </View>
+              <AppText className="flex-1 text-base font-medium">Ngày</AppText>
+              <AppText className="text-muted mr-2">Hôm nay, 24/10</AppText>
+              <IconSymbol name="chevron.right" size={16} color="#94A3B8" />
+            </PressableFeedback>
+            <Divider className="mx-4 opacity-10" />
+            <PressableFeedback className="flex-row items-center p-4">
+              <View className="w-10 h-10 rounded-lg bg-accent/10 items-center justify-center mr-4">
+                <IconSymbol name="creditcard.fill" size={20} color="#8B5CF6" />
+              </View>
+              <AppText className="flex-1 text-base font-medium">Người trả tiền</AppText>
+              <View className="flex-row items-center mr-2">
+                <Avatar size="sm" alt="Bạn" className="mr-2 border-2 border-surface">
+                  <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=1' }} />
+                </Avatar>
+                <AppText className="font-semibold">Bạn</AppText>
+              </View>
+              <IconSymbol name="chevron.right" size={16} color="#94A3B8" />
+            </PressableFeedback>
           </Card>
         </View>
 
-        <View className="pb-8">
+        {/* Split Section */}
+        <View className="mb-8">
+          <View className="flex-row items-center justify-between mb-3 px-1">
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest">CHIA CHO</AppText>
+            <PressableFeedback>
+              <AppText className="text-accent text-xs font-bold uppercase">Chọn tất cả</AppText>
+            </PressableFeedback>
+          </View>
+          <Card variant="default" className="rounded-2xl overflow-hidden border border-divider/5">
+            {MOCK_MEMBERS.map((member, index) => {
+              const isSelected = selectedMembers.includes(member.id);
+              return (
+                <View key={member.id}>
+                  <PressableFeedback onPress={() => toggleMember(member.id)} className="p-4 flex-row items-center">
+                    <View className="relative">
+                      <Avatar size="md" alt={member.name} className={cn("mr-4", member.isPlaceholder && "opacity-40")}>
+                        {member.avatarUrl && <Avatar.Image source={{ uri: member.avatarUrl }} />}
+                        <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
+                      </Avatar>
+                      {member.id === '1' && (
+                        <View className="absolute bottom-0 right-4 w-3 h-3 bg-success rounded-full border-2 border-surface" />
+                      )}
+                    </View>
+                    <View className="flex-1">
+                      <AppText className={cn("text-base font-bold", member.isPlaceholder && "text-muted")}>{member.name}</AppText>
+                      <AppText className="text-muted text-xs">{isSelected ? `${splitAmount.toLocaleString()} ₫` : '0 ₫'}</AppText>
+                    </View>
+                    <Checkbox
+                      isSelected={isSelected}
+                      onSelectedChange={() => toggleMember(member.id)}
+                    >
+                      <Checkbox.Indicator className="rounded-md" />
+                    </Checkbox>
+                  </PressableFeedback>
+                  {index < MOCK_MEMBERS.length - 1 && <Divider className="mx-4 opacity-10" />}
+                </View>
+              );
+            })}
+          </Card>
+        </View>
+
+        {/* Custom Split Trigger */}
+        <PressableFeedback className="flex-row items-center justify-center mb-10">
+          <IconSymbol name="slider.horizontal.3" size={18} color="#64748B" className="mr-2" />
+          <AppText className="text-[#64748B] font-medium">Tùy chỉnh chia tiền</AppText>
+        </PressableFeedback>
+
+        {/* Footer Summary & Button */}
+        <View className="mb-10">
+          <View className="flex-row items-center justify-between mb-4 px-1">
+            <AppText className="text-muted font-medium">Đã chọn {selectedMembers.length} người</AppText>
+            <AppText className="font-bold text-lg">Tổng: {totalAmount.toLocaleString()} đ</AppText>
+          </View>
           <Button
             variant="primary"
-            className="w-full h-16 rounded-[24px] shadow-lg"
-            isDisabled={!amount || !description || selectedMembers.length === 0}
+            className="w-full h-16 rounded-2xl shadow-xl shadow-success/20 bg-accent"
             onPress={() => router.back()}
           >
-            <Button.Label className="text-lg font-bold">Lưu giao dịch</Button.Label>
+            <Button.Label className="text-lg font-bold">Lưu khoản chi</Button.Label>
           </Button>
         </View>
       </View>

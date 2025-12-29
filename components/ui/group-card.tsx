@@ -40,9 +40,9 @@ export const GroupCard: FC<GroupCardProps> = ({
 
   if (variant === 'horizontal') {
     return (
-      <PressableFeedback onPress={onPress}>
-        <Card variant="default" className={cn('w-[240px] rounded-[32px] overflow-hidden', className)}>
-          <View className="h-[140px]">
+      <PressableFeedback onPress={onPress} className='rounded-2xl w-1/2'>
+        <Card variant="default" className={cn('p-0 rounded-2xl border-none shadow-sm', className)}>
+          <Card.Header className="p-0 h-[140px] justify-end overflow-hidden">
             {bgImage && (
               <Image
                 source={{ uri: bgImage }}
@@ -51,26 +51,26 @@ export const GroupCard: FC<GroupCardProps> = ({
               />
             )}
             <View className="absolute inset-0 bg-black/20" />
-            <View className="flex-1 justify-end p-4">
-              <AppText className="text-white text-lg font-bold">{title}</AppText>
-            </View>
-          </View>
-          <Card.Footer className="bg-surface flex-row items-center justify-between p-4">
+            <Card.Title className="text-white text-lg font-bold p-4 z-10">
+              {title}
+            </Card.Title>
+          </Card.Header>
+          <Card.Body className="bg-surface flex-row items-center justify-between p-4">
             <View className="flex-row items-center">
-              {members.slice(0, 2).map((member, index) => (
+              {members.slice(0, 3).map((member, index) => (
                 <Avatar
                   key={member.id}
                   size="sm"
                   alt={member.name}
-                  className={cn(index > 0 && '-ml-3', 'border-2 border-surface')}
+                  className={cn(index > 0 && 'rounded-full bg-surface-secondary -ml-3', 'border-2 border-surface')}
                 >
                   <Avatar.Image source={{ uri: member.avatarUrl }} />
                   <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
                 </Avatar>
               ))}
-              {memberCount > 2 && (
+              {memberCount > 3 && (
                 <View className="w-8 h-8 rounded-full bg-surface-secondary border-2 border-surface items-center justify-center -ml-3">
-                  <AppText className="text-[10px] text-muted font-bold">+{memberCount - 2}</AppText>
+                  <AppText className="text-[10px] text-muted font-bold">+{memberCount - 3}</AppText>
                 </View>
               )}
             </View>
@@ -78,7 +78,7 @@ export const GroupCard: FC<GroupCardProps> = ({
               <AppText className="text-muted text-[10px] uppercase font-bold">BẠN ĐƯỢC TRẢ</AppText>
               <AppText className={cn('font-bold', balanceColor)}>{balanceText}</AppText>
             </View>
-          </Card.Footer>
+          </Card.Body>
         </Card>
       </PressableFeedback>
     );
@@ -103,7 +103,7 @@ export const GroupCard: FC<GroupCardProps> = ({
                 key={member.id}
                 size="sm"
                 alt={member.name}
-                className={cn(index > 0 && '-ml-3', 'border-2 border-surface')}
+                className={cn(index > 0 && 'rounded-full bg-surface-secondary -ml-3', 'border-2 border-surface')}
               >
                 {member.avatarUrl ? (
                   <Avatar.Image source={{ uri: member.avatarUrl }} />

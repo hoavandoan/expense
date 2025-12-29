@@ -46,6 +46,12 @@ const MAPPING = {
   'logout': 'logout',
   'settings': 'settings',
   'xmark': 'close',
+  'dongsign': 'attach-money',
+  'doc.text.fill': 'description',
+  'calendar': 'calendar-today',
+  'creditcard.fill': 'credit-card',
+  'triangle.fill': 'arrow-drop-down',
+  'slider.horizontal.3': 'tune',
 } as any;
 
 /**
@@ -58,12 +64,14 @@ export function IconSymbol({
   size = 24,
   color,
   style,
+  className,
 }: {
   name: IconSymbolName;
   size?: number;
   color: string | OpaqueColorValue;
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
+  className?: string;
 }) {
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} className={className} />;
 }

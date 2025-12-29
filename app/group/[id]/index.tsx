@@ -22,7 +22,7 @@ export default function GroupDetailScreen() {
   return (
     <ScreenScrollView className="bg-background">
       {/* Cover Image Header (Image 4) */}
-      <View className="h-64">
+      <View className="h-64 bg-surface-quaternary">
         <Image
           source={{ uri: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1000' }}
           style={StyleSheet.absoluteFill}
@@ -43,7 +43,7 @@ export default function GroupDetailScreen() {
         </View>
       </View>
 
-      <View className="-mt-12 bg-background rounded-t-[48px] px-6 pt-8">
+      <View className="-mt-12 bg-background rounded-t-3xl px-6 pt-8">
         {/* Info Badges (Image 4) */}
         <View className="flex-row gap-3 mb-8">
           <View className="bg-surface-secondary px-4 py-2 rounded-full border border-divider/10">
@@ -57,7 +57,7 @@ export default function GroupDetailScreen() {
         {/* Stats Card (Image 4) */}
         <View className="mb-10">
           <Card variant="default"
-            className="p-8 rounded-[40px] shadow-2xl overflow-hidden"
+            className="p-8 rounded-3xl shadow-2xl overflow-hidden"
             style={{ backgroundColor: accent }}
           >
             <View className="flex-row gap-4">
@@ -74,19 +74,19 @@ export default function GroupDetailScreen() {
 
             <View className="mt-8 flex-row gap-2">
               <PressableFeedback className="flex-1">
-                <View className="bg-white/10 p-4 rounded-3xl items-center justify-center border border-white/10">
+                <View className="bg-white/10 p-4 rounded-2xl items-center justify-center border border-white/10">
                   <IconSymbol name="plus" size={20} color="white" />
                   <AppText className="text-white text-[10px] font-bold mt-1">CHI TIÊU</AppText>
                 </View>
               </PressableFeedback>
               <PressableFeedback className="flex-1">
-                <View className="bg-white/10 p-4 rounded-3xl items-center justify-center border border-white/10">
+                <View className="bg-white/10 p-4 rounded-2xl items-center justify-center border border-white/10">
                   <IconSymbol name="qrcode" size={20} color="white" />
                   <AppText className="text-white text-[10px] font-bold mt-1">THANH TOÁN</AppText>
                 </View>
               </PressableFeedback>
               <PressableFeedback className="flex-1">
-                <View className="bg-white/10 p-4 rounded-3xl items-center justify-center border border-white/10">
+                <View className="bg-white/10 p-4 rounded-2xl items-center justify-center border border-white/10">
                   <IconSymbol name="chart.bar" size={20} color="white" />
                   <AppText className="text-white text-[10px] font-bold mt-1">BÁO CÁO</AppText>
                 </View>
@@ -106,7 +106,7 @@ export default function GroupDetailScreen() {
 
           <View className="gap-3">
             {MOCK_MEMBERS.map((member) => (
-              <Card key={member.id} variant="default" className="p-4 rounded-[28px] border border-divider/5">
+              <Card key={member.id} variant="default" className="p-4 rounded-2xl border border-divider/5">
                 <View className="flex-row items-center">
                   <Avatar size="md" alt={member.name} className="mr-4">
                     <Avatar.Image source={{ uri: member.avatarUrl }} />
