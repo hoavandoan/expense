@@ -35,13 +35,13 @@ export const AppThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const toggleTheme = useCallback(() => {
-    switch (theme) {
-      case 'light':
-        Uniwind.setTheme('dark');
-        break;
-      case 'dark':
-        Uniwind.setTheme('light');
-        break;
+    const themeMap: Record<string, ThemeName> = {
+      light: 'dark',
+      dark: 'light',
+    };
+    const nextTheme = themeMap[theme];
+    if (nextTheme) {
+      Uniwind.setTheme(nextTheme);
     }
   }, [theme]);
 

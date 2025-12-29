@@ -52,7 +52,8 @@ const MAPPING = {
   'creditcard.fill': 'credit-card',
   'triangle.fill': 'arrow-drop-down',
   'slider.horizontal.3': 'tune',
-} as any;
+  'sunny': 'sunny',
+} as const;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.

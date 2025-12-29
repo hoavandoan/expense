@@ -15,6 +15,7 @@
     --background: oklch(0.982 0.002 247.9);
     --surface: oklch(100% 0 0);
     --overlay: oklch(100% 0 0); */
+    --divider: oklch(0.922 0 0);
   }
 
   @variant dark {
@@ -25,6 +26,7 @@
     --background: oklch(0.129 0.015 264.7);
     --surface: oklch(0.184 0.02 264.7);
     --overlay: oklch(0.24 0.02 264.7); */
+    --divider: oklch(1 0 0 / 10%);
   }
 }
 

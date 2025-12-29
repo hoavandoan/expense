@@ -4,7 +4,7 @@ import { ActionIcon } from '@/components/ui/action-icon';
 import { GroupCard } from '@/components/ui/group-card';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useRouter } from 'expo-router';
-import { Avatar, Card, PressableFeedback, useThemeColor } from 'heroui-native';
+import { Avatar, Card, Divider, PressableFeedback, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
@@ -37,9 +37,10 @@ export default function HomeScreen() {
   const router = useRouter();
   const [showBalance, setShowBalance] = useState(true);
   const accent = useThemeColor('accent');
+  const foreground = useThemeColor('foreground');
 
   return (
-    <ScreenScrollView className="bg-background">
+    <ScreenScrollView className="pt-10">
       {/* Header (Image 0) */}
       <View className="px-6 pt-4 pb-4 flex-row items-center justify-between">
         <View className="flex-row items-center gap-3">
@@ -56,10 +57,10 @@ export default function HomeScreen() {
         </View>
         <View className="flex-row gap-2">
           <PressableFeedback className="w-10 h-10 rounded-full bg-surface items-center justify-center">
-            <IconSymbol name="magnifyingglass" size={20} color="black" />
+            <IconSymbol name="magnifyingglass" size={20} color={foreground} />
           </PressableFeedback>
           <PressableFeedback className="w-10 h-10 rounded-full bg-surface items-center justify-center">
-            <IconSymbol name="bell" size={20} color="black" />
+            <IconSymbol name="bell" size={20} color={foreground} />
             <View className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-surface" />
           </PressableFeedback>
         </View>
@@ -97,7 +98,7 @@ export default function HomeScreen() {
               </View>
               <AppText className="text-white text-base font-bold">+ 1.450.000 đ</AppText>
             </View>
-            <View className="w-px bg-white/10" />
+            <Divider orientation='vertical' className="bg-divider" />
             <View className="flex-1">
               <View className="flex-row items-center gap-1.5 mb-1">
                 <View className="w-5 h-5 bg-orange-400 rounded-full items-center justify-center">

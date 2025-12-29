@@ -22,7 +22,7 @@ export default function GroupDetailScreen() {
   return (
     <ScreenScrollView className="bg-background">
       {/* Cover Image Header (Image 4) */}
-      <View className="h-64 bg-surface-quaternary">
+      <View className="h-64 bg-surface-quaternary sticky">
         <Image
           source={{ uri: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1000' }}
           style={StyleSheet.absoluteFill}

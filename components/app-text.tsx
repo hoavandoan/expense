@@ -6,7 +6,7 @@ export const AppText = React.forwardRef<RNText, RNTextProps>((props, ref) => {
   const { className, ...restProps } = props;
 
   return (
-    <RNText ref={ref} className={cn('font-normal', className)} {...restProps} />
+    <RNText ref={ref} className={cn('font-normal text-foreground', className)} {...restProps} />
   );
 });
 

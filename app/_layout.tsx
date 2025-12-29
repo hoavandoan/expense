@@ -1,3 +1,4 @@
+import { AppThemeProvider } from '@/contexts/app-theme-context';
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -107,7 +108,9 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <KeyboardProvider>
-        <AppContent />
+        <AppThemeProvider>
+          <AppContent />
+        </AppThemeProvider>
       </KeyboardProvider>
     </GestureHandlerRootView>
   );

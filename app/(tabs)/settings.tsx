@@ -2,19 +2,23 @@ import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { SettingsItem } from '@/components/ui/settings-item';
-import { Avatar, Button, Card, Divider, PressableFeedback, Switch } from 'heroui-native';
+import { useAppTheme } from '@/contexts/app-theme-context';
+import { Avatar, Button, Card, Divider, PressableFeedback, Switch, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
+  const { isDark, toggleTheme } = useAppTheme();
+  const foreground = useThemeColor('foreground');
 
   return (
-    <ScreenScrollView className="bg-background">
+    <ScreenScrollView className="pt-10">
       {/* Header (Image 1) */}
       <View className="px-6 pt-4 pb-4 flex-row items-center justify-between">
         <PressableFeedback className="w-10 h-10 rounded-full bg-surface items-center justify-center shadow-sm">
-          <IconSymbol name="chevron.left" size={20} color="black" />
+          <IconSymbol name="chevron.left" size={20} color={foreground} />
         </PressableFeedback>
         <AppText className="text-lg font-bold">Cài đặt</AppText>
         <View className="w-10" />
@@ -54,6 +58,53 @@ export default function SettingsScreen() {
         <View>
           <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">CÀI ĐẶT CHUNG</AppText>
           <Card variant="default" className="overflow-hidden border border-divider/5">
+            <SettingsItem
+              icon="moon.fill"
+              iconBgColor="#3F3F46"
+              label="Chế độ tối"
+              showChevron={false}
+              onPress={toggleTheme}
+              rightElement={
+                <Switch
+                  isSelected={isDark}
+                  className="w-[56px] h-[32px]"
+                  animation={{
+                    backgroundColor: {
+                      value: ['#172554', '#eab308'],
+                    },
+                  }}
+                >
+                  <Switch.Thumb
+                    className="size-[22px]"
+                    animation={{
+                      left: {
+                        value: 4,
+                        springConfig: {
+                          damping: 30,
+                          stiffness: 300,
+                          mass: 1,
+                        },
+                      },
+                    }}
+                  />
+                  <Switch.StartContent className="left-2">
+                    {isDark && (
+                      <Animated.View key="sun" entering={ZoomIn.springify()}>
+                        <IconSymbol name="sunny" size={16} color="white" />
+                      </Animated.View>
+                    )}
+                  </Switch.StartContent>
+                  <Switch.EndContent className="right-2">
+                    {!isDark && (
+                      <Animated.View key="moon" entering={ZoomIn.springify()}>
+                        <IconSymbol name="moon.fill" size={16} color="white" />
+                      </Animated.View>
+                    )}
+                  </Switch.EndContent>
+                </Switch>
+              }
+            />
+            <Divider className="my-1" />
             <SettingsItem
               icon="bell"
               iconBgColor="#9455D3"

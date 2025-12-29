@@ -30,7 +30,7 @@ export default function AddExpenseScreen() {
   const splitAmount = selectedMembers.length > 0 ? Math.floor(totalAmount / selectedMembers.length) : 0;
 
   return (
-    <ScreenScrollView className="bg-background">
+    <ScreenScrollView className="bg-background text-foreground">
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3 border-b border-divider/5 bg-surface">
         <PressableFeedback onPress={() => router.back()}>
@@ -88,7 +88,7 @@ export default function AddExpenseScreen() {
               <AppText className="text-muted mr-2">Hôm nay, 24/10</AppText>
               <IconSymbol name="chevron.right" size={16} color="#94A3B8" />
             </PressableFeedback>
-            <Divider className="mx-4 opacity-10" />
+            <Divider />
             <PressableFeedback className="flex-row items-center p-4">
               <View className="w-10 h-10 rounded-lg bg-accent/10 items-center justify-center mr-4">
                 <IconSymbol name="creditcard.fill" size={20} color="#8B5CF6" />
@@ -139,7 +139,7 @@ export default function AddExpenseScreen() {
                       <Checkbox.Indicator className="rounded-md" />
                     </Checkbox>
                   </PressableFeedback>
-                  {index < MOCK_MEMBERS.length - 1 && <Divider className="mx-4 opacity-10" />}
+                  {index < MOCK_MEMBERS.length - 1 && <Divider />}
                 </View>
               );
             })}
