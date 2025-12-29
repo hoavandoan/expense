@@ -35,8 +35,8 @@ UI and Styling
 
 - Use Expo's built-in components for common UI patterns and layouts.
 - Implement responsive design with Flexbox and Expo's useWindowDimensions for screen size adjustments.
-- Use Tailwind CSS for component styling follow cursor/rules/style.mdc (heroui-native).
-- Implement dark mode support using Expo's useColorScheme.
+- Use Tailwind CSS for component styling follow HeroUI Native documentation from https://v3.heroui.com/native/llms.txt.
+- Implement dark mode support using Expo's useAppTheme.
 - Ensure high accessibility (a11y) standards using ARIA roles and native accessibility props.
 - Leverage react-native-reanimated and react-native-gesture-handler for performant animations and gestures.
 
@@ -44,7 +44,7 @@ Safe Area Management
 
 - Use SafeAreaProvider from react-native-safe-area-context to manage safe areas globally in your app.
 - Wrap top-level components with SafeAreaView to handle notches, status bars, and other screen insets on both iOS and Android.
-- Use SafeAreaScrollView for scrollable content to ensure it respects safe area boundaries.
+- Use ScreenScrollView for scrollable content to ensure it respects safe area boundaries.
 - Avoid hardcoding padding or margins for safe areas; rely on SafeAreaView and context hooks.
 
 Performance Optimization

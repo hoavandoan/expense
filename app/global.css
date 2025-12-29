@@ -1,0 +1,38 @@
+@import 'tailwindcss';
+@import 'uniwind';
+
+@import 'heroui-native/styles';
+
+/* Path to the heroui-native lib inside node_modules from the root of your project */
+@source './node_modules/heroui-native/lib';
+
+@layer theme {
+  @variant light {
+    --accent: oklch(0.7329 0.1935 150.81);
+    /* Brand Green #17C964 */
+    --accent-gradient: linear-gradient(135deg, #17C964 0%, #17AD56 100%);
+    /* --accent-foreground: oklch(100% 0 0);
+    --background: oklch(0.982 0.002 247.9);
+    --surface: oklch(100% 0 0);
+    --overlay: oklch(100% 0 0); */
+  }
+
+  @variant dark {
+    --accent: oklch(0.7329 0.1935 150.81);
+    /* Brand Green #17C964 */
+    --accent-gradient: linear-gradient(135deg, #17C964 0%, #17AD56 100%);
+    /* --accent-foreground: oklch(0.2 0 0);
+    --background: oklch(0.129 0.015 264.7);
+    --surface: oklch(0.184 0.02 264.7);
+    --overlay: oklch(0.24 0.02 264.7); */
+  }
+}
+
+@theme {
+  --radius: 0.5rem;
+  /* Custom fonts */
+  --font-normal: 'Inter_400Regular';
+  --font-medium: 'Inter_500Medium';
+  --font-semibold: 'Inter_600SemiBold';
+  --font-bold: 'Inter_700Bold';
+}

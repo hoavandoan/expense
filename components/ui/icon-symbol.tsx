@@ -1,7 +1,7 @@
 // Fallback for using MaterialIcons on Android and web.
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { SymbolWeight, SymbolViewProps } from 'expo-symbols';
+import { SymbolViewProps, SymbolWeight } from 'expo-symbols';
 import { ComponentProps } from 'react';
 import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
 
@@ -18,7 +18,35 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
-} as IconMapping;
+  'chevron.left': 'chevron-left',
+  'magnifyingglass': 'search',
+  'bell': 'notifications-none',
+  'eye': 'visibility',
+  'eye.slash': 'visibility-off',
+  'plus': 'add',
+  'creditcard': 'credit-card',
+  'qrcode': 'qr-code-scanner',
+  'chart.bar': 'bar-chart',
+  'chart.line.uptrend.xyv': 'trending-up',
+  'arrow.up.right': 'north-east',
+  'arrow.down.left': 'south-west',
+  'ellipsis': 'more-horiz',
+  'line.3.horizontal.decrease.circle': 'filter-list',
+  'gearshape.fill': 'settings',
+  'moon.fill': 'dark-mode',
+  'bell.fill': 'notifications',
+  'lock.fill': 'lock',
+  'pencil': 'edit',
+  'person': 'person',
+  'shield': 'security',
+  'globe': 'public',
+  'heart': 'favorite',
+  'questionmark.circle': 'help',
+  'info.circle': 'info',
+  'logout': 'logout',
+  'settings': 'settings',
+  'xmark': 'close',
+} as any;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.
