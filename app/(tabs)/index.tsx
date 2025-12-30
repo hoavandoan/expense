@@ -40,7 +40,7 @@ export default function HomeScreen() {
   const foreground = useThemeColor('foreground');
 
   return (
-    <ScreenScrollView className="pt-10">
+    <ScreenScrollView className="android:my-4">
       {/* Header (Image 0) */}
       <View className="px-6 pt-4 pb-4 flex-row items-center justify-between">
         <View className="flex-row items-center gap-3">
@@ -69,55 +69,55 @@ export default function HomeScreen() {
       {/* Hero Balance Section with Accent Gradient */}
       <View className="px-5 mb-6">
         <View
-          className="p-6 rounded-[32px] shadow-xl overflow-hidden"
-          style={{ backgroundColor: accent }}
+          className="p-6 rounded-[32px] shadow-xl overflow-hidden bg-accent"
+        // style={{ backgroundColor: accent }}
         >
           {/* Accent Gradient Layer - Simulated as we can't use LinearGradient directly for bg easily without nested views or global.css */}
           <View className="flex-row items-center justify-between mb-2">
-            <AppText className="text-white/80 text-sm font-medium">Tổng số dư khả dụng</AppText>
+            <AppText className="text-accent-foreground text-sm font-medium">Tổng số dư khả dụng</AppText>
             <PressableFeedback onPress={() => setShowBalance(!showBalance)}>
               <IconSymbol name={showBalance ? "eye" : "eye.slash"} size={20} color="white" />
             </PressableFeedback>
           </View>
 
           <View className="flex-row items-baseline gap-1 mb-6">
-            <AppText className="text-white text-4xl font-bold">
+            <AppText className="text-accent-foreground text-4xl font-bold">
               {showBalance ? "1.250.000" : "••••••••"}
             </AppText>
-            <AppText className="text-white text-xl font-medium">đ</AppText>
+            <AppText className="text-accent-foreground text-xl font-medium">đ</AppText>
           </View>
 
           {/* Nested Stats Card */}
-          <View className="flex-row bg-white/10 rounded-2xl p-4 gap-4">
+          <View className="flex-row bg-accent-soft rounded-2xl p-4 gap-4">
             <View className="flex-1">
               <View className="flex-row items-center gap-1.5 mb-1">
                 <View className="w-5 h-5 bg-success rounded-full items-center justify-center">
                   <IconSymbol name="arrow.down.left" size={10} color="white" />
                 </View>
-                <AppText className="text-white/80 text-[10px] font-bold uppercase">BẠN ĐƯỢC TRẢ</AppText>
+                <AppText className="text-accent-foreground/80 text-[10px] font-bold uppercase">BẠN ĐƯỢC TRẢ</AppText>
               </View>
-              <AppText className="text-white text-base font-bold">+ 1.450.000 đ</AppText>
+              <AppText className="text-accent-foreground text-base font-bold">+ 1.450.000 đ</AppText>
             </View>
             <Divider orientation='vertical' className="bg-divider" />
             <View className="flex-1">
               <View className="flex-row items-center gap-1.5 mb-1">
-                <View className="w-5 h-5 bg-orange-400 rounded-full items-center justify-center">
+                <View className="w-5 h-5 bg-warning rounded-full items-center justify-center">
                   <IconSymbol name="arrow.up.right" size={10} color="white" />
                 </View>
-                <AppText className="text-white/80 text-[10px] font-bold uppercase">BẠN NỢ</AppText>
+                <AppText className="text-accent-foreground/80 text-[10px] font-bold uppercase">BẠN NỢ</AppText>
               </View>
-              <AppText className="text-white text-base font-bold">- 200.000 đ</AppText>
+              <AppText className="text-accent-foreground text-base font-bold">- 200.000 đ</AppText>
             </View>
           </View>
         </View>
       </View>
 
       {/* Quick Actions Row */}
-      <View className="flex-row justify-between px-10 mb-8">
+      <View className="flex-row justify-between px-20 mb-8">
         <ActionIcon name="creditcard" label="Chi tiêu" onPress={() => router.push('/add-expense')} />
         <ActionIcon name="plus" label="Tạo nhóm" onPress={() => router.push('/add-group')} />
         <ActionIcon name="qrcode" label="QR Code" />
-        <ActionIcon name="chart.bar" label="Thống kê" />
+        {/* <ActionIcon name="chart.bar" label="Thống kê" /> */}
       </View>
 
       {/* Horizontal Groups Section */}

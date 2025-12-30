@@ -30,9 +30,9 @@ export default function AddExpenseScreen() {
   const splitAmount = selectedMembers.length > 0 ? Math.floor(totalAmount / selectedMembers.length) : 0;
 
   return (
-    <ScreenScrollView className="bg-background text-foreground">
+    <ScreenScrollView>
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-3 border-b border-divider/5 bg-surface">
+      <View className="px-6 pt-4 pb-4 flex-row items-center justify-between">
         <PressableFeedback onPress={() => router.back()}>
           <IconSymbol name="xmark" size={24} color="gray" />
         </PressableFeedback>

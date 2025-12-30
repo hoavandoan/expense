@@ -8,7 +8,7 @@
 
 @layer theme {
   @variant light {
-    --accent: oklch(0.7329 0.1935 150.81);
+    /* --accent: oklch(0.7329 0.1935 150.81); */
     /* Brand Green #17C964 */
     --accent-gradient: linear-gradient(135deg, #17C964 0%, #17AD56 100%);
     /* --accent-foreground: oklch(100% 0 0);
@@ -19,7 +19,7 @@
   }
 
   @variant dark {
-    --accent: oklch(0.7329 0.1935 150.81);
+    /* --accent: oklch(0.7329 0.1935 150.81); */
     /* Brand Green #17C964 */
     --accent-gradient: linear-gradient(135deg, #17C964 0%, #17AD56 100%);
     /* --accent-foreground: oklch(0.2 0 0);

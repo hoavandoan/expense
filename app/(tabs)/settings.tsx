@@ -3,6 +3,7 @@ import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { SettingsItem } from '@/components/ui/settings-item';
 import { useAppTheme } from '@/contexts/app-theme-context';
+import { useRouter } from 'expo-router';
 import { Avatar, Button, Card, Divider, PressableFeedback, Switch, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
@@ -12,12 +13,16 @@ export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
   const { isDark, toggleTheme } = useAppTheme();
   const foreground = useThemeColor('foreground');
+  const router = useRouter()
 
   return (
-    <ScreenScrollView className="pt-10">
+    <ScreenScrollView className="android:my-4">
       {/* Header (Image 1) */}
       <View className="px-6 pt-4 pb-4 flex-row items-center justify-between">
-        <PressableFeedback className="w-10 h-10 rounded-full bg-surface items-center justify-center shadow-sm">
+        <PressableFeedback
+          onPress={router.back}
+          className="w-10 h-10 rounded-full bg-surface items-center justify-center shadow-sm"
+        >
           <IconSymbol name="chevron.left" size={20} color={foreground} />
         </PressableFeedback>
         <AppText className="text-lg font-bold">Cài đặt</AppText>

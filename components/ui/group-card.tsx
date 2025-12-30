@@ -41,13 +41,14 @@ export const GroupCard: FC<GroupCardProps> = ({
   if (variant === 'horizontal') {
     return (
       <PressableFeedback onPress={onPress} className='rounded-2xl w-1/2'>
-        <Card variant="default" className={cn('p-0 rounded-2xl border-none shadow-sm', className)}>
-          <Card.Header className="p-0 h-[140px] justify-end overflow-hidden">
+        <Card variant="default" className={cn('p-0 w-1/2 rounded-2xl border-none shadow-sm', className)}>
+          <Card.Header className="p-0 bg-accent-soft h-[140px] justify-end overflow-hidden">
             {bgImage && (
               <Image
                 source={{ uri: bgImage }}
                 style={StyleSheet.absoluteFill}
                 contentFit="cover"
+                className='w-full h-full'
               />
             )}
             <View className="absolute inset-0 bg-black/20" />
@@ -55,17 +56,17 @@ export const GroupCard: FC<GroupCardProps> = ({
               {title}
             </Card.Title>
           </Card.Header>
-          <Card.Body className="bg-surface flex-row items-center justify-between p-4">
-            <View className="flex-row items-center">
+          <Card.Body className="flex-row items-center justify-between p-4">
+            <View className="flex-row items-center flex-1">
               {members.slice(0, 3).map((member, index) => (
                 <Avatar
                   key={member.id}
                   size="sm"
                   alt={member.name}
-                  className={cn(index > 0 && 'rounded-full bg-surface-secondary -ml-3', 'border-2 border-surface')}
+                  className={cn('w-8 h-8', index > 0 && 'rounded-full bg-surface-secondary -ml-3', 'border-2 border-surface')}
                 >
                   <Avatar.Image source={{ uri: member.avatarUrl }} />
-                  <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
+                  <Avatar.Fallback className="w-8 h-8">{member.name.charAt(0)}</Avatar.Fallback>
                 </Avatar>
               ))}
               {memberCount > 3 && (

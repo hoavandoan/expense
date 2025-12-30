@@ -1,31 +1,74 @@
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Tabs, useRouter } from 'expo-router';
-import { PressableFeedback, useThemeColor } from 'heroui-native';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Icon, Label, NativeTabs, VectorIcon } from 'expo-router/unstable-native-tabs';
+import { useThemeColor } from 'heroui-native';
 import React from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 
 export default function TabLayout() {
   const accent = useThemeColor('accent');
-  const router = useRouter();
+  const accentSoft = useThemeColor('accent-soft');
+  const backgroundSecondary = useThemeColor('background-secondary');
+  const foreground = useThemeColor('surface-foreground');
+
+  const isIOS = Platform.OS === 'ios';
 
   return (
     <View className="flex-1 bg-background">
-      <Tabs
+      <NativeTabs
+        backgroundColor={backgroundSecondary}
+        indicatorColor={accentSoft}
+        iconColor={foreground}
+        shadowColor={accent}
+        labelVisibilityMode='unlabeled'
+        minimizeBehavior="onScrollDown"
+      >
+        <NativeTabs.Trigger name="index">
+          {
+            isIOS ? (
+              <Icon sf={{ default: 'house', selected: 'house.fill' }} drawable="home_drawable" selectedColor={accent} />
+            ) : (
+              <Icon src={<VectorIcon family={MaterialIcons} name="home" />} selectedColor={accent} />
+            )
+          }
+          <Label hidden />
+        </NativeTabs.Trigger>
+        {/* <NativeTabs.Trigger name="plus" disableScrollToTop disablePopToTop role='more'>
+          {
+            isIOS ? (
+              <Icon sf={{ default: 'plus', selected: 'plus' }} drawable="add_drawable" />
+            ) : (
+              <Icon src={<VectorIcon family={MaterialIcons} name="add" />} />
+            )
+          }
+          <Label hidden />
+        </NativeTabs.Trigger> */}
+        <NativeTabs.Trigger name="settings">
+          {
+            isIOS ? (
+              <Icon sf={{ default: 'gear', selected: 'gear' }} drawable="settings_drawable" selectedColor={accent} />
+            ) : (
+              <Icon src={<VectorIcon family={MaterialIcons} name="settings" />} selectedColor={accent} />
+            )
+          }
+          <Label hidden />
+        </NativeTabs.Trigger>
+      </NativeTabs>
+      {/* <Tabs
         screenOptions={{
           tabBarActiveTintColor: accent,
           headerShown: false,
           tabBarStyle: {
             height: 72,
-            backgroundColor: '#FFFFFF',
+            backgroundColor: surface,
             borderTopWidth: 0,
             paddingBottom: 10,
             paddingTop: 10,
             position: 'absolute',
-            bottom: 30,
+            bottom: insets.bottom,
             left: 20,
             right: 20,
             borderRadius: 36,
-            shadowColor: '#000',
+            shadowColor: foreground,
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.1,
             shadowRadius: 10,
@@ -64,7 +107,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <IconSymbol size={24} name="gearshape.fill" color={color} />,
           }}
         />
-      </Tabs>
+      </Tabs> */}
     </View>
   );
 }

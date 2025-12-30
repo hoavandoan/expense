@@ -2,7 +2,7 @@ import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useRouter } from 'expo-router';
-import { Avatar, Button, Card, Divider, PressableFeedback, TextField } from 'heroui-native';
+import { Avatar, Button, Card, Divider, PressableFeedback, TextField, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 
@@ -16,6 +16,8 @@ const MOCK_MEMBERS = [
 export default function AddGroupScreen() {
   const router = useRouter();
   const [groupName, setGroupName] = useState('');
+
+  const accent = useThemeColor('accent')
 
   return (
     <ScreenScrollView className="bg-background">
@@ -31,14 +33,15 @@ export default function AddGroupScreen() {
       <View className="px-6 pt-6 pb-10">
         {/* Image Upload (Image 3) */}
         <View className="items-center mb-10">
-          <PressableFeedback>
+          <PressableFeedback className='rounded-full'>
             <View className="w-32 h-32 rounded-full border-2 border-dashed border-accent/40 items-center justify-center bg-accent/5">
               <View className="bg-accent/10 p-4 rounded-full">
-                <IconSymbol name="camera.fill" size={32} color="#0070F3" />
+                <IconSymbol name="camera.fill" size={32} color={accent} />
               </View>
             </View>
-            <AppText className="text-accent text-sm font-bold mt-4">Tải lên ảnh nhóm</AppText>
           </PressableFeedback>
+          <AppText className="text-accent text-sm font-bold mt-4">Tải lên ảnh nhóm</AppText>
+
         </View>
 
         {/* Group Name Input */}
