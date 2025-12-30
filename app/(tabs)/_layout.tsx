@@ -1,20 +1,24 @@
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Icon, Label, NativeTabs, VectorIcon } from 'expo-router/unstable-native-tabs';
-import { useThemeColor } from 'heroui-native';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Tabs, useRouter } from 'expo-router';
+import { PressableFeedback, useThemeColor } from 'heroui-native';
 import React from 'react';
 import { Platform, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
   const accent = useThemeColor('accent');
   const accentSoft = useThemeColor('accent-soft');
   const backgroundSecondary = useThemeColor('background-secondary');
   const foreground = useThemeColor('surface-foreground');
+  const surface = useThemeColor('surface');
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   const isIOS = Platform.OS === 'ios';
 
   return (
-    <View className="flex-1 bg-background">
-      <NativeTabs
+    <View className="flex-1 bg-background relative">
+      {/* <NativeTabs
         backgroundColor={backgroundSecondary}
         indicatorColor={accentSoft}
         iconColor={foreground}
@@ -32,7 +36,7 @@ export default function TabLayout() {
           }
           <Label hidden />
         </NativeTabs.Trigger>
-        {/* <NativeTabs.Trigger name="plus" disableScrollToTop disablePopToTop role='more'>
+        <NativeTabs.Trigger name="plus" disableScrollToTop disablePopToTop role='more'>
           {
             isIOS ? (
               <Icon sf={{ default: 'plus', selected: 'plus' }} drawable="add_drawable" />
@@ -41,7 +45,7 @@ export default function TabLayout() {
             )
           }
           <Label hidden />
-        </NativeTabs.Trigger> */}
+        </NativeTabs.Trigger>
         <NativeTabs.Trigger name="settings">
           {
             isIOS ? (
@@ -52,8 +56,8 @@ export default function TabLayout() {
           }
           <Label hidden />
         </NativeTabs.Trigger>
-      </NativeTabs>
-      {/* <Tabs
+      </NativeTabs> */}
+      <Tabs
         screenOptions={{
           tabBarActiveTintColor: accent,
           headerShown: false,
@@ -67,6 +71,7 @@ export default function TabLayout() {
             bottom: insets.bottom,
             left: 20,
             right: 20,
+            marginHorizontal: 20,
             borderRadius: 36,
             shadowColor: foreground,
             shadowOffset: { width: 0, height: 4 },
@@ -91,7 +96,7 @@ export default function TabLayout() {
               <View className="flex-1 items-center justify-center">
                 <PressableFeedback
                   onPress={() => router.push('/add-expense')}
-                  className="w-16 h-16 rounded-full bg-accent items-center justify-center -mt-10 shadow-lg shadow-accent/40 border-4 border-background"
+                  className="w-16 h-16 rounded-full bg-accent items-center justify-center -mt-10 shadow-lg shadow-accent/60"
                 >
                   <IconSymbol name="plus" size={32} color="white" />
                 </PressableFeedback>
@@ -107,7 +112,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <IconSymbol size={24} name="gearshape.fill" color={color} />,
           }}
         />
-      </Tabs> */}
+      </Tabs>
     </View>
   );
 }

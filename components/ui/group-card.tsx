@@ -1,5 +1,6 @@
 import { AppText } from '@/components/app-text';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Avatar, Card, cn, PressableFeedback } from 'heroui-native';
 import React, { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -40,32 +41,32 @@ export const GroupCard: FC<GroupCardProps> = ({
 
   if (variant === 'horizontal') {
     return (
-      <PressableFeedback onPress={onPress} className='rounded-2xl w-1/2'>
+      <PressableFeedback onPress={onPress} className='rounded-2xl'>
         <Card variant="default" className={cn('p-0 w-1/2 rounded-2xl border-none shadow-sm', className)}>
-          <Card.Header className="p-0 bg-accent-soft h-[140px] justify-end overflow-hidden">
-            {bgImage && (
+        {bgImage && (
               <Image
                 source={{ uri: bgImage }}
-                style={StyleSheet.absoluteFill}
                 contentFit="cover"
-                className='w-full h-full'
+                className='absolute inset-0'
+                resizeMode="cover"
               />
             )}
-            <View className="absolute inset-0 bg-black/20" />
-            <Card.Title className="text-white text-lg font-bold p-4 z-10">
-              {title}
-            </Card.Title>
-          </Card.Header>
-          <Card.Body className="flex-row items-center justify-between p-4">
-            <View className="flex-row items-center flex-1">
+            <LinearGradient
+              colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.5)']}
+              style={StyleSheet.absoluteFill}
+            />
+          <Card.Body className="flex-row items-center justify-between p-4 gap-2">
+            <View className="flex-row items-center">
               {members.slice(0, 3).map((member, index) => (
                 <Avatar
                   key={member.id}
                   size="sm"
                   alt={member.name}
-                  className={cn('w-8 h-8', index > 0 && 'rounded-full bg-surface-secondary -ml-3', 'border-2 border-surface')}
+                  className={cn('w-8 h-8', index > 0 && '-ml-4', 'rounded-full')}
                 >
-                  <Avatar.Image source={{ uri: member.avatarUrl }} />
+                  <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
+                    <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} contentFit='cover' />
+                  </Avatar.Image>
                   <Avatar.Fallback className="w-8 h-8">{member.name.charAt(0)}</Avatar.Fallback>
                 </Avatar>
               ))}
@@ -75,9 +76,9 @@ export const GroupCard: FC<GroupCardProps> = ({
                 </View>
               )}
             </View>
-            <View className="items-end">
-              <AppText className="text-muted text-[10px] uppercase font-bold">BẠN ĐƯỢC TRẢ</AppText>
-              <AppText className={cn('font-bold', balanceColor)}>{balanceText}</AppText>
+            <View className="items-end flex-shrink-0">
+              <AppText className="text-muted text-[8px] uppercase font-bold" numberOfLines={1}>BẠN ĐƯỢC TRẢ</AppText>
+              <AppText className={cn('font-bold text-sm', balanceColor)} numberOfLines={1}>{balanceText}</AppText>
             </View>
           </Card.Body>
         </Card>
@@ -104,10 +105,12 @@ export const GroupCard: FC<GroupCardProps> = ({
                 key={member.id}
                 size="sm"
                 alt={member.name}
-                className={cn(index > 0 && 'rounded-full bg-surface-secondary -ml-3', 'border-2 border-surface')}
+                className={cn(index !== 0 && '-ml-3', 'border-background border-[2px]')}
               >
                 {member.avatarUrl ? (
-                  <Avatar.Image source={{ uri: member.avatarUrl }} />
+                  <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
+                    <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} contentFit='cover' />
+                  </Avatar.Image>
                 ) : (
                   <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
                 )}

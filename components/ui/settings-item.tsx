@@ -22,7 +22,7 @@ export function SettingsItem({
   showChevron = true
 }: SettingsItemProps) {
   return (
-    <PressableFeedback onPress={onPress} className="flex-row items-center py-3 px-4">
+    <PressableFeedback onPress={onPress} className="flex-row items-center py-3 px-4" animation="disabled">
       <View
         className="w-10 h-10 rounded-2xl items-center justify-center mr-4"
         style={{ backgroundColor: iconBgColor + '20' }} // 20% opacity

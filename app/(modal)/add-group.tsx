@@ -1,6 +1,7 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Avatar, Button, Card, Divider, PressableFeedback, TextField, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
@@ -71,7 +72,9 @@ export default function AddGroupScreen() {
               <View key={member.id}>
                 <View className="flex-row items-center p-4">
                   <Avatar size="sm" alt={member.name} className="mr-3">
-                    <Avatar.Image source={{ uri: member.avatarUrl }} />
+                    <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
+                      <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} />
+                    </Avatar.Image>
                     <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
                   </Avatar>
                   <View className="flex-1">

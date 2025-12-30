@@ -53,6 +53,15 @@ const MAPPING = {
   'triangle.fill': 'arrow-drop-down',
   'slider.horizontal.3': 'tune',
   'sunny': 'sunny',
+  'fork.knife': 'restaurant',
+  'car.fill': 'directions-car',
+  'cart.fill': 'shopping-cart',
+  'gamecontroller.fill': 'sports-esports',
+  'bolt.fill': 'electric-bolt',
+  'ellipsis.circle.fill': 'more-horiz',
+  'checkmark': 'check',
+  'camera.fill': 'photo-camera',
+  'square.and.arrow.up': 'share',
 } as const;
 
 /**

@@ -3,10 +3,12 @@ import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { ActionIcon } from '@/components/ui/action-icon';
 import { GroupCard } from '@/components/ui/group-card';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Avatar, Card, Divider, PressableFeedback, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 // Mock data for groups
 const MOCK_GROUPS = [
@@ -37,6 +39,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const [showBalance, setShowBalance] = useState(true);
   const accent = useThemeColor('accent');
+  const accentSoft = useThemeColor('accent-soft');
   const foreground = useThemeColor('foreground');
 
   return (
@@ -46,7 +49,9 @@ export default function HomeScreen() {
         <View className="flex-row items-center gap-3">
           <PressableFeedback onPress={() => router.push('/settings')} className='rounded-full'>
             <Avatar size="md" alt="User profile" className='bg-surface size-12'>
-              <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=minhanh' }} />
+              <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=minhanh' }} asChild>
+                <Image style={{ width: '100%', height: '100%' }} contentFit='cover'/>
+              </Avatar.Image>
               <Avatar.Fallback>MA</Avatar.Fallback>
             </Avatar>
           </PressableFeedback>
@@ -70,8 +75,11 @@ export default function HomeScreen() {
       <View className="px-5 mb-6">
         <View
           className="p-6 rounded-[32px] shadow-xl overflow-hidden bg-accent"
-        // style={{ backgroundColor: accent }}
         >
+           <LinearGradient
+                        colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.7)']}
+                        style={StyleSheet.absoluteFill}
+                      />
           {/* Accent Gradient Layer - Simulated as we can't use LinearGradient directly for bg easily without nested views or global.css */}
           <View className="flex-row items-center justify-between mb-2">
             <AppText className="text-accent-foreground text-sm font-medium">Tổng số dư khả dụng</AppText>
@@ -155,7 +163,9 @@ export default function HomeScreen() {
           <Card variant="default" className="p-4 rounded-2xl border border-divider/5">
             <View className="flex-row items-center gap-3">
               <Avatar size="md" alt="Nam" className='rounded-full'>
-                <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=nam' }} />
+                <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=nam' }} asChild>
+                  <Image source={{ uri: 'https://i.pravatar.cc/150?u=nam' }} style={{ width: '100%', height: '100%' }} />
+                </Avatar.Image>
                 <Avatar.Fallback>N</Avatar.Fallback>
               </Avatar>
               <View className="flex-1">
