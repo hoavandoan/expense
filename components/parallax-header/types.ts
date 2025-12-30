@@ -116,6 +116,7 @@ export interface HeaderNavBarProps {
     headerHeight?: number;
     intensity?: number;
     tint?: BlurTint;
+    useBlur?: boolean;
     style?: StyleProp<ViewStyle>;
     className?: string;
 }

@@ -10,6 +10,7 @@ export const HeaderNavBar: React.FC<HeaderNavBarProps> = ({
   headerHeight = 100,
   intensity = 30,
   tint = "dark",
+  useBlur,
   style,
   className,
 }) => {
@@ -20,14 +21,23 @@ export const HeaderNavBar: React.FC<HeaderNavBarProps> = ({
       className={cn("w-full overflow-hidden", className)}
       style={[{ height: headerHeight }, style]}
     >
-      <BlurView
-        intensity={intensity}
-        tint={tint}
-        className="flex-1 px-5 flex-row items-center justify-between"
-        style={{ paddingTop: insets.top }}
-      >
-        {children}
-      </BlurView>
+      {useBlur ? (
+        <BlurView
+          intensity={intensity}
+          tint={tint}
+          className="flex-1 px-5 flex-row items-center justify-between"
+          style={{ paddingTop: insets.top }}
+        >
+          {children}
+        </BlurView>
+      ) : (
+        <View
+          className="flex-1 px-5 flex-row items-center justify-between"
+          style={{ paddingTop: insets.top }}
+        >
+          {children}
+        </View>
+      )}
     </View>
   );
 };

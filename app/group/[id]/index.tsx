@@ -11,7 +11,7 @@ import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Avatar, Card, cn, PressableFeedback, useThemeColor } from 'heroui-native';
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 
 const MOCK_MEMBERS = [
   { id: '1', name: 'Minh Anh', balance: -50000, avatarUrl: 'https://i.pravatar.cc/150?u=1' },
@@ -34,32 +34,32 @@ export default function GroupDetailScreen() {
         renderHeaderNavBarComponent={() => (
           <HeaderNavBar className="bg-transparent">
             {/* This is the overflow header (visible when at top) */}
-            <TouchableOpacity
+            <PressableFeedback
               className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10"
               onPress={() => router.back()}
             >
               <IconSymbol name="chevron.left" size={24} color="white" />
-            </TouchableOpacity>
+            </PressableFeedback>
             <View className="flex-row gap-2">
-              <TouchableOpacity className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10">
+              <PressableFeedback className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10">
                 <IconSymbol name="square.and.arrow.up" size={18} color="white" />
-              </TouchableOpacity>
-              <TouchableOpacity className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10">
+              </PressableFeedback>
+              <PressableFeedback className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10">
                 <IconSymbol name="settings" size={20} color="white" />
-              </TouchableOpacity>
+              </PressableFeedback>
             </View>
           </HeaderNavBar>
         )}
         renderTopNavBarComponent={() => (
-          <HeaderNavBar>
+          <HeaderNavBar useBlur={true}>
             {/* This is the sticky navbar (visible when scrolled) */}
-            <TouchableOpacity onPress={() => router.back()}>
+            <PressableFeedback onPress={() => router.back()}>
               <IconSymbol name="chevron.left" size={24} color="white" />
-            </TouchableOpacity>
+            </PressableFeedback>
             <AppText className="text-white text-lg font-bold">Trip Đà Lạt</AppText>
-            <TouchableOpacity>
+            <PressableFeedback>
               <IconSymbol name="ellipsis" size={20} color="white" />
-            </TouchableOpacity>
+            </PressableFeedback>
           </HeaderNavBar>
         )}
         renderOveralComponent={() => (
