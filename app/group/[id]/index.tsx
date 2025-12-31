@@ -7,6 +7,7 @@ import {
   HeaderNavBar,
 } from '@/components/parallax-header';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Timeline, type TimelineItem } from '@/components/ui/timeline';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Avatar, Card, cn, PressableFeedback, useThemeColor } from 'heroui-native';
@@ -18,6 +19,12 @@ const MOCK_MEMBERS = [
   { id: '2', name: 'Bình', balance: 150000, avatarUrl: 'https://i.pravatar.cc/150?u=2' },
   { id: '3', name: 'Chi', balance: -200000, avatarUrl: 'https://i.pravatar.cc/150?u=3' },
   { id: '4', name: 'Dũng', balance: 100000, avatarUrl: 'https://i.pravatar.cc/150?u=4' },
+];
+
+const MOCK_ACTIVITIES: TimelineItem[] = [
+  { id: '1', title: 'Bạn đã thêm Ăn tối', description: 'Ăn tối tại Phở Hiếu - Đà Lạt', timestamp: '2 giờ trước', icon: 'fork.knife', status: 'complete', meta: '150.000 đ' },
+  { id: '2', title: 'Bình đã trả Minh Anh', description: 'Thanh toán nợ cũ', timestamp: '5 giờ trước', icon: 'creditcard.fill', status: 'complete', meta: '50.000 đ' },
+  { id: '3', title: 'Chi đã thêm Vé xem phim', description: 'Xem phim tại CGV Vincom', timestamp: 'Hôm qua', icon: 'cart.fill', status: 'current', meta: '320.000 đ' },
 ];
 
 export default function GroupDetailScreen() {
@@ -135,11 +142,13 @@ export default function GroupDetailScreen() {
             </Card>
           </View>
 
+          {/* Recent Activity moved below */}
+
           {/* Members List */}
-          <View className="pb-20">
+          <View className="mb-10">
             <View className="flex-row items-center justify-between mb-6">
               <AppText className="text-xl font-bold text-white">Thành viên nợ/trả</AppText>
-              <PressableFeedback>
+              <PressableFeedback onPress={() => router.push('/group/[id]/history')}>
                 <IconSymbol name="line.3.horizontal.decrease.circle" size={20} color={accent} />
               </PressableFeedback>
             </View>
@@ -170,6 +179,22 @@ export default function GroupDetailScreen() {
                 </Card>
               ))}
             </View>
+          </View>
+
+          {/* Recent Activity */}
+          <View className="pb-20">
+            <View className="flex-row items-center justify-between mb-6">
+              <AppText className="text-xl font-bold text-white">Hoạt động gần đây</AppText>
+              <PressableFeedback>
+                <AppText className="text-accent font-bold text-sm">Xem tất cả</AppText>
+              </PressableFeedback>
+            </View>
+            <Timeline
+              items={MOCK_ACTIVITIES}
+              activeColor={accent}
+              inactiveColor="#27272a"
+              animationType="rotate"
+            />
           </View>
         </View>
       </AnimatedScrollView>

@@ -7,6 +7,7 @@ import {
 import { ActionIcon } from '@/components/ui/action-icon';
 import { GroupCard } from '@/components/ui/group-card';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useAuth } from '@/contexts/auth-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -44,6 +45,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [showBalance, setShowBalance] = useState(true);
+  const { isLoggedIn, user, setLoginSheetOpen } = useAuth();
   const accent = useThemeColor('accent');
   const foreground = useThemeColor('foreground');
 
@@ -53,13 +55,25 @@ export default function HomeScreen() {
     <HeaderNavBar useBlur={true} className="border-b border-divider/5">
       <View className="flex-row items-center justify-between px-6 h-full">
         <View className="flex-row items-center gap-3">
-          <Avatar size="sm" alt="User profile" className="bg-surface size-8">
-            <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=minhanh' }} asChild>
-              <Image style={{ width: '100%', height: '100%' }} contentFit="cover" />
-            </Avatar.Image>
-            <Avatar.Fallback>MA</Avatar.Fallback>
-          </Avatar>
-          <AppText className="font-bold text-foreground">Minh Anh</AppText>
+          <PressableFeedback
+            onPress={() => !isLoggedIn && setLoginSheetOpen(true)}
+            className="rounded-full"
+          >
+            <Avatar size="sm" alt="User profile" className="bg-surface size-8">
+              {isLoggedIn && user?.avatarUrl ? (
+                <Avatar.Image source={{ uri: user.avatarUrl }} asChild>
+                  <Image style={{ width: '100%', height: '100%' }} contentFit="cover" />
+                </Avatar.Image>
+              ) : (
+                <Avatar.Fallback className="bg-accent/10">
+                  <IconSymbol name="person" size={14} color={accent} />
+                </Avatar.Fallback>
+              )}
+            </Avatar>
+          </PressableFeedback>
+          <AppText className="font-bold text-foreground">
+            {isLoggedIn ? user?.name : 'Chào bạn!'}
+          </AppText>
         </View>
         <View className="flex-row gap-2">
           <PressableFeedback className="w-8 h-8 rounded-full items-center justify-center">
@@ -80,17 +94,29 @@ export default function HomeScreen() {
         className="px-6 pb-4 flex-row items-center justify-between"
       >
         <View className="flex-row items-center gap-3">
-          <PressableFeedback onPress={() => router.push('/settings')} className="rounded-full">
+          <PressableFeedback
+            onPress={() => isLoggedIn ? router.push('/settings') : setLoginSheetOpen(true)}
+            className="rounded-full bg-accent"
+          >
             <Avatar size="md" alt="User profile" className="bg-surface size-12 shadow-sm">
-              <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=minhanh' }} asChild>
-                <Image style={{ width: '100%', height: '100%' }} contentFit="cover" />
-              </Avatar.Image>
-              <Avatar.Fallback>MA</Avatar.Fallback>
+              {isLoggedIn && user?.avatarUrl ? (
+                <Avatar.Image source={{ uri: user.avatarUrl }} asChild>
+                  <Image style={{ width: '100%', height: '100%' }} contentFit="cover" />
+                </Avatar.Image>
+              ) : (
+                <Avatar.Fallback className="bg-accent/10">
+                  <IconSymbol name="person" size={20} color={accent} />
+                </Avatar.Fallback>
+              )}
             </Avatar>
           </PressableFeedback>
           <View>
-            <AppText className="text-muted text-[13px]">Xin chào,</AppText>
-            <AppText className="text-lg font-bold text-foreground">Minh Anh</AppText>
+            <AppText className="text-muted text-[13px]">
+              {isLoggedIn ? 'Xin chào,' : 'Chào mừng bạn,'}
+            </AppText>
+            <AppText className="text-lg font-bold text-foreground">
+              {isLoggedIn ? user?.name : 'Đăng nhập'}
+            </AppText>
           </View>
         </View>
         <View className="flex-row gap-2">

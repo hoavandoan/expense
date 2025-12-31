@@ -41,21 +41,21 @@ export const GroupCard: FC<GroupCardProps> = ({
 
   if (variant === 'horizontal') {
     return (
-      <PressableFeedback onPress={onPress} className='rounded-2xl'>
-        <Card variant="default" className={cn('p-0 w-1/2 rounded-2xl border-none shadow-sm', className)}>
-        {bgImage && (
-              <Image
-                source={{ uri: bgImage }}
-                contentFit="cover"
-                className='absolute inset-0'
-                resizeMode="cover"
-              />
-            )}
-            <LinearGradient
-              colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.5)']}
-              style={StyleSheet.absoluteFill}
+      <PressableFeedback onPress={onPress} className='w-1/2 bg-accent-soft rounded-2xl'>
+        <Card variant="default" className={cn('relative p-0 w-full rounded-2xl border-none shadow-sm', className)}>
+          {bgImage && (
+            <Image
+              source={{ uri: bgImage }}
+              contentFit="cover"
+              className='absolute h-[140px] w-full'
             />
-          <Card.Body className="flex-row items-center justify-between p-4 gap-2">
+          )}
+          <LinearGradient
+            colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.5)']}
+            style={StyleSheet.absoluteFill}
+            className='w-full'
+          />
+          <Card.Body className="flex-row items-center justify-between p-4 gap-2 w-full">
             <View className="flex-row items-center">
               {members.slice(0, 3).map((member, index) => (
                 <Avatar

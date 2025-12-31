@@ -3,7 +3,7 @@ import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { Avatar, Button, Card, Divider, PressableFeedback, TextField, useThemeColor } from 'heroui-native';
+import { Avatar, Button, Card, Divider, PressableFeedback, Select, TextField, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 
@@ -17,8 +17,18 @@ const MOCK_MEMBERS = [
 export default function AddGroupScreen() {
   const router = useRouter();
   const [groupName, setGroupName] = useState('');
+  const [description, setDescription] = useState('');
+  const [groupType, setGroupType] = useState('trip');
 
-  const accent = useThemeColor('accent')
+  const accent = useThemeColor('accent');
+  const muted = useThemeColor('muted');
+
+  const GROUP_TYPES = [
+    { value: 'trip', label: 'Chuyến đi', icon: 'airplane' },
+    { value: 'home', label: 'Nhà cửa', icon: 'house.fill' },
+    { value: 'couple', label: 'Cặp đôi', icon: 'heart.fill' },
+    { value: 'other', label: 'Khác', icon: 'ellipsis.circle.fill' },
+  ];
 
   return (
     <ScreenScrollView className="bg-background">
@@ -45,17 +55,69 @@ export default function AddGroupScreen() {
 
         </View>
 
-        {/* Group Name Input */}
-        <View className="mb-10">
-          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">THÔNG TIN NHÓM</AppText>
-          <TextField>
-            <TextField.Input
-              placeholder="Nhập tên nhóm (e.g. Ăn trưa Cty)"
-              value={groupName}
-              onChangeText={setGroupName}
-              className="bg-surface border-divider/10 h-14 rounded-2xl px-4"
-            />
-          </TextField>
+        {/* Group Info Input */}
+        <View className="mb-10 gap-6">
+          <View>
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">THÔNG TIN NHÓM</AppText>
+            <TextField>
+              <TextField.Input
+                placeholder="Nhập tên nhóm (e.g. Ăn trưa Cty)"
+                value={groupName}
+                onChangeText={setGroupName}
+                className="bg-surface border-divider/10 h-14 rounded-2xl px-4"
+              />
+            </TextField>
+          </View>
+
+          <View>
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">MÔ TẢ</AppText>
+            <TextField>
+              <TextField.Input
+                placeholder="Mô tả ngắn gọn về nhóm..."
+                value={description}
+                onChangeText={setDescription}
+                className="bg-surface border-divider/10 h-14 rounded-2xl px-4"
+              />
+            </TextField>
+          </View>
+
+          <View>
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">LOẠI NHÓM</AppText>
+            <Select
+              value={GROUP_TYPES.find(t => t.value === groupType)!}
+              onValueChange={(opt) => opt && setGroupType(opt.value)}
+            >
+              <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                <View className="flex-row items-center gap-3">
+                  <IconSymbol
+                    name={GROUP_TYPES.find(t => t.value === groupType)?.icon as any}
+                    size={20}
+                    color={accent}
+                  />
+                  <Select.Value className="text-base font-medium" placeholder="Chọn loại nhóm" />
+                </View>
+                <IconSymbol name="chevron.right" size={16} color={muted} className="rotate-90" />
+              </Select.Trigger>
+              <Select.Portal>
+                <Select.Overlay className='bg-black/10' />
+                <Select.Content
+                  placement="bottom"
+                  className="rounded-2xl bg-surface border border-divider/10"
+                  width={300}
+                >
+                  {GROUP_TYPES.map(type => (
+                    <Select.Item key={type.value} value={type.value} label={type.label} className="p-4">
+                      <View className="flex-row items-center gap-3">
+                        <IconSymbol name={type.icon as any} size={18} color={accent} />
+                        <Select.ItemLabel className="text-base" />
+                      </View>
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Portal>
+            </Select>
+          </View>
         </View>
 
         {/* Member List (Image 3) */}
@@ -91,6 +153,21 @@ export default function AddGroupScreen() {
               </View>
             ))}
           </Card>
+        </View>
+
+        {/* Invite Section */}
+        <View className="mb-12">
+          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">MỜI THÀNH VIÊN</AppText>
+          <View className="flex-row gap-4">
+            <PressableFeedback className="flex-1 bg-surface border border-divider/10 h-16 rounded-2xl items-center justify-center flex-row gap-2">
+              <IconSymbol name="link" size={20} color={accent} />
+              <AppText className="font-bold">Sao chép Link</AppText>
+            </PressableFeedback>
+            <PressableFeedback className="flex-1 bg-surface border border-divider/10 h-16 rounded-2xl items-center justify-center flex-row gap-2">
+              <IconSymbol name="qrcode" size={20} color={accent} />
+              <AppText className="font-bold">Chia sẻ QR</AppText>
+            </PressableFeedback>
+          </View>
         </View>
 
         {/* Submit Button (Image 3) */}

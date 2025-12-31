@@ -28,6 +28,7 @@ export default function AddExpenseScreen() {
   const accent = useThemeColor('accent');
   const [amount, setAmount] = useState('150000');
   const [description, setDescription] = useState('');
+  const [notes, setNotes] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('food');
   const [selectedMembers, setSelectedMembers] = useState<string[]>(['1', '2', '3']);
 
@@ -61,18 +62,18 @@ export default function AddExpenseScreen() {
           <View className="flex-row items-center justify-center mb-2">
             <View className='w-1/2'>
               <TextField>
-              <TextField.Input
-                placeholder="0"
-                value={amount}
-                onChangeText={setAmount}
-                keyboardType="numeric"
-              className="bg-surface border-divider/10 h-14 rounded-2xl px-4 w-full"
-              >
-<TextField.InputEndContent>
-            <IconSymbol name="dongsign" size={24} color={muted} className="mr-3" />
-            </TextField.InputEndContent>
+                <TextField.Input
+                  placeholder="0"
+                  value={amount}
+                  onChangeText={setAmount}
+                  keyboardType="numeric"
+                  className="bg-surface border-divider/10 h-14 rounded-2xl px-4 w-full"
+                >
+                  <TextField.InputEndContent>
+                    <IconSymbol name="dongsign" size={24} color={muted} className="mr-3" />
+                  </TextField.InputEndContent>
                 </TextField.Input>
-            </TextField>
+              </TextField>
             </View>
           </View>
           <AppText className="text-muted text-lg font-medium">Nhập số tiền</AppText>
@@ -81,14 +82,14 @@ export default function AddExpenseScreen() {
         {/* Description & Category Selection */}
         <Card variant="default" className="p-4 rounded-3xl border border-divider/5 mb-6">
           <View className="flex-row items-center mb-4">
-            <View 
+            <View
               className="w-12 h-12 rounded-2xl items-center justify-center mr-3"
               style={{ backgroundColor: CATEGORIES.find(c => c.value === selectedCategory)?.bg }}
             >
-              <IconSymbol 
-                name={CATEGORIES.find(c => c.value === selectedCategory)?.icon as any || 'doc.text.fill'} 
-                size={24} 
-                color={CATEGORIES.find(c => c.value === selectedCategory)?.color || accent} 
+              <IconSymbol
+                name={CATEGORIES.find(c => c.value === selectedCategory)?.icon as any || 'doc.text.fill'}
+                size={24}
+                color={CATEGORIES.find(c => c.value === selectedCategory)?.color || accent}
               />
             </View>
             <TextField className="bg-transparent flex-1 border-0 h-10 px-0">
@@ -100,9 +101,9 @@ export default function AddExpenseScreen() {
               />
             </TextField>
           </View>
-          
+
           <Divider className="mb-4 opacity-50" />
-          
+
           <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest mb-3 px-1">PHÂN LOẠI</AppText>
           <Select
             value={CATEGORIES.find(c => c.value === selectedCategory)!}
@@ -110,13 +111,13 @@ export default function AddExpenseScreen() {
           >
             <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
-                <IconSymbol 
-                  name={CATEGORIES.find(c => c.value === selectedCategory)?.icon as any || 'doc.text.fill'} 
-                  size={20} 
-                  color={CATEGORIES.find(c => c.value === selectedCategory)?.color || accent} 
+                <IconSymbol
+                  name={CATEGORIES.find(c => c.value === selectedCategory)?.icon as any || 'doc.text.fill'}
+                  size={20}
+                  color={CATEGORIES.find(c => c.value === selectedCategory)?.color || accent}
                   className="mr-3"
                 />
-                <Select.Value 
+                <Select.Value
                   className="text-base font-medium text-foreground"
                   placeholder="Chọn phân loại"
                 />
@@ -125,23 +126,23 @@ export default function AddExpenseScreen() {
             </Select.Trigger>
             <Select.Portal>
               <Select.Overlay className='bg-black/10' />
-              <Select.Content 
+              <Select.Content
                 placement="bottom"
                 className="rounded-2xl bg-surface border border-divider/10"
                 width={300}
                 presentation="popover"
                 align="start"
                 alignOffset={-20}
-               >
+              >
                 {CATEGORIES.map(category => (
-                  <Select.Item 
-                    key={category.value} 
-                    value={category.value} 
+                  <Select.Item
+                    key={category.value}
+                    value={category.value}
                     label={category.label}
                     className='p-4'
                   >
                     <View className="flex-row items-center gap-3">
-                      <View 
+                      <View
                         className="w-8 h-8 rounded-lg items-center justify-center mr-3"
                         style={{ backgroundColor: category.bg }}
                       >
@@ -186,6 +187,32 @@ export default function AddExpenseScreen() {
               </View>
               <IconSymbol name="chevron.right" size={16} color={muted} />
             </PressableFeedback>
+            <Divider />
+            <View className="p-4 gap-4">
+              <View>
+                <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">GHI CHÚ</AppText>
+                <TextField className="bg-surface/50 border-divider/10 rounded-xl min-h-[80px]">
+                  <TextField.Input
+                    placeholder="Nhập ghi chú thêm..."
+                    value={notes}
+                    onChangeText={setNotes}
+                    multiline
+                    numberOfLines={3}
+                    className="p-3 text-base"
+                  />
+                </TextField>
+              </View>
+
+              <View>
+                <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">ẢNH HÓA ĐƠN</AppText>
+                <PressableFeedback className="border-2 border-dashed border-divider/20 rounded-2xl h-32 items-center justify-center bg-surface/30">
+                  <View className="bg-accent/10 p-3 rounded-full mb-2">
+                    <IconSymbol name="camera.fill" size={24} color={accent} />
+                  </View>
+                  <AppText className="text-muted text-sm">Chụp hoặc tải ảnh lên</AppText>
+                </PressableFeedback>
+              </View>
+            </View>
           </Card>
         </View>
 

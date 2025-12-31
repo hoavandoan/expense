@@ -62,6 +62,9 @@ const MAPPING = {
   'checkmark': 'check',
   'camera.fill': 'photo-camera',
   'square.and.arrow.up': 'share',
+  'link': 'link',
+  'airplane': 'flight',
+  'heart.fill': 'favorite',
 } as const;
 
 /**

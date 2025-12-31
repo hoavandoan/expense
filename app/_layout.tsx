@@ -1,4 +1,6 @@
+import { LoginBottomSheet } from '@/components/auth/LoginBottomSheet';
 import { AppThemeProvider } from '@/contexts/app-theme-context';
+import { AuthProvider, useAuth } from '@/contexts/auth-context';
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -54,6 +56,7 @@ const config: HeroUINativeConfig = {
 };
 
 function AppContent() {
+  const { isLoginSheetOpen, setLoginSheetOpen } = useAuth();
   const contentWrapper = useCallback(
     (children: React.ReactNode) => (
       <KeyboardAvoidingView
@@ -88,6 +91,7 @@ function AppContent() {
           <Stack.Screen name="group/[id]/index" />
           <Stack.Screen name="(modal)" options={{ presentation: 'modal' }} />
         </Stack>
+        <LoginBottomSheet isOpen={isLoginSheetOpen} onOpenChange={setLoginSheetOpen} />
       </HeroUINativeProvider>
     </>
   );
@@ -109,7 +113,9 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <KeyboardProvider>
         <AppThemeProvider>
-          <AppContent />
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
         </AppThemeProvider>
       </KeyboardProvider>
     </GestureHandlerRootView>
