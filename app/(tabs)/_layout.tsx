@@ -89,6 +89,14 @@ export default function TabLayout() {
         />
 
         <Tabs.Screen
+          name="activity"
+          options={{
+            title: 'Hoạt động',
+            tabBarIcon: ({ color }) => <IconSymbol size={24} name="clock.fill" color={color} />,
+          }}
+        />
+
+        <Tabs.Screen
           name="plus"
           options={{
             title: '',

@@ -76,10 +76,16 @@ export default function HomeScreen() {
           </AppText>
         </View>
         <View className="flex-row gap-2">
-          <PressableFeedback className="w-8 h-8 rounded-full items-center justify-center">
+          <PressableFeedback
+            onPress={() => router.push('/search' as any)}
+            className="w-8 h-8 rounded-full items-center justify-center"
+          >
             <IconSymbol name="magnifyingglass" size={18} color={foreground} />
           </PressableFeedback>
-          <PressableFeedback className="w-8 h-8 rounded-full items-center justify-center">
+          <PressableFeedback
+            onPress={() => router.push('/notifications' as any)}
+            className="w-8 h-8 rounded-full items-center justify-center"
+          >
             <IconSymbol name="bell" size={18} color={foreground} />
           </PressableFeedback>
         </View>
@@ -204,7 +210,7 @@ export default function HomeScreen() {
               onPress={() => router.push('/add-expense')}
             />
             <ActionIcon name="plus" label="Tạo nhóm" onPress={() => router.push('/add-group')} />
-            <ActionIcon name="qrcode" label="QR Code" />
+            <ActionIcon name="qrcode" label="Tham gia" onPress={() => router.push('/join-group')} />
           </View>
 
           {/* Horizontal Groups Section */}
@@ -242,12 +248,7 @@ export default function HomeScreen() {
               <Card variant="default" className="p-4 rounded-2xl border border-divider/5">
                 <View className="flex-row items-center gap-3">
                   <Avatar size="md" alt="Nam" className="rounded-full">
-                    <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=nam' }} asChild>
-                      <Image
-                        source={{ uri: 'https://i.pravatar.cc/150?u=nam' }}
-                        style={{ width: '100%', height: '100%' }}
-                      />
-                    </Avatar.Image>
+                    <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=nam' }} />
                     <Avatar.Fallback>N</Avatar.Fallback>
                   </Avatar>
                   <View className="flex-1">
@@ -288,4 +289,3 @@ export default function HomeScreen() {
     </View>
   );
 }
-

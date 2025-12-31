@@ -48,7 +48,7 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
         <BottomSheetBlurOverlay />
         <BottomSheet.Content
           detached={true}
-          className="mx-4 bg-background"
+          className="mx-4"
           backgroundClassName="rounded-3xl"
           handleIndicatorClassName="bg-divider/20 w-12"
           bottomInset={insets.bottom}
@@ -71,11 +71,11 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
                 <Ionicons
                   name="logo-apple"
                   size={22}
-                  color={foreground}
+                  color={'#FFFFFF'}
                 />
                 <Button.Label
                   className="font-bold text-[17px]"
-                  style={{ color: foreground }}
+                  style={{ color: '#FFFFFF' }}
                 >
                   Tiếp tục với Apple
                 </Button.Label>
@@ -84,7 +84,7 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
 
             <Button
               variant="secondary"
-              className="w-full h-14 rounded-2xl border border-divider/20 bg-surface/5"
+              className="w-full h-14 rounded-2xl border border-black/10 bg-surface/5"
               onPress={handleGoogleLogin}
             >
               <View className="flex-row items-center gap-3">

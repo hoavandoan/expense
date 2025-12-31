@@ -252,6 +252,22 @@ export default function SettingsScreen() {
             </Card>
           </View>
 
+          {/* Profile Edit Card */}
+          {isLoggedIn && (
+            <PressableFeedback onPress={() => router.push('/profile/edit')}>
+              <Card className="flex-row items-center p-4 bg-surface rounded-3xl border border-divider/5">
+                <Avatar size="lg" alt="User Profile">
+                  <Avatar.Image source={{ uri: user?.avatarUrl || 'https://i.pravatar.cc/150?u=1' }} />
+                </Avatar>
+                <View className="flex-1 ml-4">
+                  <AppText className="text-xl font-bold">{user?.name || 'Người dùng'}</AppText>
+                  <AppText className="text-muted text-sm">{user?.email || 'user@example.com'}</AppText>
+                </View>
+                <IconSymbol name="chevron.right" size={20} color="gray" />
+              </Card>
+            </PressableFeedback>
+          )}
+
           {/* Auth Section */}
           <View className="mt-4 gap-4 items-center">
             {!isLoggedIn ? (

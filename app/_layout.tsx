@@ -87,6 +87,7 @@ function AppContent() {
             headerShown: false,
           }}
         >
+          <Stack.Screen name="(onboarding)" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="group/[id]/index" />
           <Stack.Screen name="(modal)" options={{ presentation: 'modal' }} />

@@ -51,8 +51,11 @@ export default function GroupDetailScreen() {
               <PressableFeedback className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10">
                 <IconSymbol name="square.and.arrow.up" size={18} color="white" />
               </PressableFeedback>
-              <PressableFeedback className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10">
-                <IconSymbol name="settings" size={20} color="white" />
+              <PressableFeedback
+                className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10"
+                onPress={() => router.push(`/group/${id}/settings`)}
+              >
+                <IconSymbol name="gearshape.fill" size={20} color="white" />
               </PressableFeedback>
             </View>
           </HeaderNavBar>
@@ -126,15 +129,15 @@ export default function GroupDetailScreen() {
                     <AppText className="text-white text-[10px] font-bold mt-1 uppercase">CHI TIÊU</AppText>
                   </View>
                 </PressableFeedback>
-                <PressableFeedback className="flex-1">
+                <PressableFeedback className="flex-1" onPress={() => router.push('/settle-up')}>
                   <View className="bg-white/10 p-4 rounded-2xl items-center justify-center border border-white/10">
                     <IconSymbol name="qrcode" size={20} color="white" />
-                    <AppText className="text-white text-[10px] font-bold mt-1 uppercase">THANH TOÁN</AppText>
+                    <AppText className="text-white text-[10px] font-bold mt-1 uppercase">TẤT TOÁN</AppText>
                   </View>
                 </PressableFeedback>
-                <PressableFeedback className="flex-1">
+                <PressableFeedback className="flex-1" onPress={() => router.push(`/group/${id}/stats`)}>
                   <View className="bg-white/10 p-4 rounded-2xl items-center justify-center border border-white/10">
-                    <IconSymbol name="chart.bar" size={20} color="white" />
+                    <IconSymbol name="chart.bar.fill" size={20} color="white" />
                     <AppText className="text-white text-[10px] font-bold mt-1 uppercase">BÁO CÁO</AppText>
                   </View>
                 </PressableFeedback>
@@ -148,8 +151,8 @@ export default function GroupDetailScreen() {
           <View className="mb-10">
             <View className="flex-row items-center justify-between mb-6">
               <AppText className="text-xl font-bold text-white">Thành viên nợ/trả</AppText>
-              <PressableFeedback onPress={() => router.push('/group/[id]/history')}>
-                <IconSymbol name="line.3.horizontal.decrease.circle" size={20} color={accent} />
+              <PressableFeedback onPress={() => router.push(`/group/${id}/members`)}>
+                <AppText className="text-accent font-bold text-sm">Xem tất cả</AppText>
               </PressableFeedback>
             </View>
 
