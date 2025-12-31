@@ -6,6 +6,7 @@ export default function OnboardingLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="welcome" />
       <Stack.Screen name="tutorial" />
+      <Stack.Screen name="login" />
     </Stack>
   );
 }

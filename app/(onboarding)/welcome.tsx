@@ -75,7 +75,7 @@ export default function WelcomeScreen() {
         <Button
           size="lg"
           className="h-16 rounded-2xl bg-accent shadow-lg"
-          onPress={() => router.push('/(onboarding)/tutorial')}
+          onPress={() => router.push('/(onboarding)/login')}
         >
           <View className="flex-row items-center gap-2">
             <AppText className="font-bold text-lg text-white">Bắt đầu ngay</AppText>
@@ -83,7 +83,7 @@ export default function WelcomeScreen() {
           </View>
         </Button>
 
-        <PressableFeedback>
+        <PressableFeedback onPress={() => router.push('/(onboarding)/login')}>
           <View className="h-16 rounded-2xl border border-divider items-center justify-center">
             <AppText className="font-semibold text-foreground">Đã có tài khoản? Đăng nhập</AppText>
           </View>
