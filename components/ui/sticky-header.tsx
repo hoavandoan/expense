@@ -26,7 +26,6 @@ export function StickyHeader({ title, onBack, rightContent }: StickyHeaderProps)
 
   return (
     <View
-      style={{ paddingTop: insets.top }}
       className="bg-background border-b border-divider/5"
     >
       <View className="h-16 px-6 flex-row items-center justify-between">
