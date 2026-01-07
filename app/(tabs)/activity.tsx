@@ -146,36 +146,20 @@ export default function ActivityScreen() {
             className='bg-surface-secondary rounded-full p-1'
           >
             <Tabs.List>
-              <Tabs.Indicator className="bg-surface-quaternary shadow-none" />
-              <Tabs.ScrollView
-                scrollAlign="center"
-              >
-                {FILTERS.map((filter) => (
+              <Tabs.Indicator className="bg-accent shadow-none" />
+              {
+                FILTERS.map((filter) => (
                   <Tabs.Trigger
                     key={filter.id}
                     value={filter.id}
-                    className="flex-row items-center px-4 py-2 rounded-full"
+                    className="px-6 py-2 rounded-full"
                   >
                     {({ isSelected }) => (
-                      <View className={cn("flex-row items-center")}>
-                        <IconSymbol
-                          name={filter.icon}
-                          size={18}
-                          color={isSelected ? accent : muted}
-                        />
-                        <Tabs.Label
-                          className={cn(
-                            "ml-2 font-semibold transition-colors",
-                            isSelected ? "text-accent" : "text-foreground"
-                          )}
-                        >
-                          {filter.label}
-                        </Tabs.Label>
-                      </View>
+                      <Tabs.Label className={cn("font-bold text-sm", isSelected ? "text-white" : "text-foreground")}>{filter.label}</Tabs.Label>
                     )}
                   </Tabs.Trigger>
-                ))}
-              </Tabs.ScrollView>
+                ))
+              }
             </Tabs.List>
           </Tabs>
         </View>
@@ -184,7 +168,7 @@ export default function ActivityScreen() {
       <ScreenScrollView
         refreshing={refreshing}
         onRefresh={onRefresh}
-        className="px-6 pt-6"
+        className="pt-6"
         withTabBarOffset
       >
         {ACTIVITY_SECTIONS.map((section) => (

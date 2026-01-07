@@ -1,6 +1,5 @@
 import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { ModalHeader } from '@/components/ui/modal-header';
 import { useJoinGroup } from '@/lib/hooks';
 import * as Clipboard from 'expo-clipboard';
 import { useRouter } from 'expo-router';
@@ -45,11 +44,6 @@ export default function JoinGroupScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ModalHeader
-        title="Tham gia nhóm"
-        variant="close"
-      />
-
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 24 }}
@@ -112,25 +106,25 @@ export default function JoinGroupScreen() {
               <TextField.InputStartContent>
                 <IconSymbol name="link" size={18} color="gray" />
               </TextField.InputStartContent>
-                <TextInput
-                  placeholder="Mã hoặc liên kết mời"
-                  className="flex-1 ml-2 text-foreground"
-                  placeholderTextColor="gray"
-                  value={inviteCode}
-                  onChangeText={(text) => setInviteCode(text.toUpperCase())}
-                  autoCapitalize="characters"
-                />
-                <TextField.InputEndContent>
-                  <PressableFeedback 
-                    className="bg-surface-secondary px-4 py-2 rounded-xl border border-divider/10 shadow-sm"
-                    onPress={handlePaste}
-                  >
-                    <View className="flex-row items-center gap-1.5">
-                      <IconSymbol name="doc.on.clipboard" size={14} color="gray" />
-                      <AppText className="text-xs font-bold">Dán</AppText>
-                    </View>
-                  </PressableFeedback>
-                </TextField.InputEndContent>
+              <TextInput
+                placeholder="Mã hoặc liên kết mời"
+                className="flex-1 ml-2 text-foreground"
+                placeholderTextColor="gray"
+                value={inviteCode}
+                onChangeText={(text) => setInviteCode(text.toUpperCase())}
+                autoCapitalize="characters"
+              />
+              <TextField.InputEndContent>
+                <PressableFeedback
+                  className="bg-surface-secondary px-4 py-2 rounded-xl border border-divider/10 shadow-sm"
+                  onPress={handlePaste}
+                >
+                  <View className="flex-row items-center gap-1.5">
+                    <IconSymbol name="doc.on.clipboard" size={14} color="gray" />
+                    <AppText className="text-xs font-bold">Dán</AppText>
+                  </View>
+                </PressableFeedback>
+              </TextField.InputEndContent>
             </TextField>
           </View>
         </View>

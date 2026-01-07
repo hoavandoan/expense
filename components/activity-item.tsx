@@ -1,6 +1,6 @@
 import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Avatar, Card, cn, useThemeColor } from 'heroui-native';
+import { Avatar, cn, PressableFeedback, useThemeColor } from 'heroui-native';
 import React from 'react';
 import { View } from 'react-native';
 
@@ -35,7 +35,7 @@ export const ActivityItem = ({
   const muted = useThemeColor('muted');
 
   return (
-    <Card className="bg-surface p-4 rounded-2xl border border-divider/10">
+    <PressableFeedback className="bg-surface p-4 rounded-2xl border border-divider/10">
       <View className="flex-row items-center">
         <View className="relative">
           <Avatar size="lg" alt={user.name} className="w-14 h-14">
@@ -49,9 +49,13 @@ export const ActivityItem = ({
           </Avatar>
           <View
             className={cn(
-              "absolute bottom-1 right-1 w-6 h-6 rounded-full items-center justify-center border-2 border-surface",
+              "absolute w-6 h-6 rounded-full items-center justify-center border-2 border-surface shadow-lg",
               typeColor
             )}
+            style={{
+              bottom: 0,
+              right: 0,
+            }}
           >
             <IconSymbol name={typeIcon} size={10} color={iconColor} />
           </View>
@@ -88,6 +92,6 @@ export const ActivityItem = ({
         </View>
 
       </View>
-    </Card>
+    </PressableFeedback>
   );
 };
