@@ -20,7 +20,7 @@ export function ActionIcon({ name, label, onPress, color }: ActionIconProps) {
       <View className="w-16 h-16 bg-surface rounded-2xl items-center justify-center">
         <IconSymbol name={name as any} size={28} color={iconColor} />
       </View>
-      <AppText className="text-[13px] font-medium text-muted">{label}</AppText>
+      <AppText className="text-sm font-medium text-muted">{label}</AppText>
     </PressableFeedback>
   );
 }

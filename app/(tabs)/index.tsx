@@ -14,7 +14,7 @@ import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Avatar, Card, Divider, PressableFeedback, Spinner, Surface, useThemeColor } from 'heroui-native';
+import { Avatar, PressableFeedback, Spinner, Surface, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -136,8 +136,8 @@ export default function HomeScreen() {
       >
         <View className="mb-8">
           {/* Hero Balance Section with Accent Gradient */}
-            <View className="px-5 mb-8">
-              <Surface variant="default" className="p-8 rounded-[40px] shadow-2xl overflow-hidden bg-accent relative">
+          <View className="px-5 mb-8">
+            <Surface variant="default" className="p-8 rounded-3xl shadow-2xl overflow-hidden bg-accent relative">
               <LinearGradient
                 colors={['rgba(0,0,0,0.5)', 'transparent']}
                 start={{ x: 0, y: 0 }}
@@ -164,7 +164,7 @@ export default function HomeScreen() {
               </View>
 
               {/* Nested Stats with glassmorphism feel */}
-              <View className="flex-row bg-black/10 rounded-3xl p-5 gap-4">
+              <View className="flex-row bg-black/10 rounded-2xl p-5 gap-4">
                 <View className="flex-1">
                   <View className="flex-row items-center gap-2 mb-2">
                     <View className="w-6 h-6 bg-success/20 rounded-full items-center justify-center">

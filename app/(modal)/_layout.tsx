@@ -16,7 +16,9 @@ export default function ModalLayout() {
         headerLeft: () => (
           <Button
             onPress={() => router.back()}
-            className="w-10 h-10 items-center justify-center rounded-full bg-surface-secondary"
+            variant='ghost'
+            isIconOnly
+            className='size-10 mr-2'
           >
             <IconSymbol name="chevron.left" size={24} color={useThemeColor('foreground')} />
           </Button>

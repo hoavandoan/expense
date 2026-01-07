@@ -1,7 +1,6 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { ModalHeader } from '@/components/ui/modal-header';
 import { useCreateExpense, useGroups } from '@/lib/hooks';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
@@ -115,16 +114,6 @@ export default function AddExpenseScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ModalHeader
-        title="Tạo khoản chi"
-        variant="close"
-        rightElement={
-          <PressableFeedback onPress={() => router.back()}>
-            <AppText className="text-accent font-bold text-base">Lưu</AppText>
-          </PressableFeedback>
-        }
-      />
-
       <ScreenScrollView>
         <View className="px-5 pt-8">
           {/* Group Selector */}
@@ -169,7 +158,7 @@ export default function AddExpenseScreen() {
               <View className='w-2/3'>
                 <TextField>
                   <TextField.Input
-                      autoFocus
+                    autoFocus
                     placeholder="0"
                     value={amount}
                     onChangeText={setAmount}

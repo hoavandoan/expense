@@ -1,7 +1,6 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { ModalHeader } from '@/components/ui/modal-header';
 import { useCreateGroup } from '@/lib/hooks';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
@@ -54,13 +53,8 @@ export default function AddGroupScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ModalHeader
-        title="Tạo nhóm mới"
-        variant="close"
-      />
-
       <ScreenScrollView>
-        <View className="px-6 pt-6 pb-10">
+        <View className="px-6 pb-10">
           {/* Image Upload */}
           <View className="items-center mb-10">
             <PressableFeedback className='rounded-full'>
