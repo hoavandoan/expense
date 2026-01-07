@@ -21,8 +21,8 @@ export default function WelcomeScreen() {
         </View>
 
         <View className="relative w-full aspect-square items-center justify-center">
-          <View className="absolute inset-0 bg-accent/5 rounded-[48px] rotate-3" />
-          <View className="w-full h-full bg-[#0a2e24] rounded-[56px] overflow-hidden shadow-2xl items-center justify-center">
+          <View className="absolute inset-x-4 inset-y-4 bg-accent/5 rounded-3xl rotate-3" />
+          <View className="w-full h-full bg-surface-secondary/20 rounded-3xl overflow-hidden border border-divider/10 shadow-2xl items-center justify-center">
             <Image
               source={{ uri: "https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=600" }}
               style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.3 }}
@@ -30,7 +30,7 @@ export default function WelcomeScreen() {
             />
             <View className="items-center">
               <IconSymbol name="doc.plaintext.fill" size={100} color="#10b981" />
-              <View className="flex-row gap-2 mt-8 bg-surface/90 p-4 rounded-3xl border border-divider/10 shadow-lg items-center">
+              <View className="flex-row gap-2 mt-8 bg-surface p-4 rounded-2xl border border-divider/10 shadow-lg items-center">
                 <View className="flex-row -space-x-3">
                   <Avatar size="sm" alt="User 1">
                     <Avatar.Image source={{ uri: "https://i.pravatar.cc/100?u=1" }} />

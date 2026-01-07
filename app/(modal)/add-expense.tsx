@@ -1,18 +1,14 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { ModalHeader } from '@/components/ui/modal-header';
+import { useCreateExpense, useGroups } from '@/lib/hooks';
+import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
-import { Avatar, Button, Card, Checkbox, cn, Divider, PressableFeedback, Select, TextField, useThemeColor } from 'heroui-native';
-import React, { useState } from 'react';
-import { View } from 'react-native';
-
-const MOCK_MEMBERS = [
-  { id: '1', name: 'Bạn', avatarUrl: 'https://i.pravatar.cc/150?u=1' },
-  { id: '2', name: 'Hương', avatarUrl: 'https://i.pravatar.cc/150?u=2' },
-  { id: '3', name: 'Minh', avatarUrl: 'https://i.pravatar.cc/150?u=3' },
-  { id: '4', name: 'Tuấn', avatarUrl: 'https://i.pravatar.cc/150?u=4', isPlaceholder: true },
-];
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Avatar, Button, Card, Checkbox, Divider, PressableFeedback, Select, TextField, useThemeColor } from 'heroui-native';
+import React, { useMemo, useState } from 'react';
+import { Alert, View } from 'react-native';
 
 const CATEGORIES = [
   { value: 'food', label: 'Ăn uống', icon: 'fork.knife', color: '#F5A623', bg: '#FFF7ED' },
@@ -23,16 +19,51 @@ const CATEGORIES = [
   { value: 'other', label: 'Khác', icon: 'ellipsis.circle.fill', color: '#71717A', bg: '#F4F4F5' },
 ];
 
+interface Member {
+  id: string;
+  name: string;
+  avatarUrl: string | null;
+  isCurrentUser: boolean;
+}
+
 export default function AddExpenseScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ groupId?: string }>();
   const accent = useThemeColor('accent');
-  const [amount, setAmount] = useState('150000');
+  const muted = useThemeColor('muted');
+
+  const { user } = useAuthStore();
+  const { data: groups } = useGroups();
+  const createExpense = useCreateExpense();
+
+  const [selectedGroupId, setSelectedGroupId] = useState<string>(params.groupId || '');
+  const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [notes, setNotes] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('food');
-  const [selectedMembers, setSelectedMembers] = useState<string[]>(['1', '2', '3']);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
-  const muted = useThemeColor('muted');
+  // Get current group's members
+  const currentGroup = useMemo(() => {
+    return groups?.find(g => g.id === selectedGroupId);
+  }, [groups, selectedGroupId]);
+
+  const members: Member[] = useMemo(() => {
+    if (!currentGroup?.group_members) return [];
+    return currentGroup.group_members.map((m: any) => ({
+      id: m.user_id,
+      name: m.user?.name || 'Thành viên',
+      avatarUrl: m.user?.avatar_url,
+      isCurrentUser: m.user_id === user?.id,
+    }));
+  }, [currentGroup, user]);
+
+  // Auto-select all members when group changes
+  React.useEffect(() => {
+    if (members.length > 0 && selectedMembers.length === 0) {
+      setSelectedMembers(members.map((m: { id: string }) => m.id));
+    }
+  }, [members]);
 
   const toggleMember = (id: string) => {
     setSelectedMembers(prev =>
@@ -40,248 +71,331 @@ export default function AddExpenseScreen() {
     );
   };
 
-  const totalAmount = 150000;
+  const totalAmount = parseInt(amount) || 0;
   const splitAmount = selectedMembers.length > 0 ? Math.floor(totalAmount / selectedMembers.length) : 0;
 
+  const handleSaveExpense = async () => {
+    if (!selectedGroupId) {
+      Alert.alert('Lỗi', 'Vui lòng chọn nhóm');
+      return;
+    }
+    if (!description.trim()) {
+      Alert.alert('Lỗi', 'Vui lòng nhập mô tả');
+      return;
+    }
+    if (totalAmount <= 0) {
+      Alert.alert('Lỗi', 'Vui lòng nhập số tiền');
+      return;
+    }
+    if (selectedMembers.length === 0) {
+      Alert.alert('Lỗi', 'Vui lòng chọn người chia tiền');
+      return;
+    }
+
+    try {
+      await createExpense.mutateAsync({
+        groupId: selectedGroupId,
+        title: description.trim(),
+        amount: totalAmount,
+        category: selectedCategory,
+        description: notes.trim() || undefined,
+        splits: selectedMembers.map(userId => ({
+          userId,
+          amount: splitAmount,
+        })),
+      });
+
+      Alert.alert('Thành công', 'Đã tạo khoản chi', [
+        { text: 'OK', onPress: () => router.back() },
+      ]);
+    } catch (error: any) {
+      Alert.alert('Lỗi', error.message || 'Đã có lỗi xảy ra');
+    }
+  };
+
   return (
-    <ScreenScrollView>
-      {/* Header */}
-      <View className="px-6 pt-4 pb-4 flex-row items-center justify-between">
-        <PressableFeedback onPress={() => router.back()}>
-          <IconSymbol name="xmark" size={24} color="gray" />
-        </PressableFeedback>
-        <AppText className="text-lg font-bold">Tạo khoản chi</AppText>
-        <PressableFeedback onPress={() => router.back()}>
-          <AppText className="text-accent font-bold text-base">Lưu</AppText>
-        </PressableFeedback>
-      </View>
+    <View className="flex-1 bg-background">
+      <ModalHeader
+        title="Tạo khoản chi"
+        variant="close"
+        rightElement={
+          <PressableFeedback onPress={() => router.back()}>
+            <AppText className="text-accent font-bold text-base">Lưu</AppText>
+          </PressableFeedback>
+        }
+      />
 
-      <View className="px-5 pt-8">
-        {/* Amount Section */}
-        <View className="items-center mb-8">
-          <View className="flex-row items-center justify-center mb-2">
-            <View className='w-1/2'>
-              <TextField>
-                <TextField.Input
-                  placeholder="0"
-                  value={amount}
-                  onChangeText={setAmount}
-                  keyboardType="numeric"
-                  className="bg-surface border-divider/10 h-14 rounded-2xl px-4 w-full"
-                >
-                  <TextField.InputEndContent>
-                    <IconSymbol name="dongsign" size={24} color={muted} className="mr-3" />
-                  </TextField.InputEndContent>
-                </TextField.Input>
-              </TextField>
-            </View>
-          </View>
-          <AppText className="text-muted text-lg font-medium">Nhập số tiền</AppText>
-        </View>
-
-        {/* Description & Category Selection */}
-        <Card variant="default" className="p-4 rounded-3xl border border-divider/5 mb-6">
-          <View className="flex-row items-center mb-4">
-            <View
-              className="w-12 h-12 rounded-2xl items-center justify-center mr-3"
-              style={{ backgroundColor: CATEGORIES.find(c => c.value === selectedCategory)?.bg }}
-            >
-              <IconSymbol
-                name={CATEGORIES.find(c => c.value === selectedCategory)?.icon as any || 'doc.text.fill'}
-                size={24}
-                color={CATEGORIES.find(c => c.value === selectedCategory)?.color || accent}
-              />
-            </View>
-            <TextField className="bg-transparent flex-1 border-0 h-10 px-0">
-              <TextField.Input
-                placeholder="Nhập mô tả (ví dũ: Ăn tối)"
-                value={description}
-                onChangeText={setDescription}
-                className="text-lg text-foreground font-semibold"
-              />
-            </TextField>
-          </View>
-
-          <Divider className="mb-4 opacity-50" />
-
-          <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest mb-3 px-1">PHÂN LOẠI</AppText>
-          <Select
-            value={CATEGORIES.find(c => c.value === selectedCategory)!}
-            onValueChange={(opt) => opt && setSelectedCategory(opt.value)}
-          >
-            <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
-              <View className="flex-row items-center gap-3">
-                <IconSymbol
-                  name={CATEGORIES.find(c => c.value === selectedCategory)?.icon as any || 'doc.text.fill'}
-                  size={20}
-                  color={CATEGORIES.find(c => c.value === selectedCategory)?.color || accent}
-                  className="mr-3"
-                />
-                <Select.Value
-                  className="text-base font-medium text-foreground"
-                  placeholder="Chọn phân loại"
-                />
-              </View>
-              <IconSymbol name="chevron.right" size={16} color={muted} className="rotate-90" />
-            </Select.Trigger>
-            <Select.Portal>
-              <Select.Overlay className='bg-black/10' />
-              <Select.Content
-                placement="bottom"
-                className="rounded-2xl bg-surface border border-divider/10"
-                width={300}
-                presentation="popover"
-                align="start"
-                alignOffset={-20}
+      <ScreenScrollView>
+        <View className="px-5 pt-8">
+          {/* Group Selector */}
+          {groups && groups.length > 0 && (
+            <View className="mb-6">
+              <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">NHÓM</AppText>
+              <Select
+                value={groups.find(g => g.id === selectedGroupId) || null}
+                onValueChange={(opt: any) => {
+                  if (opt) {
+                    setSelectedGroupId(opt.id);
+                    setSelectedMembers([]);
+                  }
+                }}
               >
-                {CATEGORIES.map(category => (
-                  <Select.Item
-                    key={category.value}
-                    value={category.value}
-                    label={category.label}
-                    className='p-4'
+                <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                  <Select.Value className="text-base font-medium" placeholder="Chọn nhóm" />
+                  <IconSymbol name="chevron.right" size={16} color={muted} className="rotate-90" />
+                </Select.Trigger>
+                <Select.Portal>
+                  <Select.Overlay className='bg-black/20' />
+                  <Select.Content
+                    placement="bottom"
+                    className="rounded-2xl bg-surface border border-divider/10"
+                    width={300}
                   >
-                    <View className="flex-row items-center gap-3">
-                      <View
-                        className="w-8 h-8 rounded-lg items-center justify-center mr-3"
-                        style={{ backgroundColor: category.bg }}
-                      >
-                        <IconSymbol name={category.icon as any} size={18} color={category.color} />
-                      </View>
-                      <Select.ItemLabel className="text-base" />
-                    </View>
-                    <Select.ItemIndicator />
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Portal>
-          </Select>
-        </Card>
+                    {groups.map(group => (
+                      <Select.Item key={group.id} value={group.id} label={group.name} className="p-4">
+                        <Select.ItemLabel className="text-base" />
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Portal>
+              </Select>
+            </View>
+          )}
 
-        {/* Details Section */}
-        <View className="mb-6">
-          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">CHI TIẾT</AppText>
-          <Card variant="default" className="rounded-2xl overflow-hidden border border-divider/5">
-            <PressableFeedback className="flex-row items-center p-4">
-              <View className="w-10 h-10 rounded-lg bg-accent/10 items-center justify-center mr-4">
-                <IconSymbol name="calendar" size={20} color={accent} />
-              </View>
-              <AppText className="flex-1 text-base font-medium">Ngày</AppText>
-              <AppText className="text-muted mr-2">Hôm nay, 24/10</AppText>
-              <IconSymbol name="chevron.right" size={16} color={muted} />
-            </PressableFeedback>
-            <Divider />
-            <PressableFeedback className="flex-row items-center p-4">
-              <View className="w-10 h-10 rounded-lg bg-accent/10 items-center justify-center mr-4">
-                <IconSymbol name="creditcard.fill" size={20} color="#8B5CF6" />
-              </View>
-              <AppText className="flex-1 text-base font-medium">Người trả tiền</AppText>
-              <View className="flex-row items-center mr-2">
-                <Avatar size="sm" alt="Bạn" className="w-8 h-8 mr-2 border-2 border-surface">
-                  <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=1' }} asChild>
-                    <Image source={{ uri: 'https://i.pravatar.cc/150?u=1' }} style={{ width: '100%', height: '100%' }} />
-                  </Avatar.Image>
-                  <Avatar.Fallback>B</Avatar.Fallback>
-                </Avatar>
-                <AppText className="font-semibold">Bạn</AppText>
-              </View>
-              <IconSymbol name="chevron.right" size={16} color={muted} />
-            </PressableFeedback>
-            <Divider />
-            <View className="p-4 gap-4">
-              <View>
-                <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">GHI CHÚ</AppText>
-                <TextField className="bg-surface/50 border-divider/10 rounded-xl min-h-[80px]">
+          {/* Amount Section */}
+          <View className="items-center mb-8">
+            <View className="flex-row items-center justify-center mb-2">
+              <View className='w-2/3'>
+                <TextField>
                   <TextField.Input
-                    placeholder="Nhập ghi chú thêm..."
-                    value={notes}
-                    onChangeText={setNotes}
-                    multiline
-                    numberOfLines={3}
-                    className="p-3 text-base"
-                  />
+                    placeholder="0"
+                    value={amount}
+                    onChangeText={setAmount}
+                    keyboardType="numeric"
+                    className="bg-surface border border-divider/10 h-16 rounded-2xl px-4 w-full text-center text-2xl font-bold"
+                  >
+                    <TextField.InputEndContent>
+                      <IconSymbol name="dongsign" size={24} color={muted} className="mr-3" />
+                    </TextField.InputEndContent>
+                  </TextField.Input>
                 </TextField>
               </View>
-
-              <View>
-                <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">ẢNH HÓA ĐƠN</AppText>
-                <PressableFeedback className="border-2 border-dashed border-divider/20 rounded-2xl h-32 items-center justify-center bg-surface/30">
-                  <View className="bg-accent/10 p-3 rounded-full mb-2">
-                    <IconSymbol name="camera.fill" size={24} color={accent} />
-                  </View>
-                  <AppText className="text-muted text-sm">Chụp hoặc tải ảnh lên</AppText>
-                </PressableFeedback>
-              </View>
             </View>
-          </Card>
-        </View>
-
-        {/* Split Section */}
-        <View className="mb-8">
-          <View className="flex-row items-center justify-between mb-3 px-1">
-            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest">CHIA CHO</AppText>
-            <PressableFeedback>
-              <AppText className="text-accent text-xs font-bold uppercase">Chọn tất cả</AppText>
-            </PressableFeedback>
+            <AppText className="text-muted text-sm font-medium">Nhập số tiền chi tiêu</AppText>
           </View>
-          <Card variant="default" className="rounded-2xl overflow-hidden border border-divider/5">
-            {MOCK_MEMBERS.map((member, index) => {
-              const isSelected = selectedMembers.includes(member.id);
-              return (
-                <View key={member.id}>
-                  <PressableFeedback onPress={() => toggleMember(member.id)} className="p-4 flex-row items-center rounded-lg">
-                    <View className="relative">
-                      <Avatar size="md" alt={member.name} className={cn("mr-4 bg-accent-soft", member.isPlaceholder && "opacity-40")}>
-                        {member.avatarUrl && (
-                          <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
-                            <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} />
-                          </Avatar.Image>
-                        )}
-                        <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
-                      </Avatar>
-                      {member.id === '1' && (
-                        <View className="absolute bottom-0 right-4 w-3.5 h-3.5 bg-success rounded-full border-2 border-surface" />
-                      )}
-                    </View>
-                    <View className="flex-1">
-                      <AppText className={cn("text-base font-bold", member.isPlaceholder && "text-muted")}>{member.name}</AppText>
-                      <AppText className="text-muted text-[13px]">{isSelected ? `${splitAmount.toLocaleString()} ₫` : '0 ₫'}</AppText>
-                    </View>
-                    <Checkbox
-                      isSelected={isSelected}
-                      onSelectedChange={() => toggleMember(member.id)}
-                      className="size-6"
-                    />
-                  </PressableFeedback>
-                  {index < MOCK_MEMBERS.length - 1 && <Divider className="mx-4" />}
+
+          {/* Description & Category Selection */}
+          <Card variant="default" className="p-4 rounded-2xl border border-divider/10 mb-6">
+            <View className="flex-row items-center mb-4">
+              <View
+                className="w-12 h-12 rounded-xl items-center justify-center mr-3"
+                style={{ backgroundColor: CATEGORIES.find(c => c.value === selectedCategory)?.bg }}
+              >
+                <IconSymbol
+                  name={CATEGORIES.find(c => c.value === selectedCategory)?.icon as any || 'doc.text.fill'}
+                  size={24}
+                  color={CATEGORIES.find(c => c.value === selectedCategory)?.color || accent}
+                />
+              </View>
+              <TextField className="bg-transparent flex-1 border-0 h-10 px-0">
+                <TextField.Input
+                  placeholder="Bạn đã chi cho việc gì?"
+                  value={description}
+                  onChangeText={setDescription}
+                  className="text-lg text-foreground font-semibold"
+                />
+              </TextField>
+            </View>
+
+            <Divider className="mb-4" />
+
+            <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest mb-3 px-1">PHÂN LOẠI</AppText>
+            <Select
+              value={CATEGORIES.find(c => c.value === selectedCategory)!}
+              onValueChange={(opt) => opt && setSelectedCategory(opt.value)}
+            >
+              <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-xl px-4 flex-row items-center justify-between">
+                <View className="flex-row items-center gap-3">
+                  <IconSymbol
+                    name={CATEGORIES.find(c => c.value === selectedCategory)?.icon as any || 'doc.text.fill'}
+                    size={20}
+                    color={CATEGORIES.find(c => c.value === selectedCategory)?.color || accent}
+                    className="mr-3"
+                  />
+                  <Select.Value
+                    className="text-base font-medium text-foreground"
+                    placeholder="Chọn phân loại"
+                  />
                 </View>
-              );
-            })}
+                <IconSymbol name="chevron.right" size={16} color={muted} className="rotate-90" />
+              </Select.Trigger>
+              <Select.Portal>
+                <Select.Overlay className='bg-black/20' />
+                <Select.Content
+                  placement="bottom"
+                  className="rounded-2xl bg-surface border border-divider/10"
+                  width={300}
+                >
+                  {CATEGORIES.map(category => (
+                    <Select.Item
+                      key={category.value}
+                      value={category.value}
+                      label={category.label}
+                      className='p-4'
+                    >
+                      <View className="flex-row items-center gap-3">
+                        <View
+                          className="w-8 h-8 rounded-lg items-center justify-center mr-3"
+                          style={{ backgroundColor: category.bg }}
+                        >
+                          <IconSymbol name={category.icon as any} size={18} color={category.color} />
+                        </View>
+                        <Select.ItemLabel className="text-base" />
+                      </View>
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Portal>
+            </Select>
           </Card>
-        </View>
 
-        {/* Custom Split Trigger */}
-        {/* <PressableFeedback className="flex-row items-center justify-center mb-10">
-          <IconSymbol name="slider.horizontal.3" size={18} color="#64748B" className="mr-2" />
-          <AppText className="text-[#64748B] font-medium">Tùy chỉnh chia tiền</AppText>
-        </PressableFeedback> */}
+          {/* Details Section */}
+          <View className="mb-6">
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">CHI TIẾT</AppText>
+            <Card variant="default" className="rounded-2xl overflow-hidden border border-divider/10">
+              <PressableFeedback className="flex-row items-center p-4">
+                <View className="w-10 h-10 rounded-lg bg-surface-secondary items-center justify-center mr-4">
+                  <IconSymbol name="calendar" size={20} color={accent} />
+                </View>
+                <AppText className="flex-1 text-base font-medium">Ngày</AppText>
+                <AppText className="text-muted mr-2">Hôm nay, 24/10</AppText>
+                <IconSymbol name="chevron.right" size={16} color={muted} />
+              </PressableFeedback>
+              <Divider className="mx-4" />
+              <PressableFeedback className="flex-row items-center p-4">
+                <View className="w-10 h-10 rounded-lg bg-surface-secondary items-center justify-center mr-4">
+                  <IconSymbol name="creditcard.fill" size={20} color="#8B5CF6" />
+                </View>
+                <AppText className="flex-1 text-base font-medium">Người trả tiền</AppText>
+                <View className="flex-row items-center mr-2">
+                  <Avatar size="sm" alt="Bạn" className="w-8 h-8 mr-2 border-2 border-surface">
+                    <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=1' }} asChild>
+                      <Image source={{ uri: 'https://i.pravatar.cc/150?u=1' }} style={{ width: '100%', height: '100%' }} />
+                    </Avatar.Image>
+                    <Avatar.Fallback>B</Avatar.Fallback>
+                  </Avatar>
+                  <AppText className="font-semibold">Bạn</AppText>
+                </View>
+                <IconSymbol name="chevron.right" size={16} color={muted} />
+              </PressableFeedback>
+              <Divider className="mx-4" />
+              <View className="p-4 gap-4">
+                <View>
+                  <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">GHI CHÚ</AppText>
+                  <TextField className="bg-surface-secondary border border-divider/5 rounded-xl min-h-[80px]">
+                    <TextField.Input
+                      placeholder="Ghi chú thêm về khoản chi này..."
+                      value={notes}
+                      onChangeText={setNotes}
+                      multiline
+                      numberOfLines={3}
+                      className="p-3 text-base"
+                    />
+                  </TextField>
+                </View>
 
-        {/* Footer Summary & Button */}
-        <View className="mb-10">
-          <View className="flex-row items-center justify-between mb-4 px-1">
-            <AppText className="text-muted font-medium">Đã chọn {selectedMembers.length} người</AppText>
-            <AppText className="font-bold text-lg">Tổng: {totalAmount.toLocaleString()} đ</AppText>
+                <View>
+                  <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">ẢNH HÓA ĐƠN</AppText>
+                  <PressableFeedback className="border-2 border-dashed border-divider/20 rounded-xl h-32 items-center justify-center bg-surface-secondary/50">
+                    <View className="bg-accent/10 p-3 rounded-full mb-2">
+                      <IconSymbol name="camera.fill" size={24} color={accent} />
+                    </View>
+                    <AppText className="text-muted text-sm">Chụp hoặc tải ảnh lên</AppText>
+                  </PressableFeedback>
+                </View>
+              </View>
+            </Card>
           </View>
-          <Button
-            variant="primary"
-            className="w-full h-16 rounded-2xl shadow-xl shadow-accent/20 bg-accent"
-            onPress={() => router.back()}
-          >
-            <Button.Label className="text-lg font-bold">Lưu khoản chi</Button.Label>
-          </Button>
+
+          {/* Split Section */}
+          <View className="mb-8">
+            <View className="flex-row items-center justify-between mb-3 px-1">
+              <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest">CHIA CHO</AppText>
+              <PressableFeedback onPress={() => setSelectedMembers(members.map(m => m.id))}>
+                <AppText className="text-accent text-xs font-bold uppercase">Chọn tất cả</AppText>
+              </PressableFeedback>
+            </View>
+            {members.length === 0 ? (
+              <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                <AppText className="text-muted text-center">
+                  {selectedGroupId ? 'Không có thành viên trong nhóm' : 'Vui lòng chọn nhóm trước'}
+                </AppText>
+              </View>
+            ) : (
+              <Card variant="default" className="rounded-2xl overflow-hidden border border-divider/10">
+                {members.map((member, index) => {
+                  const isSelected = selectedMembers.includes(member.id);
+                  return (
+                    <View key={member.id}>
+                      <PressableFeedback onPress={() => toggleMember(member.id)} className="p-4 flex-row items-center">
+                        <View className="relative">
+                          <Avatar size="md" alt={member.name} className="mr-4 bg-accent-soft">
+                            {member.avatarUrl ? (
+                              <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
+                                <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} />
+                              </Avatar.Image>
+                            ) : (
+                              <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
+                            )}
+                          </Avatar>
+                          {member.isCurrentUser && (
+                            <View className="absolute bottom-0 right-4 w-3.5 h-3.5 bg-success rounded-full border-2 border-surface" />
+                          )}
+                        </View>
+                        <View className="flex-1">
+                          <AppText className="text-base font-bold">
+                            {member.name}{member.isCurrentUser ? ' (Bạn)' : ''}
+                          </AppText>
+                          <AppText className="text-muted text-[13px]">
+                            {isSelected ? `${splitAmount.toLocaleString()} ₫` : '0 ₫'}
+                          </AppText>
+                        </View>
+                        <Checkbox
+                          isSelected={isSelected}
+                          onSelectedChange={() => toggleMember(member.id)}
+                          className="size-6"
+                        />
+                      </PressableFeedback>
+                      {index < members.length - 1 && <Divider className="mx-4" />}
+                    </View>
+                  );
+                })}
+              </Card>
+            )}
+          </View>
+
+          {/* Footer Summary & Button */}
+          <View className="mb-10">
+            <View className="flex-row items-center justify-between mb-4 px-1">
+              <AppText className="text-muted font-medium">Đã chọn {selectedMembers.length} người</AppText>
+              <AppText className="font-bold text-lg">Tổng: {totalAmount.toLocaleString()} đ</AppText>
+            </View>
+            <Button
+              variant="primary"
+              className="w-full h-16 rounded-2xl shadow-xl shadow-accent/20 bg-accent"
+              onPress={handleSaveExpense}
+              isDisabled={createExpense.isPending || !selectedGroupId || !description.trim() || totalAmount <= 0}
+            >
+              <Button.Label className="text-lg font-bold">
+                {createExpense.isPending ? 'Đang lưu...' : 'Lưu khoản chi'}
+              </Button.Label>
+            </Button>
+          </View>
         </View>
-      </View>
-    </ScreenScrollView>
+      </ScreenScrollView>
+    </View>
   );
 }
 

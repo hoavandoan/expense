@@ -10,7 +10,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Timeline, type TimelineItem } from '@/components/ui/timeline';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Avatar, Card, cn, PressableFeedback, useThemeColor } from 'heroui-native';
+import { Avatar, Card, cn, Divider, PressableFeedback, useThemeColor } from 'heroui-native';
 import React from 'react';
 import { View } from 'react-native';
 
@@ -93,31 +93,30 @@ export default function GroupDetailScreen() {
           </HeaderComponentWrapper>
         )}
       >
-        <View className="px-6 pt-4 bg-black">
+        <View className="px-6 pt-4 bg-background">
           {/* Info Badges */}
           <View className="flex-row gap-3 mb-8">
-            <View className="bg-surface-secondary/20 px-4 py-2 rounded-full border border-white/10">
-              <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest">THÀNH VIÊN: 4</AppText>
+            <View className="bg-surface-secondary px-4 py-2 rounded-full border border-divider/10">
+              <AppText className="text-muted text-[10px] font-bold uppercase tracking-widest">THÀNH VIÊN: 4</AppText>
             </View>
-            <View className="bg-success/10 px-4 py-2 rounded-full border border-success/20">
-              <AppText className="text-success text-[10px] font-bold uppercase tracking-widest">BẠN NHẬN LẠI: 150K</AppText>
+            <View className="bg-accent/10 px-4 py-2 rounded-full border border-accent/20">
+              <AppText className="text-accent text-[10px] font-bold uppercase tracking-widest">BẠN NHẬN LẠI: 150K</AppText>
             </View>
           </View>
 
           {/* Stats Card */}
           <View className="mb-10">
             <Card variant="default"
-              className="p-8 rounded-3xl shadow-2xl overflow-hidden"
-              style={{ backgroundColor: accent }}
+              className="p-8 rounded-2xl shadow-xl overflow-hidden bg-accent"
             >
               <View className="flex-row gap-4">
                 <View className="flex-1">
-                  <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">BẠN CHI</AppText>
+                  <AppText className="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-1">BẠN CHI</AppText>
                   <AppText className="text-white text-2xl font-bold">1.250.000 đ</AppText>
                 </View>
-                <View className="w-px bg-white/20" />
+                <Divider orientation="vertical" className="bg-white/20" />
                 <View className="flex-1">
-                  <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">BẠN NHẬN LẠI</AppText>
+                  <AppText className="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-1">BẠN NHẬN LẠI</AppText>
                   <AppText className="text-white text-2xl font-bold">150.000 đ</AppText>
                 </View>
               </View>
@@ -129,7 +128,7 @@ export default function GroupDetailScreen() {
                     <AppText className="text-white text-[10px] font-bold mt-1 uppercase">CHI TIÊU</AppText>
                   </View>
                 </PressableFeedback>
-                <PressableFeedback className="flex-1" onPress={() => router.push('/settle-up')}>
+                <PressableFeedback className="flex-1" onPress={() => router.push(`/(modal)/settle-up?groupId=${id}` as any)}>
                   <View className="bg-white/10 p-4 rounded-2xl items-center justify-center border border-white/10">
                     <IconSymbol name="qrcode" size={20} color="white" />
                     <AppText className="text-white text-[10px] font-bold mt-1 uppercase">TẤT TOÁN</AppText>
@@ -150,7 +149,7 @@ export default function GroupDetailScreen() {
           {/* Members List */}
           <View className="mb-10">
             <View className="flex-row items-center justify-between mb-6">
-              <AppText className="text-xl font-bold text-white">Thành viên nợ/trả</AppText>
+              <AppText className="text-xl font-bold text-foreground">Thành viên nợ/trả</AppText>
               <PressableFeedback onPress={() => router.push(`/group/${id}/members`)}>
                 <AppText className="text-accent font-bold text-sm">Xem tất cả</AppText>
               </PressableFeedback>
@@ -158,7 +157,7 @@ export default function GroupDetailScreen() {
 
             <View className="gap-3">
               {MOCK_MEMBERS.map((member) => (
-                <Card key={member.id} variant="default" className="p-4 rounded-2xl bg-surface-secondary/10 border border-white/5">
+                <Card key={member.id} variant="default" className="p-4 rounded-2xl bg-surface border border-divider/10">
                   <View className="flex-row items-center">
                     <Avatar size="md" alt={member.name} className="mr-4">
                       <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
@@ -187,7 +186,7 @@ export default function GroupDetailScreen() {
           {/* Recent Activity */}
           <View className="pb-20">
             <View className="flex-row items-center justify-between mb-6">
-              <AppText className="text-xl font-bold text-white">Hoạt động gần đây</AppText>
+              <AppText className="text-xl font-bold text-foreground">Hoạt động gần đây</AppText>
               <PressableFeedback>
                 <AppText className="text-accent font-bold text-sm">Xem tất cả</AppText>
               </PressableFeedback>

@@ -1,11 +1,13 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Tabs, useRouter } from 'expo-router';
+import { useAuthStore } from '@/lib/stores/auth-store';
+import { Redirect, Tabs, useRouter } from 'expo-router';
 import { PressableFeedback, useThemeColor } from 'heroui-native';
 import React from 'react';
 import { Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
+  const { isAuthenticated, isLoading } = useAuthStore();
   const accent = useThemeColor('accent');
   const accentSoft = useThemeColor('accent-soft');
   const backgroundSecondary = useThemeColor('background-secondary');
@@ -13,6 +15,14 @@ export default function TabLayout() {
   const surface = useThemeColor('surface');
   const insets = useSafeAreaInsets();
   const router = useRouter();
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return <Redirect href="/(onboarding)/welcome" />;
+  }
 
   const isIOS = Platform.OS === 'ios';
 
@@ -61,6 +71,7 @@ export default function TabLayout() {
         screenOptions={{
           tabBarActiveTintColor: accent,
           headerShown: false,
+          title: 'Trang chủ',
           tabBarStyle: {
             height: 72,
             backgroundColor: surface,

@@ -7,45 +7,30 @@ import {
 import { ActionIcon } from '@/components/ui/action-icon';
 import { GroupCard } from '@/components/ui/group-card';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useAuth } from '@/contexts/auth-context';
+import { useGroups, useGroupsRealtime } from '@/lib/hooks';
+import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Avatar, Card, Divider, PressableFeedback, useThemeColor } from 'heroui-native';
+import { Avatar, Card, Divider, PressableFeedback, Spinner, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-// Mock data for groups
-const MOCK_GROUPS = [
-  {
-    id: '1',
-    title: 'Trip Đà Lạt',
-    memberCount: 4,
-    balance: 500000,
-    bgImage: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=500',
-    members: [
-      { id: '1', name: 'An', avatarUrl: 'https://i.pravatar.cc/150?u=1' },
-      { id: '2', name: 'Bình', avatarUrl: 'https://i.pravatar.cc/150?u=2' },
-    ],
-  },
-  {
-    id: '2',
-    title: 'Tiền nhà trọ',
-    memberCount: 2,
-    balance: 0,
-    bgImage: 'https://images.unsplash.com/photo-1513584684374-8bdb7489feef?q=80&w=500',
-    members: [
-      { id: '4', name: 'Dũng', avatarUrl: 'https://i.pravatar.cc/150?u=4' },
-    ],
-  },
-];
 
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [showBalance, setShowBalance] = useState(true);
-  const { isLoggedIn, user, setLoginSheetOpen } = useAuth();
+
+  // Auth state from Zustand
+  const { user, isAuthenticated } = useAuthStore();
+
+  // Fetch groups from Supabase with real-time updates
+  const { data: groups, isLoading, isRefetching, refetch } = useGroups();
+  
+  // Enable real-time subscriptions for groups
+  useGroupsRealtime();
+
   const accent = useThemeColor('accent');
   const foreground = useThemeColor('foreground');
 
@@ -56,11 +41,11 @@ export default function HomeScreen() {
       <View className="flex-row items-center justify-between px-6 h-full">
         <View className="flex-row items-center gap-3">
           <PressableFeedback
-            onPress={() => !isLoggedIn && setLoginSheetOpen(true)}
+            onPress={() => router.push('/settings')}
             className="rounded-full"
           >
             <Avatar size="sm" alt="User profile" className="bg-surface size-8">
-              {isLoggedIn && user?.avatarUrl ? (
+              {isAuthenticated && user?.avatarUrl ? (
                 <Avatar.Image source={{ uri: user.avatarUrl }} asChild>
                   <Image style={{ width: '100%', height: '100%' }} contentFit="cover" />
                 </Avatar.Image>
@@ -72,7 +57,7 @@ export default function HomeScreen() {
             </Avatar>
           </PressableFeedback>
           <AppText className="font-bold text-foreground">
-            {isLoggedIn ? user?.name : 'Chào bạn!'}
+            {user?.name || 'Chào bạn!'}
           </AppText>
         </View>
         <View className="flex-row gap-2">
@@ -101,11 +86,11 @@ export default function HomeScreen() {
       >
         <View className="flex-row items-center gap-3">
           <PressableFeedback
-            onPress={() => isLoggedIn ? router.push('/settings') : setLoginSheetOpen(true)}
+            onPress={() => router.push('/settings')}
             className="rounded-full bg-accent"
           >
             <Avatar size="md" alt="User profile" className="bg-surface size-12 shadow-sm">
-              {isLoggedIn && user?.avatarUrl ? (
+              {isAuthenticated && user?.avatarUrl ? (
                 <Avatar.Image source={{ uri: user.avatarUrl }} asChild>
                   <Image style={{ width: '100%', height: '100%' }} contentFit="cover" />
                 </Avatar.Image>
@@ -117,11 +102,9 @@ export default function HomeScreen() {
             </Avatar>
           </PressableFeedback>
           <View>
-            <AppText className="text-muted text-[13px]">
-              {isLoggedIn ? 'Xin chào,' : 'Chào mừng bạn,'}
-            </AppText>
+            <AppText className="text-muted text-[13px]">Xin chào,</AppText>
             <AppText className="text-lg font-bold text-foreground">
-              {isLoggedIn ? user?.name : 'Đăng nhập'}
+              {user?.name || 'Bạn'}
             </AppText>
           </View>
         </View>
@@ -151,8 +134,8 @@ export default function HomeScreen() {
       >
         <View className="pt-2">
           {/* Hero Balance Section with Accent Gradient */}
-          <View className="px-5 mb-6">
-            <View className="p-6 rounded-[32px] shadow-xl overflow-hidden bg-accent">
+          <View className="px-6 mb-8">
+            <View className="p-6 rounded-2xl shadow-xl overflow-hidden bg-accent">
               <LinearGradient
                 colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.7)']}
                 style={StyleSheet.absoluteFill}
@@ -221,31 +204,49 @@ export default function HomeScreen() {
                 <AppText className="text-accent font-semibold text-sm">Xem tất cả</AppText>
               </PressableFeedback>
             </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 24, gap: 16 }}
-            >
-              {MOCK_GROUPS.map((group) => (
-                <GroupCard
-                  key={group.id}
-                  variant="horizontal"
-                  title={group.title}
-                  memberCount={group.memberCount}
-                  balance={group.balance}
-                  members={group.members}
-                  bgImage={group.bgImage}
-                  onPress={() => router.push(`/group/${group.id}` as any)}
-                />
-              ))}
-            </ScrollView>
+            {isLoading ? (
+              <View className="h-32 items-center justify-center">
+                <Spinner size="md" color={accent} />
+              </View>
+            ) : groups && groups.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 24, gap: 16 }}
+              >
+                {groups.map((group) => (
+                  <GroupCard
+                    key={group.id}
+                    variant="horizontal"
+                    title={group.name}
+                    memberCount={group.memberCount || 0}
+                    balance={group.totalExpenses || 0}
+                    members={group.group_members?.map((m: any) => ({
+                      id: m.user_id,
+                      name: m.user?.name || '',
+                      avatarUrl: m.user?.avatar_url,
+                    })) || []}
+                    bgImage={group.cover_image_url}
+                    onPress={() => router.push(`/group/${group.id}` as any)}
+                  />
+                ))}
+              </ScrollView>
+            ) : (
+              <View className="mx-6 p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                <IconSymbol name="person.3.fill" size={40} color={accent} />
+                <AppText className="text-foreground font-semibold mt-3">Chưa có nhóm nào</AppText>
+                <AppText className="text-muted text-sm text-center mt-1">
+                  Tạo nhóm mới hoặc tham gia nhóm bạn bè
+                </AppText>
+              </View>
+            )}
           </View>
 
           {/* Recent Activity Section */}
           <View className="px-6 mb-10">
             <AppText className="text-lg font-bold mb-4">Hoạt động gần đây</AppText>
             <View className="gap-3">
-              <Card variant="default" className="p-4 rounded-2xl border border-divider/5">
+              <Card variant="default" className="p-4 rounded-2xl border border-divider/10">
                 <View className="flex-row items-center gap-3">
                   <Avatar size="md" alt="Nam" className="rounded-full">
                     <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=nam' }} />

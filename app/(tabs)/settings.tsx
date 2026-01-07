@@ -120,7 +120,7 @@ export default function SettingsScreen() {
         <View className="px-6 gap-8 pb-10 mt-6">
           {/* Pro Upgrade Card */}
           <PressableFeedback>
-            <Card variant="default" className="bg-accent rounded-3xl p-5 border-0 shadow-xl shadow-accent/30 flex-row items-center overflow-hidden">
+            <Card variant="default" className="bg-accent rounded-2xl p-5 border-0 shadow-xl shadow-accent/30 flex-row items-center overflow-hidden">
               <View className="flex-1">
                 <View className="bg-white/20 px-2 py-0.5 rounded-full self-start mb-2">
                   <AppText className="text-white text-[10px] font-bold">PREMIUM</AppText>
@@ -140,7 +140,7 @@ export default function SettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
               TÀI KHOẢN
             </AppText>
-            <Card variant="default" className="overflow-hidden border border-divider/5">
+            <Card variant="default" className="overflow-hidden border border-divider/10 rounded-2xl">
               <SettingsItem
                 icon="creditcard"
                 iconBgColor="#17C964"
@@ -158,7 +158,7 @@ export default function SettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
               CÀI ĐẶT CHUNG
             </AppText>
-            <Card variant="default" className="overflow-hidden border border-divider/5">
+            <Card variant="default" className="overflow-hidden border border-divider/10 rounded-2xl">
               <SettingsItem
                 icon="moon.fill"
                 iconBgColor="#3F3F46"
@@ -243,7 +243,7 @@ export default function SettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
               HỖ TRỢ & KHÁC
             </AppText>
-            <Card variant="default" className="overflow-hidden border border-divider/5">
+            <Card variant="default" className="overflow-hidden border border-divider/10 rounded-2xl">
               <SettingsItem icon="heart" iconBgColor="#F31260" label="Mời bạn bè" />
               <Divider className="my-3" />
               <SettingsItem icon="questionmark.circle" iconBgColor="#0070F3" label="Trợ giúp" />
@@ -255,7 +255,7 @@ export default function SettingsScreen() {
           {/* Profile Edit Card */}
           {isLoggedIn && (
             <PressableFeedback onPress={() => router.push('/profile/edit')}>
-              <Card className="flex-row items-center p-4 bg-surface rounded-3xl border border-divider/5">
+              <Card className="flex-row items-center p-4 bg-surface rounded-2xl border border-divider/10">
                 <Avatar size="lg" alt="User Profile">
                   <Avatar.Image source={{ uri: user?.avatarUrl || 'https://i.pravatar.cc/150?u=1' }} />
                 </Avatar>
@@ -274,7 +274,7 @@ export default function SettingsScreen() {
               <Button
                 variant="primary"
                 size="lg"
-                className="w-full rounded-[24px]"
+                className="w-full rounded-2xl"
                 onPress={() => setLoginSheetOpen(true)}
               >
                 <View className="flex-row items-center gap-2">
@@ -286,7 +286,7 @@ export default function SettingsScreen() {
               <Button
                 variant="danger-soft"
                 size="lg"
-                className="w-full rounded-[24px]"
+                className="w-full rounded-2xl"
                 onPress={logout}
               >
                 <View className="flex-row items-center gap-2">

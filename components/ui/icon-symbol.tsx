@@ -87,6 +87,7 @@ const MAPPING = {
   'checkmark.circle.fill': 'check-circle',
   'wineglass.fill': 'local-bar',
   'person.fill.badge.plus': 'person-add',
+  'xmark.circle.fill': 'cancel',
 } as const;
 
 /**

@@ -24,27 +24,27 @@ export default function ProfileEditScreen() {
         </View>
 
         <View className="mb-8 gap-4">
-          <TextField className="bg-surface-secondary">
+          <TextField className="bg-surface border border-divider/10 rounded-2xl px-4 h-16">
             <TextField.Label>Họ và tên</TextField.Label>
             <TextField.Input defaultValue="Duy" />
           </TextField>
 
-          <TextField className="bg-surface-secondary">
+          <TextField className="bg-surface border border-divider/10 rounded-2xl px-4 h-16">
             <TextField.Label>Email</TextField.Label>
             <TextField.Input defaultValue="duy@example.com" keyboardType="email-address" />
           </TextField>
 
-          <TextField className="bg-surface-secondary">
+          <TextField className="bg-surface border border-divider/10 rounded-2xl px-4 h-16">
             <TextField.Label>Số điện thoại</TextField.Label>
             <TextField.Input defaultValue="0901234567" keyboardType="phone-pad" />
           </TextField>
         </View>
 
         <Button
-          variant="secondary"
-          className="h-14 rounded-2xl bg-accent shadow-lg"
+          size="lg"
+          className="h-16 rounded-2xl bg-accent shadow-xl shadow-accent/20"
         >
-          <Button.Label className="text-white font-bold">Lưu thay đổi</Button.Label>
+          <Button.Label className="text-white font-bold text-lg">Lưu thay đổi</Button.Label>
         </Button>
       </ScreenScrollView>
     </View>

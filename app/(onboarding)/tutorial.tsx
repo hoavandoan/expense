@@ -25,7 +25,7 @@ const SLIDES: Slide[] = [
     description: 'Lên kế hoạch cho chuyến đi hoặc chia tiền nhà chỉ trong vài giây.',
     image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=600',
     renderOverlay: (accent) => (
-      <View className="absolute bottom-10 left-6 right-6 bg-surface/90 p-4 rounded-3xl flex-row items-center gap-3 border border-divider/10 shadow-lg">
+      <View className="absolute bottom-10 left-6 right-6 bg-surface p-4 rounded-2xl flex-row items-center gap-3 border border-divider/10 shadow-lg">
         <View className="w-10 h-10 rounded-2xl bg-accent items-center justify-center">
           <IconSymbol name="house.fill" size={20} color="white" />
         </View>
@@ -54,7 +54,7 @@ const SLIDES: Slide[] = [
     description: 'Dễ dàng mời thành viên mới và kiểm soát ngân sách nhóm mọi lúc, mọi nơi.',
     image: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?q=80&w=600',
     renderOverlay: (accent) => (
-      <View className="absolute inset-x-8 top-1/4 bg-surface p-4 rounded-3xl shadow-2xl border border-divider/5">
+      <View className="absolute inset-x-8 top-1/4 bg-surface p-4 rounded-2xl shadow-2xl border border-divider/10">
         <View className="flex-row items-center justify-between mb-4">
           <View>
             <AppText className="text-[10px] text-muted uppercase font-bold">Chi tiêu nhóm</AppText>
@@ -101,7 +101,7 @@ const SLIDES: Slide[] = [
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600',
     renderOverlay: (accent) => (
       <View className="absolute inset-x-6 bottom-1/4 gap-4">
-        <View className="bg-surface/90 p-4 rounded-3xl border border-divider/10 shadow-lg">
+        <View className="bg-surface p-4 rounded-2xl border border-divider/10 shadow-lg">
           <View className="flex-row items-center justify-between mb-2">
             <View className="flex-row items-center gap-2">
               <View className="w-8 h-8 rounded-xl bg-accent-soft items-center justify-center">
@@ -116,7 +116,7 @@ const SLIDES: Slide[] = [
           </View>
         </View>
 
-        <View className="bg-surface p-4 rounded-3xl border border-divider/10 shadow-xl flex-row items-center gap-4">
+        <View className="bg-surface p-4 rounded-2xl border border-divider/10 shadow-xl flex-row items-center gap-4">
           <View className="w-12 h-12 rounded-2xl bg-accent items-center justify-center">
             <IconSymbol name="chart.bar.fill" size={24} color="white" />
           </View>
@@ -163,7 +163,7 @@ export default function TutorialScreen() {
           key={currentSlide}
           entering={SlideInRight}
           exiting={SlideOutLeft}
-          className="w-full h-[380px] bg-surface-tertiary rounded-[48px] overflow-hidden shadow-2xl relative"
+          className="w-full h-[380px] bg-surface-tertiary rounded-2xl overflow-hidden shadow-2xl relative border border-divider/10"
         >
           <Image
             source={{ uri: slide.image }}

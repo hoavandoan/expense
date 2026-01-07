@@ -33,8 +33,8 @@ export default function GroupMembersScreen() {
 
       <ScreenScrollView contentContainerStyle={{ padding: 20 }}>
         <View className="mb-6">
-          <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">DANH SÁCH THÀNH VIÊN (5)</AppText>
-          <Card className="rounded-3xl border border-divider/5 overflow-hidden">
+          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">DANH SÁCH THÀNH VIÊN (5)</AppText>
+          <Card className="rounded-2xl border border-divider/10 overflow-hidden">
             {MOCK_MEMBERS.map((member, idx) => (
               <View key={member.id}>
                 <View className="p-4 flex-row items-center">
@@ -51,7 +51,7 @@ export default function GroupMembersScreen() {
                     </AppText>
                   </View>
                 </View>
-                {idx < MOCK_MEMBERS.length - 1 && <View className="h-px bg-divider/5 mx-4" />}
+                {idx < MOCK_MEMBERS.length - 1 && <View className="h-px bg-divider/10 mx-4" />}
               </View>
             ))}
           </Card>

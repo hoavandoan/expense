@@ -28,8 +28,8 @@ export default function GroupSettingsScreen() {
         </View>
 
         <View className="mb-8">
-          <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">THÔNG TIN CHUNG</AppText>
-          <Card className="p-4 rounded-3xl border border-divider/5 gap-4">
+          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">THÔNG TIN CHUNG</AppText>
+          <Card className="p-4 rounded-2xl border border-divider/10 gap-4">
             <TextField className="bg-surface-secondary">
               <TextField.Label>Tên nhóm</TextField.Label>
               <TextField.Input defaultValue="Đà Lạt 2024 🍓" />
@@ -48,8 +48,8 @@ export default function GroupSettingsScreen() {
         </View>
 
         <View className="mb-8">
-          <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">TÙY CHỌN</AppText>
-          <Card className="rounded-3xl border border-divider/5 overflow-hidden">
+          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">TÙY CHỌN</AppText>
+          <Card className="rounded-2xl border border-divider/10 overflow-hidden">
             <View className="p-4 flex-row items-center justify-between">
               <View className="flex-1 mr-4">
                 <AppText className="font-bold text-base">Tối ưu hóa nợ</AppText>
@@ -61,7 +61,7 @@ export default function GroupSettingsScreen() {
                 trackColor={{ false: '#767577', true: accent }}
               />
             </View>
-            <View className="h-px bg-divider/5 mx-4" />
+            <View className="h-px bg-divider/10 mx-4" />
             <PressableFeedback>
               <View className="p-4 flex-row items-center justify-between">
                 <View>

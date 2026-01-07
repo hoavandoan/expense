@@ -14,20 +14,20 @@ export default function SearchScreen() {
       <StickyHeader title="Tìm kiếm" />
 
       <View className="px-6 py-4">
-        <TextField className="bg-surface-secondary rounded-2xl px-2">
+        <TextField className="bg-surface border border-divider/10 rounded-2xl px-4 h-16">
           <TextField.InputStartContent>
             <IconSymbol name="magnifyingglass" size={18} color="gray" />
           </TextField.InputStartContent>
-          <TextField.Input placeholder="Tìm nhóm, bạn bè, khoản chi..." />
+          <TextField.Input placeholder="Tìm nhóm, bạn bè, khoản chi..." placeholderTextColor="gray" className="text-foreground" />
         </TextField>
       </View>
 
       <ScreenScrollView>
         <View className="p-6">
-          <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4">GẦN ĐÂY</AppText>
+          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">GẦN ĐÂY</AppText>
           <View className="gap-2">
             {['Đà Lạt', 'Tiền điện', 'Hương', 'Nhà trọ'].map((item, idx) => (
-              <PressableFeedback key={idx} className="flex-row items-center justify-between py-3 border-b border-divider/5">
+              <PressableFeedback key={idx} className="flex-row items-center justify-between py-4 border-b border-divider/10">
                 <View className="flex-row items-center gap-3">
                   <IconSymbol name="clock" size={16} color="gray" />
                   <AppText className="text-base">{item}</AppText>

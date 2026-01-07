@@ -91,13 +91,16 @@ export const GroupCard: FC<GroupCardProps> = ({
     : `Bạn nợ: ${Math.abs(balance).toLocaleString()}đ`;
 
   const Content = (
-    <Card variant="default" className={cn('mb-4 p-4', className)}>
+    <Card 
+      variant="default" 
+      className={cn('mb-4 p-4 rounded-2xl border border-divider/10', className)}
+    >
       <Card.Body className="flex-row items-center justify-between">
         <View className="flex-1 mr-4">
-          <Card.Title className="text-lg font-bold mb-1">{title}</Card.Title>
-          <Card.Description className="text-muted text-sm mb-2">
+          <AppText className="text-lg font-bold text-foreground mb-1">{title}</AppText>
+          <AppText className="text-muted text-sm mb-2">
             {memberCount} thành viên
-          </Card.Description>
+          </AppText>
 
           <View className="flex-row items-center">
             {members.slice(0, 4).map((member, index) => (
@@ -129,9 +132,9 @@ export const GroupCard: FC<GroupCardProps> = ({
         </View>
 
         <View className="items-end">
-          <Card.Description className={cn('font-semibold', balanceColor)}>
+          <AppText className={cn('text-sm font-semibold', balanceColor)}>
             {balanceDisplay}
-          </Card.Description>
+          </AppText>
         </View>
       </Card.Body>
     </Card>

@@ -44,10 +44,10 @@ export default function PaymentConfirmScreen() {
 
         <Button
           size="lg"
-          className="h-16 rounded-2xl bg-accent px-12 shadow-lg"
+          className="h-16 rounded-2xl bg-accent px-12 shadow-xl shadow-accent/20"
           onPress={() => router.dismissAll()}
         >
-          <Button.Label className="text-lg font-bold">Quay về trang chủ</Button.Label>
+          <Button.Label className="text-lg font-bold text-white">Quay về trang chủ</Button.Label>
         </Button>
       </Animated.View>
     </View>

@@ -11,7 +11,7 @@ const NOTIFICATIONS = [
     id: '1',
     type: 'request',
     title: 'Minh đã yêu cầu bạn tất toán',
-    desc: 'Số tiền: 200.000đ trong nhóm "Đà Lạt 2024"',
+    desc: 'Số tiền: 200.000 đ trong nhóm "Đà Lạt 2024"',
     time: '5 phút trước',
     isUnread: true,
   },
@@ -42,8 +42,8 @@ export default function NotificationsScreen() {
 
       <ScreenScrollView>
         <View className="p-6">
-          <View className="flex-row items-center justify-between mb-6">
-            <AppText className="text-muted text-xs font-bold uppercase tracking-widest">GẦN ĐÂY</AppText>
+          <View className="flex-row items-center justify-between mb-6 px-1">
+            <AppText className="text-muted text-[12px] font-bold uppercase tracking-widest">GẦN ĐÂY</AppText>
             <PressableFeedback>
               <AppText className="text-accent text-xs font-bold">Đánh dấu đã đọc</AppText>
             </PressableFeedback>
@@ -53,7 +53,7 @@ export default function NotificationsScreen() {
             {NOTIFICATIONS.map((notif) => (
               <PressableFeedback key={notif.id}>
                 <Card
-                  className={`p-4 rounded-2xl border border-divider/5 flex-row items-start gap-3 ${notif.isUnread ? 'bg-accent/5' : ''}`}
+                  className={`p-4 rounded-2xl border border-divider/10 flex-row items-start gap-3 shadow-sm ${notif.isUnread ? 'bg-accent/5 border-accent/10' : 'bg-surface'}`}
                 >
                   <View className={`w-10 h-10 rounded-xl items-center justify-center ${notif.isUnread ? 'bg-accent' : 'bg-surface-tertiary'}`}>
                     <IconSymbol
