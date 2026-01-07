@@ -7,6 +7,8 @@ export interface User {
     createdAt: string;
 }
 
+export type GroupType = 'trip' | 'home' | 'couple' | 'other';
+
 // Group entity
 export interface Group {
     id: string;
@@ -15,6 +17,7 @@ export interface Group {
     coverImageUrl: string | null;
     inviteCode: string;
     currency: string;
+    groupType: GroupType;
     createdBy: string;
     createdAt: string;
 }

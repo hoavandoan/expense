@@ -1,13 +1,14 @@
 import { AppText } from '@/components/app-text';
 
 import {
-  AnimatedScrollView,
-  AnimatedScrollViewTitle,
-  AnimatedScrollViewTitleWrapper,
-  HeaderComponentWrapper,
-  HeaderNavBar,
+    AnimatedScrollView,
+    AnimatedScrollViewTitle,
+    AnimatedScrollViewTitleWrapper,
+    HeaderComponentWrapper,
+    HeaderNavBar,
 } from '@/components/parallax-header';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { PendingSettlements } from '@/components/ui/pending-settlements';
 import { Timeline, type TimelineItem } from '@/components/ui/timeline';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -154,7 +155,8 @@ export default function GroupDetailScreen() {
             </Card>
           </View>
 
-          {/* Recent Activity moved below */}
+          {/* Pending Settlements */}
+          <PendingSettlements groupId={id as string} />
 
           {/* Members List */}
           <View className="mb-10">

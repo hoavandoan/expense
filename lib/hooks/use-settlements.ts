@@ -29,6 +29,37 @@ export const useSettlements = (groupId: string | null) => {
 };
 
 /**
+ * Fetch pending settlements where current user is the receiver
+ */
+export const usePendingSettlements = (groupId: string | null) => {
+    return useQuery({
+        queryKey: ['pending-settlements', groupId],
+        queryFn: async () => {
+            if (!groupId) return [];
+
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return [];
+
+            const { data, error } = await supabase
+                .from('settlements')
+                .select(`
+          *,
+          from_user:users!settlements_from_user_id_fkey(id, name, avatar_url),
+          to_user:users!settlements_to_user_id_fkey(id, name, avatar_url)
+        `)
+                .eq('group_id', groupId)
+                .eq('to_user_id', user.id)
+                .eq('status', 'pending')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            return data as Settlement[];
+        },
+        enabled: !!groupId,
+    });
+};
+
+/**
  * Create a settlement request
  */
 export const useCreateSettlement = () => {

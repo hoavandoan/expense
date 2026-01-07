@@ -25,6 +25,8 @@ interface Member {
   isCurrentUser: boolean;
 }
 
+type SplitMode = 'equal' | 'custom' | 'percent';
+
 export default function AddExpenseScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ groupId?: string }>();
@@ -41,6 +43,8 @@ export default function AddExpenseScreen() {
   const [notes, setNotes] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('food');
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [splitMode, setSplitMode] = useState<SplitMode>('equal');
+  const [customSplits, setCustomSplits] = useState<Record<string, number>>({});
 
   // Get current group's members
   const currentGroup = useMemo(() => {
@@ -71,6 +75,32 @@ export default function AddExpenseScreen() {
   };
 
   const totalAmount = parseInt(amount) || 0;
+  
+  // Calculate split amounts based on mode
+  const getSplitAmount = (memberId: string): number => {
+    if (!selectedMembers.includes(memberId)) return 0;
+    
+    if (splitMode === 'equal') {
+      return selectedMembers.length > 0 ? Math.floor(totalAmount / selectedMembers.length) : 0;
+    }
+    
+    if (splitMode === 'custom') {
+      return customSplits[memberId] || 0;
+    }
+    
+    if (splitMode === 'percent') {
+      const percent = customSplits[memberId] || 0;
+      return Math.floor((totalAmount * percent) / 100);
+    }
+    
+    return 0;
+  };
+
+  const updateCustomSplit = (memberId: string, value: string) => {
+    const numValue = parseInt(value) || 0;
+    setCustomSplits(prev => ({ ...prev, [memberId]: numValue }));
+  };
+
   const splitAmount = selectedMembers.length > 0 ? Math.floor(totalAmount / selectedMembers.length) : 0;
 
   const handleSaveExpense = async () => {
@@ -100,7 +130,7 @@ export default function AddExpenseScreen() {
         description: notes.trim() || undefined,
         splits: selectedMembers.map(userId => ({
           userId,
-          amount: splitAmount,
+          amount: getSplitAmount(userId),
         })),
       });
 
@@ -317,6 +347,28 @@ export default function AddExpenseScreen() {
                 <AppText className="text-accent text-xs font-bold uppercase">Chọn tất cả</AppText>
               </PressableFeedback>
             </View>
+
+            {/* Split Mode Tabs */}
+            <View className="flex-row gap-2 mb-4">
+              {[
+                { id: 'equal', label: 'Chia đều' },
+                { id: 'custom', label: 'Tự nhập' },
+                { id: 'percent', label: 'Theo %' },
+              ].map(mode => (
+                <PressableFeedback 
+                  key={mode.id}
+                  className="flex-1"
+                  onPress={() => setSplitMode(mode.id as SplitMode)}
+                >
+                  <View className={`py-3 rounded-xl items-center ${splitMode === mode.id ? 'bg-accent' : 'bg-surface border border-divider/10'}`}>
+                    <AppText className={`font-bold text-sm ${splitMode === mode.id ? 'text-white' : 'text-muted'}`}>
+                      {mode.label}
+                    </AppText>
+                  </View>
+                </PressableFeedback>
+              ))}
+            </View>
+
             {members.length === 0 ? (
               <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
                 <AppText className="text-muted text-center">
@@ -327,37 +379,61 @@ export default function AddExpenseScreen() {
               <Card variant="default" className="rounded-2xl overflow-hidden border border-divider/10">
                 {members.map((member, index) => {
                   const isSelected = selectedMembers.includes(member.id);
+                  const memberSplit = getSplitAmount(member.id);
                   return (
                     <View key={member.id}>
-                      <PressableFeedback onPress={() => toggleMember(member.id)} className="p-4 flex-row items-center">
-                        <View className="relative">
-                          <Avatar size="md" alt={member.name} className="mr-4 bg-accent-soft">
-                            {member.avatarUrl ? (
-                              <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
-                                <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} />
-                              </Avatar.Image>
-                            ) : (
-                              <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
+                      <View className="p-4 flex-row items-center">
+                        <PressableFeedback onPress={() => toggleMember(member.id)} className="flex-row items-center flex-1">
+                          <View className="relative">
+                            <Avatar size="md" alt={member.name} className="mr-4 bg-accent-soft">
+                              {member.avatarUrl ? (
+                                <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
+                                  <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} />
+                                </Avatar.Image>
+                              ) : (
+                                <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
+                              )}
+                            </Avatar>
+                            {member.isCurrentUser && (
+                              <View className="absolute bottom-0 right-4 w-3.5 h-3.5 bg-success rounded-full border-2 border-surface" />
                             )}
-                          </Avatar>
-                          {member.isCurrentUser && (
-                            <View className="absolute bottom-0 right-4 w-3.5 h-3.5 bg-success rounded-full border-2 border-surface" />
-                          )}
-                        </View>
-                        <View className="flex-1">
-                          <AppText className="text-base font-bold">
-                            {member.name}{member.isCurrentUser ? ' (Bạn)' : ''}
-                          </AppText>
-                          <AppText className="text-muted text-[13px]">
-                            {isSelected ? `${splitAmount.toLocaleString()} ₫` : '0 ₫'}
-                          </AppText>
-                        </View>
+                          </View>
+                          <View className="flex-1">
+                            <AppText className="text-base font-bold">
+                              {member.name}{member.isCurrentUser ? ' (Bạn)' : ''}
+                            </AppText>
+                            {splitMode === 'equal' && (
+                              <AppText className="text-muted text-[13px]">
+                                {isSelected ? `${memberSplit.toLocaleString()} ₫` : '0 ₫'}
+                              </AppText>
+                            )}
+                          </View>
+                        </PressableFeedback>
+
+                        {/* Custom/Percent Input */}
+                        {splitMode !== 'equal' && isSelected && (
+                          <View className="flex-row items-center mr-3">
+                            <TextField className="w-24 h-10 bg-surface-secondary border border-divider/10 rounded-lg">
+                              <TextField.Input
+                                placeholder="0"
+                                keyboardType="number-pad"
+                                value={customSplits[member.id]?.toString() || ''}
+                                onChangeText={(v) => updateCustomSplit(member.id, v)}
+                                className="text-center font-bold"
+                              />
+                            </TextField>
+                            <AppText className="ml-2 text-muted font-medium">
+                              {splitMode === 'percent' ? '%' : '₫'}
+                            </AppText>
+                          </View>
+                        )}
+
                         <Checkbox
                           isSelected={isSelected}
                           onSelectedChange={() => toggleMember(member.id)}
                           className="size-6"
                         />
-                      </PressableFeedback>
+                      </View>
                       {index < members.length - 1 && <Divider className="mx-4" />}
                     </View>
                   );

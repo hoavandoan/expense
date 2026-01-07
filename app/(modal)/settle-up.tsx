@@ -117,7 +117,11 @@ export default function SettleUpScreen() {
         note: `Thanh toán qua ${selectedMethod}`,
       });
 
-      router.push('/(modal)/payment-confirm');
+      Alert.alert(
+        'Đã gửi yêu cầu',
+        `Yêu cầu thanh toán ${selectedDebt.amount.toLocaleString()}đ cho ${selectedDebt.name} đang chờ xác nhận.`,
+        [{ text: 'OK', onPress: () => router.back() }]
+      );
     } catch (error: any) {
       Alert.alert('Lỗi', error.message || 'Đã có lỗi xảy ra');
     }

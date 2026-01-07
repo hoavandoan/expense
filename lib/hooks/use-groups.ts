@@ -75,7 +75,13 @@ export const useCreateGroup = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (input: { name: string; description?: string; coverImageUrl?: string }) => {
+        mutationFn: async (input: {
+            name: string;
+            description?: string;
+            coverImageUrl?: string;
+            currency?: string;
+            groupType?: string;
+        }) => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('Not authenticated');
 
@@ -85,6 +91,8 @@ export const useCreateGroup = () => {
                     name: input.name,
                     description: input.description || null,
                     cover_image_url: input.coverImageUrl || null,
+                    currency: input.currency || 'VND',
+                    group_type: input.groupType || 'trip',
                     created_by: user.id,
                 })
                 .select()
