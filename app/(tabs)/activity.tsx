@@ -1,6 +1,7 @@
 import { ActivityItem } from '@/components/activity-item';
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
+
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { cn, Tabs, TextField, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
@@ -108,6 +109,13 @@ export default function ActivityScreen() {
   const foreground = useThemeColor('foreground');
   const muted = useThemeColor('muted');
   const [activeFilter, setActiveFilter] = useState('all');
+  const [refreshing, setRefreshing] = useState(false);
+
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 2000);
+  }, []);
 
   return (
     <View className="flex-1 bg-background">
@@ -174,8 +182,10 @@ export default function ActivityScreen() {
       </View>
 
       <ScreenScrollView
-        contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         className="px-6 pt-6"
+        withTabBarOffset
       >
         {ACTIVITY_SECTIONS.map((section) => (
           <View key={section.title} className="mb-8">
@@ -191,3 +201,4 @@ export default function ActivityScreen() {
     </View>
   );
 }
+

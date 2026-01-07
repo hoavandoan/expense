@@ -1,4 +1,5 @@
 import { AppText } from '@/components/app-text';
+
 import {
   AnimatedScrollView,
   AnimatedScrollViewTitle,
@@ -11,8 +12,8 @@ import { Timeline, type TimelineItem } from '@/components/ui/timeline';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Avatar, Card, cn, PressableFeedback, useThemeColor } from 'heroui-native';
-import React from 'react';
-import { View } from 'react-native';
+import React, { useState } from 'react';
+import { RefreshControl, View } from 'react-native';
 
 const MOCK_MEMBERS = [
   { id: '1', name: 'Minh Anh', balance: -50000, avatarUrl: 'https://i.pravatar.cc/150?u=1' },
@@ -32,12 +33,21 @@ export default function GroupDetailScreen() {
   const router = useRouter();
   const accent = useThemeColor('accent');
 
+  const [refreshing, setRefreshing] = useState(false);
+
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 2000);
+  }, []);
+
   return (
     <View className="flex-1 bg-black">
       <AnimatedScrollView
         showsVerticalScrollIndicator={false}
         headerMaxHeight={300}
         topBarHeight={100}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         renderHeaderNavBarComponent={() => (
           <HeaderNavBar className="bg-transparent">
             {/* This is the overflow header (visible when at top) */}
@@ -175,9 +185,10 @@ export default function GroupDetailScreen() {
                         'font-bold text-base',
                         member.balance >= 0 ? 'text-success' : 'text-danger'
                       )}>
-                        {member.balance >= 0 ? `+${member.balance / 1000}k` : `-${Math.abs(member.balance) / 1000}k`}
+                        {member.balance >= 0 ? `+${member.balance.toLocaleString()}đ` : `${member.balance.toLocaleString()}đ`}
                       </AppText>
                     </View>
+
                   </View>
                 </Card>
               ))}

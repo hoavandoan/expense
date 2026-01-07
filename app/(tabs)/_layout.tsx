@@ -13,6 +13,8 @@ export default function TabLayout() {
   const surface = useThemeColor('surface');
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const divider = useThemeColor('divider');
+
 
   const isIOS = Platform.OS === 'ios';
 
@@ -62,23 +64,18 @@ export default function TabLayout() {
           tabBarActiveTintColor: accent,
           headerShown: false,
           tabBarStyle: {
-            height: 72,
+            height: 64 + (insets.bottom > 0 ? insets.bottom : 0),
             backgroundColor: surface,
-            borderTopWidth: 0,
-            paddingBottom: 10,
-            paddingTop: 10,
+            borderTopWidth: 1,
+            borderTopColor: divider,
+            paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
+            paddingTop: 8,
             position: 'absolute',
-            bottom: insets.bottom,
-            left: 20,
-            right: 20,
-            marginHorizontal: 20,
-            borderRadius: 36,
-            shadowColor: foreground,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.1,
-            shadowRadius: 10,
-            elevation: 5,
+            bottom: 0,
+            left: 0,
+            right: 0,
           },
+
         }}>
         <Tabs.Screen
           name="index"

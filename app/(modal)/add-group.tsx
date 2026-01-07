@@ -32,14 +32,7 @@ export default function AddGroupScreen() {
 
   return (
     <ScreenScrollView className="bg-background">
-      {/* Header (Image 3) */}
-      <View className="px-6 pt-4 pb-4 flex-row items-center justify-between">
-        <PressableFeedback onPress={() => router.back()} className="w-10 h-10 rounded-full bg-surface items-center justify-center shadow-sm">
-          <IconSymbol name="chevron.left" size={20} color="black" />
-        </PressableFeedback>
-        <AppText className="text-lg font-bold">Tạo nhóm mới</AppText>
-        <View className="w-10" />
-      </View>
+
 
       <View className="px-6 pt-6 pb-10">
         {/* Image Upload (Image 3) */}

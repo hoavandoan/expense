@@ -1,4 +1,6 @@
+import { ActivityItem } from '@/components/activity-item';
 import { AppText } from '@/components/app-text';
+
 import {
   AnimatedScrollView,
   HeaderComponentWrapper,
@@ -11,7 +13,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Avatar, Card, Divider, PressableFeedback, useThemeColor } from 'heroui-native';
+import { Avatar, PressableFeedback, Surface, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -149,58 +151,67 @@ export default function HomeScreen() {
         renderHeaderComponent={renderHeaderComponent}
         renderOveralComponent={undefined}
       >
-        <View className="pt-2">
-          {/* Hero Balance Section with Accent Gradient */}
-          <View className="px-5 mb-6">
-            <View className="p-6 rounded-[32px] shadow-xl overflow-hidden bg-accent">
+        <View className="mb-8">
+          {/* Hero Balance Section */}
+          <View className="px-5 mb-8">
+            <Surface variant="default" className="p-8 rounded-[40px] shadow-2xl overflow-hidden bg-accent relative">
+
               <LinearGradient
-                colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.7)']}
+                colors={['rgba(0,0,0,0.5)', 'transparent']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
               />
-              <View className="flex-row items-center justify-between mb-2">
-                <AppText className="text-accent-foreground text-sm font-medium">
-                  Tổng số dư khả dụng
+              <View className="flex-row items-center justify-between mb-4">
+                <AppText className="text-white/80 text-sm font-semibold tracking-wider uppercase">
+                  Số dư của bạn
                 </AppText>
-                <PressableFeedback onPress={() => setShowBalance(!showBalance)}>
+                <PressableFeedback
+                  onPress={() => setShowBalance(!showBalance)}
+                  className="w-10 h-10 items-center justify-center rounded-full bg-white/10"
+                >
                   <IconSymbol name={showBalance ? 'eye' : 'eye.slash'} size={20} color="white" />
                 </PressableFeedback>
               </View>
 
-              <View className="flex-row items-baseline gap-1 mb-6">
-                <AppText className="text-accent-foreground text-4xl font-bold">
+              <View className="flex-row items-baseline gap-2 mb-8">
+                <AppText className="text-white text-5xl font-black">
                   {showBalance ? '1.250.000' : '••••••••'}
                 </AppText>
-                <AppText className="text-accent-foreground text-xl font-medium">đ</AppText>
+                <AppText className="text-white/90 text-2xl font-bold">đ</AppText>
               </View>
 
-              {/* Nested Stats Card */}
-              <View className="flex-row bg-accent-soft rounded-2xl p-4 gap-4">
+              {/* Nested Stats with glassmorphism feel */}
+              <View className="flex-row bg-black/10 rounded-3xl p-5 gap-4">
                 <View className="flex-1">
-                  <View className="flex-row items-center gap-1.5 mb-1">
-                    <View className="w-5 h-5 bg-success rounded-full items-center justify-center">
-                      <IconSymbol name="arrow.down.left" size={10} color="white" />
+                  <View className="flex-row items-center gap-2 mb-2">
+                    <View className="w-6 h-6 bg-success/20 rounded-full items-center justify-center">
+                      <IconSymbol name="arrow.down.left" size={12} color="#4ade80" />
                     </View>
-                    <AppText className="text-accent-foreground/80 text-[10px] font-bold uppercase">
-                      BẠN ĐƯỢC TRẢ
+                    <AppText className="text-white/70 text-[11px] font-bold uppercase tracking-tight">
+                      Bạn được trả
                     </AppText>
                   </View>
-                  <AppText className="text-accent-foreground text-base font-bold">+ 1.450.000 đ</AppText>
+                  <AppText className="text-white text-lg font-bold">+ 1.450k</AppText>
                 </View>
-                <Divider orientation="vertical" className="bg-divider" />
+
+                <View className="w-px bg-white/10 h-10 self-center" />
+
                 <View className="flex-1">
-                  <View className="flex-row items-center gap-1.5 mb-1">
-                    <View className="w-5 h-5 bg-warning rounded-full items-center justify-center">
-                      <IconSymbol name="arrow.up.right" size={10} color="white" />
+                  <View className="flex-row items-center gap-2 mb-2">
+                    <View className="w-6 h-6 bg-danger/20 rounded-full items-center justify-center">
+                      <IconSymbol name="arrow.up.right" size={12} color="#fb7185" />
                     </View>
-                    <AppText className="text-accent-foreground/80 text-[10px] font-bold uppercase">
-                      BẠN NỢ
+                    <AppText className="text-white/70 text-[11px] font-bold uppercase tracking-tight">
+                      Bạn nợ
                     </AppText>
                   </View>
-                  <AppText className="text-accent-foreground text-base font-bold">- 200.000 đ</AppText>
+                  <AppText className="text-white text-lg font-bold">- 200k</AppText>
                 </View>
               </View>
-            </View>
+            </Surface>
           </View>
+
 
           {/* Quick Actions Row */}
           <View className="flex-row justify-between px-20 mb-8">
@@ -243,47 +254,42 @@ export default function HomeScreen() {
 
           {/* Recent Activity Section */}
           <View className="px-6 mb-10">
-            <AppText className="text-lg font-bold mb-4">Hoạt động gần đây</AppText>
+            <View className="flex-row items-center justify-between mb-4">
+              <AppText className="text-lg font-bold">Hoạt động gần đây</AppText>
+              <PressableFeedback onPress={() => router.push('/activity')}>
+                <AppText className="text-accent font-semibold text-sm">Xem tất cả</AppText>
+              </PressableFeedback>
+            </View>
             <View className="gap-3">
-              <Card variant="default" className="p-4 rounded-2xl border border-divider/5">
-                <View className="flex-row items-center gap-3">
-                  <Avatar size="md" alt="Nam" className="rounded-full">
-                    <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=nam' }} />
-                    <Avatar.Fallback>N</Avatar.Fallback>
-                  </Avatar>
-                  <View className="flex-1">
-                    <AppText className="font-bold">
-                      Nam <AppText className="font-normal text-muted">đã thanh toán cho bạn</AppText>
-                    </AppText>
-                    <AppText className="text-xs text-muted mt-0.5">
-                      trong nhóm <AppText className="text-accent">Ăn trưa Cty</AppText> • 5h trước
-                    </AppText>
-                  </View>
-                  <View className="items-end">
-                    <AppText className="text-success text-xs font-bold uppercase mb-1">
-                      ĐÃ NHẬN
-                    </AppText>
-                    <AppText className="font-bold text-lg">35k</AppText>
-                  </View>
-                </View>
-              </Card>
-              <Card variant="default" className="p-4 rounded-2xl border border-divider/5">
-                <View className="flex-row items-center gap-3">
-                  <Avatar size="md" alt="Me" className="rounded-full bg-yellow-100">
-                    <Avatar.Fallback>B</Avatar.Fallback>
-                  </Avatar>
-                  <View className="flex-1">
-                    <AppText className="font-bold">
-                      Bạn <AppText className="font-normal text-muted">đã tạo nhóm mới</AppText>
-                    </AppText>
-                    <AppText className="text-xs text-muted mt-0.5">
-                      Tiền nhà trọ • 1 ngày trước
-                    </AppText>
-                  </View>
-                </View>
-              </Card>
+              <ActivityItem
+                user={{ name: 'Nam', avatar: 'https://i.pravatar.cc/150?u=nam' }}
+
+                action="đã trả"
+                subject="Ăn trưa"
+                group="Ăn trưa Cty"
+                groupIcon="fork.knife"
+                amount="+35.000đ"
+                status="đã nhận"
+                typeIcon="fork.knife"
+                typeColor="bg-success/10"
+                iconColor="#22c55e"
+              />
+              <ActivityItem
+                user={{ name: 'Bạn', avatar: 'https://i.pravatar.cc/150?u=me' }}
+
+                action="đã tạo nhóm"
+                group="Tiền nhà trọ"
+                groupIcon="house.fill"
+                amount=""
+                status=""
+                typeIcon="plus"
+                typeColor="bg-default/10"
+                iconColor="#6b7280"
+                isMe
+              />
             </View>
           </View>
+
         </View>
       </AnimatedScrollView>
     </View>

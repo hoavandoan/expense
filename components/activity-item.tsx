@@ -74,8 +74,10 @@ export const ActivityItem = ({
         <View className="items-end justify-center">
           {amount && (
             <AppText
-              style={{ color: amount.startsWith('+') ? '#22c55e' : (status ? accent : undefined) }}
-              className={cn("text-lg font-bold", amount.startsWith('+') ? "" : (status ? "" : "text-foreground"))}
+              className={cn(
+                "text-lg font-bold",
+                amount.startsWith('+') ? "text-success" : (status ? "text-accent" : "text-foreground")
+              )}
             >
               {amount}
             </AppText>
@@ -84,6 +86,7 @@ export const ActivityItem = ({
             <AppText className="text-muted text-[11px] font-medium">{status}</AppText>
           )}
         </View>
+
       </View>
     </Card>
   );

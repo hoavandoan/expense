@@ -1,4 +1,5 @@
 import { AppText } from '@/components/app-text';
+
 import {
   AnimatedScrollView,
   HeaderComponentWrapper,
@@ -168,7 +169,8 @@ export default function SettingsScreen() {
                 rightElement={
                   <Switch
                     isSelected={isDark}
-                    className="w-[56px] h-[32px]"
+                    className="w-[56px] h-8"
+
                     animation={{
                       backgroundColor: {
                         value: ['#172554', '#eab308'],

@@ -39,6 +39,7 @@ export const GroupCard: FC<GroupCardProps> = ({
 
   const balanceColor = isPositive ? 'text-success' : 'text-danger';
 
+
   if (variant === 'horizontal') {
     return (
       <PressableFeedback onPress={onPress} className='w-1/2 bg-accent-soft rounded-2xl'>

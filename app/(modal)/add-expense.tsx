@@ -1,5 +1,6 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
+
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -45,16 +46,7 @@ export default function AddExpenseScreen() {
 
   return (
     <ScreenScrollView>
-      {/* Header */}
-      <View className="px-6 pt-4 pb-4 flex-row items-center justify-between">
-        <PressableFeedback onPress={() => router.back()}>
-          <IconSymbol name="xmark" size={24} color="gray" />
-        </PressableFeedback>
-        <AppText className="text-lg font-bold">Tạo khoản chi</AppText>
-        <PressableFeedback onPress={() => router.back()}>
-          <AppText className="text-accent font-bold text-base">Lưu</AppText>
-        </PressableFeedback>
-      </View>
+
 
       <View className="px-5 pt-8">
         {/* Amount Section */}
@@ -63,12 +55,14 @@ export default function AddExpenseScreen() {
             <View className='w-1/2'>
               <TextField>
                 <TextField.Input
+                  autoFocus
                   placeholder="0"
                   value={amount}
                   onChangeText={setAmount}
                   keyboardType="numeric"
-                  className="bg-surface border-divider/10 h-14 rounded-2xl px-4 w-full"
+                  className="bg-surface border-divider/10 h-14 rounded-2xl px-4 w-full text-2xl font-bold"
                 >
+
                   <TextField.InputEndContent>
                     <IconSymbol name="dongsign" size={24} color={muted} className="mr-3" />
                   </TextField.InputEndContent>
