@@ -1,10 +1,7 @@
 import { ActivityItem } from '@/components/activity-item';
 import { AppText } from '@/components/app-text';
-import {
-    AnimatedScrollView,
-    HeaderComponentWrapper,
-    HeaderNavBar,
-} from '@/components/parallax-header';
+import { ScreenScrollView } from '@/components/screen-scroll-view';
+
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { cn, Tabs, TextField, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
@@ -112,48 +109,47 @@ export default function ActivityScreen() {
   const foreground = useThemeColor('foreground');
   const muted = useThemeColor('muted');
   const [activeFilter, setActiveFilter] = useState('all');
+  const [refreshing, setRefreshing] = useState(false);
 
-  const ACTIVITY_HEADER_HEIGHT = 280;
 
-  const renderTopNavBarComponent = () => (
-    <HeaderNavBar useBlur={true} className="border-b border-divider/5">
-      <View className="flex-row items-center justify-center h-full">
-        <AppText className="text-lg font-bold text-foreground">Hoạt động</AppText>
-      </View>
-    </HeaderNavBar>
-  );
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 2000);
+  }, []);
 
-  const renderHeaderComponent = () => (
-    <HeaderComponentWrapper className="bg-background" useGradient={false}>
+  return (
+    <View className="flex-1 bg-background">
       <View
-        style={{ paddingTop: insets.top + 16 }}
-        className="px-6 pb-6"
+        style={{ paddingTop: insets.top + 20 }}
+        className="pb-4 bg-surface"
       >
-        <AppText className="text-3xl font-extrabold text-foreground mb-6">Hoạt động</AppText>
+        <AppText className="text-3xl font-extrabold text-foreground mb-6 px-6">Hoạt động</AppText>
 
-        <View className="mb-6">
-          <TextField className="bg-surface border border-divider/10 rounded-2xl">
+        <View className="px-6 mb-6">
+          <TextField className="bg-default/5 rounded-2xl">
             <TextField.Input
-              placeholder="Tìm kiếm hoạt động, nhóm..."
-              className="text-base h-12"
+              placeholder="Tìm kiếm hoạt động, nhóm, bạn bè"
+              className="text-base"
             >
               <TextField.InputStartContent>
-                <IconSymbol name="magnifyingglass" size={20} color={muted} className="ml-3" />
+                <IconSymbol name="magnifyingglass" size={20} color={muted} />
               </TextField.InputStartContent>
             </TextField.Input>
           </TextField>
         </View>
 
-        <View className='flex-row'>
+        <View className='flex-row justify-center px-4'>
           <Tabs
             value={activeFilter}
             onValueChange={setActiveFilter}
             variant="pill"
-            className='bg-surface-secondary rounded-full p-1 border border-divider/5'
+            className='bg-surface-secondary rounded-full p-1'
           >
             <Tabs.List>
-              <Tabs.Indicator className="bg-surface shadow-sm" />
-              <Tabs.ScrollView scrollAlign="center">
+              <Tabs.Indicator className="bg-surface-quaternary shadow-none" />
+              <Tabs.ScrollView
+                scrollAlign="center"
+              >
                 {FILTERS.map((filter) => (
                   <Tabs.Trigger
                     key={filter.id}
@@ -161,16 +157,16 @@ export default function ActivityScreen() {
                     className="flex-row items-center px-4 py-2 rounded-full"
                   >
                     {({ isSelected }) => (
-                      <View className="flex-row items-center">
+                      <View className={cn("flex-row items-center")}>
                         <IconSymbol
                           name={filter.icon}
-                          size={16}
+                          size={18}
                           color={isSelected ? accent : muted}
                         />
                         <Tabs.Label
                           className={cn(
-                            "ml-2 font-semibold text-sm transition-colors",
-                            isSelected ? "text-accent" : "text-foreground/70"
+                            "ml-2 font-semibold transition-colors",
+                            isSelected ? "text-accent" : "text-foreground"
                           )}
                         >
                           {filter.label}
@@ -184,32 +180,25 @@ export default function ActivityScreen() {
           </Tabs>
         </View>
       </View>
-    </HeaderComponentWrapper>
-  );
 
-  return (
-    <View className="flex-1 bg-background">
-      <AnimatedScrollView
-        headerMaxHeight={ACTIVITY_HEADER_HEIGHT}
-        disableScale={true}
-        renderTopNavBarComponent={renderTopNavBarComponent}
-        renderHeaderComponent={renderHeaderComponent}
+      <ScreenScrollView
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        className="px-6 pt-6"
+        withTabBarOffset
       >
-        <View className="px-6 pt-4 pb-20">
-          {ACTIVITY_SECTIONS.map((section) => (
-            <View key={section.title} className="mb-8">
-              <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
-                {section.title}
-              </AppText>
-              <View className="gap-4">
-                {section.data.map((item) => (
-                  <ActivityItem key={item.id} {...item} />
-                ))}
-              </View>
+        {ACTIVITY_SECTIONS.map((section) => (
+          <View key={section.title} className="mb-8">
+            <AppText className="text-xl font-bold text-foreground mb-5">{section.title}</AppText>
+            <View className="gap-4">
+              {section.data.map((item) => (
+                <ActivityItem key={item.id} {...item} />
+              ))}
             </View>
-          ))}
-        </View>
-      </AnimatedScrollView>
+          </View>
+        ))}
+      </ScreenScrollView>
     </View>
   );
 }
+

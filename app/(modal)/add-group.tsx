@@ -54,7 +54,7 @@ export default function AddGroupScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ModalHeader 
+      <ModalHeader
         title="Tạo nhóm mới"
         variant="close"
       />
@@ -169,9 +169,9 @@ export default function AddGroupScreen() {
           </View>
 
           {/* Submit Button */}
-          <Button 
-            variant="primary" 
-            size="lg" 
+          <Button
+            variant="primary"
+            size="lg"
             className="h-16 rounded-2xl bg-accent shadow-xl shadow-accent/20"
             onPress={handleCreateGroup}
             isDisabled={createGroup.isPending || !groupName.trim()}

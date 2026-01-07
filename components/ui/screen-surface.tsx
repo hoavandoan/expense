@@ -1,4 +1,4 @@
-import { Surface } from 'heroui-native';
+import { cn, Surface } from 'heroui-native';
 import React, { FC, PropsWithChildren } from 'react';
 import { SafeAreaView, ViewProps } from 'react-native';
 
@@ -18,12 +18,13 @@ export const ScreenSurface: FC<PropsWithChildren<Props>> = ({
   ...props
 }) => {
   return (
-    <Surface variant={variant} className="flex-1" {...props}>
+    <Surface variant={variant} className={cn('flex-1', className)} {...props}>
       <SafeAreaView className="flex-1">
-        <Surface variant="transparent" className="flex-1 p-4">
+        <Surface variant="transparent" className="flex-1 px-5">
           {children}
         </Surface>
       </SafeAreaView>
     </Surface>
   );
 };
+

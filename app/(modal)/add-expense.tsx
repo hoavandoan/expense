@@ -169,6 +169,7 @@ export default function AddExpenseScreen() {
               <View className='w-2/3'>
                 <TextField>
                   <TextField.Input
+                      autoFocus
                     placeholder="0"
                     value={amount}
                     onChangeText={setAmount}
