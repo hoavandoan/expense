@@ -1,8 +1,7 @@
 import { LoginBottomSheet } from '@/components/auth/LoginBottomSheet';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { AppThemeProvider } from '@/contexts/app-theme-context';
-import { AuthProvider, useAuth } from '@/contexts/auth-context';
-import { useAuth as useSupabaseAuth } from '@/lib/hooks';
+import { useAuth } from '@/lib/hooks';
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -68,7 +67,7 @@ const queryClient = new QueryClient({
 
 function AuthListener() {
   // This hook sets up auth state listener on mount
-  useSupabaseAuth();
+  useAuth();
   return null;
 }
 
@@ -134,9 +133,7 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <KeyboardProvider>
             <AppThemeProvider>
-              <AuthProvider>
-                <AppContent />
-              </AuthProvider>
+              <AppContent />
             </AppThemeProvider>
           </KeyboardProvider>
         </QueryClientProvider>

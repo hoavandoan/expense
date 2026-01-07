@@ -7,7 +7,16 @@ import type { User } from '../types';
  * Hook to manage authentication state
  */
 export const useAuth = () => {
-    const { user, isAuthenticated, isLoading, setUser, setLoading, logout } = useAuthStore();
+    const {
+        user,
+        isAuthenticated,
+        isLoading,
+        isLoginSheetOpen,
+        setUser,
+        setLoading,
+        setLoginSheetOpen,
+        logout,
+    } = useAuthStore();
 
     useEffect(() => {
         // Check current session on mount
@@ -121,6 +130,9 @@ export const useAuth = () => {
         user,
         isAuthenticated,
         isLoading,
+        isLoginSheetOpen,
+        setLoginSheetOpen,
+        setUser,
         signInWithEmail,
         signUpWithEmail,
         signOut,

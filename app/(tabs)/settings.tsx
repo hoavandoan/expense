@@ -8,9 +8,7 @@ import {
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { SettingsItem } from '@/components/ui/settings-item';
 import { useAppTheme } from '@/contexts/app-theme-context';
-import { useAuth } from '@/contexts/auth-context';
-import { signOut } from '@/lib/auth/oauth';
-import { useAuthStore } from '@/lib/stores/auth-store';
+import { useAuth } from '@/lib/hooks';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import {
@@ -29,9 +27,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
-  const { user, isAuthenticated, logout: clearAuthState } = useAuthStore();
+  const { user, isAuthenticated, signOut, setLoginSheetOpen } = useAuth();
   const { isDark, toggleTheme } = useAppTheme();
-  const { setLoginSheetOpen } = useAuth();
   const foreground = useThemeColor('foreground');
   const router = useRouter();
   const insets = useSafeAreaInsets();

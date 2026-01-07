@@ -1,4 +1,4 @@
-import { useAuth } from '@/contexts/auth-context';
+import { useAuth } from '@/lib/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheet, Button, Divider, useThemeColor } from 'heroui-native';
 import React from 'react';
@@ -17,27 +17,31 @@ interface LoginBottomSheetProps {
  * It uses HeroUI Native BottomSheet for a premium mobile experience.
  */
 export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps) => {
-  const { login } = useAuth();
+  const { setUser } = useAuth();
   const background = useThemeColor('background');
   const foreground = useThemeColor('foreground');
   const insets = useSafeAreaInsets();
 
   const handleAppleLogin = () => {
     // Mock login for demo
-    login({
+    setUser({
+      id: 'mock-apple-id',
       name: 'Apple User',
       email: 'apple@example.com',
       avatarUrl: 'https://i.pravatar.cc/150?u=apple',
+      createdAt: new Date().toISOString(),
     });
     onOpenChange(false);
   };
 
   const handleGoogleLogin = () => {
     // Mock login for demo
-    login({
+    setUser({
+      id: 'mock-google-id',
       name: 'Google User',
       email: 'google@example.com',
       avatarUrl: 'https://i.pravatar.cc/150?u=google',
+      createdAt: new Date().toISOString(),
     });
     onOpenChange(false);
   };

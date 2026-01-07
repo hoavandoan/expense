@@ -9,9 +9,11 @@ interface AuthState {
     isAuthenticated: boolean;
     isLoading: boolean;
     hasCompletedOnboarding: boolean;
+    isLoginSheetOpen: boolean;
     setUser: (user: User | null) => void;
     setLoading: (loading: boolean) => void;
     setOnboardingComplete: () => void;
+    setLoginSheetOpen: (open: boolean) => void;
     logout: () => void;
 }
 
@@ -22,6 +24,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             isLoading: true,
             hasCompletedOnboarding: false,
+            isLoginSheetOpen: false,
 
             setUser: (user) =>
                 set({
@@ -37,11 +40,14 @@ export const useAuthStore = create<AuthState>()(
                     hasCompletedOnboarding: true,
                 }),
 
+            setLoginSheetOpen: (isLoginSheetOpen) => set({ isLoginSheetOpen }),
+
             logout: () =>
                 set({
                     user: null,
                     isAuthenticated: false,
                     isLoading: false,
+                    isLoginSheetOpen: false,
                     // Keep hasCompletedOnboarding true after logout
                 }),
         }),
