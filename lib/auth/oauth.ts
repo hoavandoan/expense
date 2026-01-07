@@ -1,11 +1,27 @@
-import * as Linking from 'expo-linking';
+import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
+import { Platform } from 'react-native';
 import { useAuthStore } from '../stores/auth-store';
 import { supabase } from '../supabase';
 import type { User } from '../types';
 
 // Ensure browser session closes properly after auth
 WebBrowser.maybeCompleteAuthSession();
+
+/**
+ * Get the correct redirect URI for the current platform
+ */
+const getRedirectUri = () => {
+    // Use AuthSession.makeRedirectUri for proper Expo Go compatibility
+    const redirectUri = AuthSession.makeRedirectUri({
+        path: 'auth/callback',
+    });
+
+    console.log('Platform:', Platform.OS);
+    console.log('Redirect URI:', redirectUri);
+
+    return redirectUri;
+};
 
 /**
  * Decode JWT token to get user data without calling Supabase
@@ -71,8 +87,7 @@ const extractTokensFromUrl = (url: string): { accessToken: string; refreshToken:
  * Initiate Google Sign-In flow
  */
 export const signInWithGoogle = async () => {
-    const redirectUri = Linking.createURL('auth/callback');
-    console.log('Google OAuth redirect URI:', redirectUri);
+    const redirectUri = getRedirectUri();
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -154,8 +169,7 @@ export const signInWithGoogle = async () => {
  * Initiate Apple Sign-In flow
  */
 export const signInWithApple = async () => {
-    const redirectUri = Linking.createURL('auth/callback');
-    console.log('Apple OAuth redirect URI:', redirectUri);
+    const redirectUri = getRedirectUri();
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
