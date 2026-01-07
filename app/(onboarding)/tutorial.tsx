@@ -1,12 +1,16 @@
 import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Avatar, Button, PressableFeedback, useThemeColor } from 'heroui-native';
-import React from 'react';
-import { View } from 'react-native';
-import Animated, { SlideInRight, SlideOutLeft } from 'react-native-reanimated';
+import React, { useRef, useState } from 'react';
+import { Dimensions, View } from 'react-native';
+import PagerView from 'react-native-pager-view';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface Slide {
   id: number;
@@ -137,15 +141,26 @@ const SLIDES: Slide[] = [
 export default function TutorialScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [currentSlide, setCurrentSlide] = React.useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const accent = useThemeColor('accent');
+  const pagerRef = useRef<PagerView>(null);
+  const setOnboardingComplete = useAuthStore((state) => state.setOnboardingComplete);
+
+  const handleComplete = () => {
+    setOnboardingComplete();
+    router.replace('/(onboarding)/login');
+  };
 
   const nextSlide = () => {
     if (currentSlide < SLIDES.length - 1) {
-      setCurrentSlide(currentSlide + 1);
+      pagerRef.current?.setPage(currentSlide + 1);
       return;
     }
-    router.replace('/(tabs)');
+    handleComplete();
+  };
+
+  const handleSkip = () => {
+    handleComplete();
   };
 
   const slide = SLIDES[currentSlide];
@@ -153,34 +168,42 @@ export default function TutorialScreen() {
   return (
     <View className="flex-1 bg-background justify-between py-12 px-6">
       <View style={{ paddingTop: insets.top }} className="flex-row justify-end">
-        <PressableFeedback onPress={() => router.replace('/(tabs)')}>
+        <PressableFeedback onPress={handleSkip}>
           <AppText className="text-muted font-bold">Bỏ qua</AppText>
         </PressableFeedback>
       </View>
 
       <View className="flex-1 items-center justify-center my-8">
-        <Animated.View
-          key={currentSlide}
-          entering={SlideInRight}
-          exiting={SlideOutLeft}
-          className="w-full h-[380px] bg-surface-tertiary rounded-2xl overflow-hidden shadow-2xl relative border border-divider/10"
+        <PagerView
+          ref={pagerRef}
+          style={{ width: SCREEN_WIDTH - 48, height: 380 }}
+          initialPage={0}
+          onPageSelected={(e) => setCurrentSlide(e.nativeEvent.position)}
         >
-          <Image
-            source={{ uri: slide.image }}
-            style={{ width: '100%', height: '100%', opacity: 0.4 }}
-            contentFit="cover"
-          />
-          {slide.renderOverlay(accent)}
-        </Animated.View>
+          {SLIDES.map((slideItem, index) => (
+            <View key={slideItem.id} className="flex-1">
+              <View className="w-full h-full bg-surface-tertiary rounded-2xl overflow-hidden shadow-2xl relative border border-divider/10">
+                <Image
+                  source={{ uri: slideItem.image }}
+                  style={{ width: '100%', height: '100%', opacity: 0.4 }}
+                  contentFit="cover"
+                />
+                {slideItem.renderOverlay(accent)}
+              </View>
+            </View>
+          ))}
+        </PagerView>
 
         <View className="mt-12 items-center px-4">
-          <AppText className="text-3xl font-bold text-center leading-tight mb-4">
-            {slide.title}
-            <AppText className="text-accent">{slide.accent}</AppText>
-          </AppText>
-          <AppText className="text-muted text-center leading-relaxed">
-            {slide.description}
-          </AppText>
+          <Animated.View key={currentSlide} entering={FadeIn} exiting={FadeOut}>
+            <AppText className="text-3xl font-bold text-center leading-tight mb-4">
+              {slide.title}
+              <AppText className="text-accent">{slide.accent}</AppText>
+            </AppText>
+            <AppText className="text-muted text-center leading-relaxed">
+              {slide.description}
+            </AppText>
+          </Animated.View>
         </View>
       </View>
 

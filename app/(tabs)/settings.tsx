@@ -9,6 +9,8 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { SettingsItem } from '@/components/ui/settings-item';
 import { useAppTheme } from '@/contexts/app-theme-context';
 import { useAuth } from '@/contexts/auth-context';
+import { signOut } from '@/lib/auth/oauth';
+import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import {
@@ -27,8 +29,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
-  const { isLoggedIn, user, logout, setLoginSheetOpen } = useAuth();
+  const { user, isAuthenticated, logout: clearAuthState } = useAuthStore();
   const { isDark, toggleTheme } = useAppTheme();
+  const { setLoginSheetOpen } = useAuth();
   const foreground = useThemeColor('foreground');
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -72,10 +75,10 @@ export default function SettingsScreen() {
         <View className="relative">
           <Avatar
             size="lg"
-            alt={isLoggedIn ? user?.name || '' : 'Guest'}
+            alt={isAuthenticated ? user?.name || '' : 'Guest'}
             className="w-28 h-28 border-4 border-surface shadow-xl"
           >
-            {isLoggedIn && user?.avatarUrl ? (
+            {isAuthenticated && user?.avatarUrl ? (
               <Avatar.Image source={{ uri: user.avatarUrl }} asChild>
                 <Image
                   source={{ uri: user.avatarUrl }}
@@ -88,16 +91,16 @@ export default function SettingsScreen() {
               </Avatar.Fallback>
             )}
           </Avatar>
-          {isLoggedIn && (
+          {isAuthenticated && (
             <PressableFeedback className="absolute bottom-0 right-0 bg-accent p-2 rounded-full border-2 border-surface shadow-md">
               <IconSymbol name="pencil" size={16} color="white" />
             </PressableFeedback>
           )}
         </View>
         <AppText className="text-xl font-bold mt-4">
-          {isLoggedIn ? user?.name : 'Chưa đăng nhập'}
+          {isAuthenticated ? user?.name : 'Chưa đăng nhập'}
         </AppText>
-        {isLoggedIn ? (
+        {isAuthenticated ? (
           <View className="bg-surface px-4 py-1 rounded-full mt-2 border border-divider/10">
             <AppText className="text-muted text-sm font-medium">{user?.email}</AppText>
           </View>
@@ -254,25 +257,9 @@ export default function SettingsScreen() {
             </Card>
           </View>
 
-          {/* Profile Edit Card */}
-          {isLoggedIn && (
-            <PressableFeedback onPress={() => router.push('/profile/edit')}>
-              <Card className="flex-row items-center p-4 bg-surface rounded-2xl border border-divider/10">
-                <Avatar size="lg" alt="User Profile">
-                  <Avatar.Image source={{ uri: user?.avatarUrl || 'https://i.pravatar.cc/150?u=1' }} />
-                </Avatar>
-                <View className="flex-1 ml-4">
-                  <AppText className="text-xl font-bold">{user?.name || 'Người dùng'}</AppText>
-                  <AppText className="text-muted text-sm">{user?.email || 'user@example.com'}</AppText>
-                </View>
-                <IconSymbol name="chevron.right" size={20} color="gray" />
-              </Card>
-            </PressableFeedback>
-          )}
-
           {/* Auth Section */}
           <View className="mt-4 gap-4 items-center">
-            {!isLoggedIn ? (
+            {!isAuthenticated ? (
               <Button
                 variant="primary"
                 size="lg"
@@ -289,7 +276,7 @@ export default function SettingsScreen() {
                 variant="danger-soft"
                 size="lg"
                 className="w-full rounded-2xl"
-                onPress={logout}
+                onPress={signOut}
               >
                 <View className="flex-row items-center gap-2">
                   <IconSymbol name="logout" size={20} color="#F31260" />

@@ -8,8 +8,10 @@ interface AuthState {
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
+    hasCompletedOnboarding: boolean;
     setUser: (user: User | null) => void;
     setLoading: (loading: boolean) => void;
+    setOnboardingComplete: () => void;
     logout: () => void;
 }
 
@@ -19,6 +21,7 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             isAuthenticated: false,
             isLoading: true,
+            hasCompletedOnboarding: false,
 
             setUser: (user) =>
                 set({
@@ -29,11 +32,17 @@ export const useAuthStore = create<AuthState>()(
 
             setLoading: (isLoading) => set({ isLoading }),
 
+            setOnboardingComplete: () =>
+                set({
+                    hasCompletedOnboarding: true,
+                }),
+
             logout: () =>
                 set({
                     user: null,
                     isAuthenticated: false,
                     isLoading: false,
+                    // Keep hasCompletedOnboarding true after logout
                 }),
         }),
         {
@@ -42,6 +51,7 @@ export const useAuthStore = create<AuthState>()(
             partialize: (state) => ({
                 user: state.user,
                 isAuthenticated: state.isAuthenticated,
+                hasCompletedOnboarding: state.hasCompletedOnboarding,
             }),
         }
     )
