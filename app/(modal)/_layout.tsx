@@ -18,7 +18,7 @@ export default function ModalLayout() {
             onPress={() => router.back()}
             variant='ghost'
             isIconOnly
-            className='size-10 mr-2'
+            className='size-10 mr-2 bg-surface'
           >
             <IconSymbol name="chevron.left" size={24} color={useThemeColor('foreground')} />
           </Button>

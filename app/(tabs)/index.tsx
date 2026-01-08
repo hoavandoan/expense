@@ -150,11 +150,17 @@ export default function HomeScreen() {
           </View>
         </View>
         <View className="flex-row gap-2">
-          <PressableFeedback className="w-10 h-10 rounded-full bg-surface items-center justify-center border border-divider/5">
+          <PressableFeedback
+            onPress={() => router.push('/search' as any)}
+            className="w-10 h-10 rounded-full bg-surface items-center justify-center border border-divider/5"
+          >
             <IconSymbol name="magnifyingglass" size={20} color={foreground} />
           </PressableFeedback>
           <View>
-            <PressableFeedback className="w-10 h-10 rounded-full bg-surface items-center justify-center border border-divider/5">
+            <PressableFeedback
+              onPress={() => router.push('/notifications' as any)}
+              className="w-10 h-10 rounded-full bg-surface items-center justify-center border border-divider/5"
+            >
               <IconSymbol name="bell" size={20} color={foreground} />
             </PressableFeedback>
             <View className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-surface" />
@@ -236,7 +242,6 @@ export default function HomeScreen() {
             </Surface>
           </View>
 
-
           {/* Quick Actions Row */}
           <View className="flex-row justify-between px-20 mb-8">
             <ActionIcon
@@ -293,6 +298,25 @@ export default function HomeScreen() {
               </View>
             )}
           </View>
+
+          {/* Smart Insights Card */}
+          {/* <View className="px-5 mb-8">
+            <PressableFeedback>
+              <Surface variant="default" className="bg-accent/5 p-5 rounded-3xl flex-row items-center justify-between overflow-hidden relative">
+                <View className="flex-1 pr-4">
+                  <View className="flex-row items-center gap-2 mb-2">
+                    <View className="w-2 h-2 rounded-full bg-accent" />
+                    <AppText className="text-accent font-bold text-[11px] uppercase tracking-wider">Phân tích thông minh</AppText>
+                  </View>
+                  <AppText className="text-foreground font-bold text-[15px] mb-1">Cân nhắc tạm dừng các dịch vụ chưa sử dụng.</AppText>
+                  <AppText className="text-muted text-[13px]">Bạn đã chi tiêu nhiều hơn 20% cho các đăng ký thuê bao trong tháng này.</AppText>
+                </View>
+                <View className="w-16 h-16 items-center justify-center bg-accent/10 rounded-2xl rotate-12">
+                  <IconSymbol name="chart.bar.fill" size={32} color={accent} />
+                </View>
+              </Surface>
+            </PressableFeedback>
+          </View> */}
 
           {/* Recent Activity Section */}
           <View className="px-6 mb-10">
