@@ -2,39 +2,78 @@ import { ActivityItem } from '@/components/activity-item';
 import { AppText } from '@/components/app-text';
 
 import {
-  AnimatedScrollView,
-  HeaderComponentWrapper,
-  HeaderNavBar,
+    AnimatedScrollView,
+    HeaderComponentWrapper,
+    HeaderNavBar,
 } from '@/components/parallax-header';
 import { ActionIcon } from '@/components/ui/action-icon';
 import { GroupCard } from '@/components/ui/group-card';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useGroups, useGroupsRealtime } from '@/lib/hooks';
+import { CATEGORY_CONFIG } from '@/constants';
+import { useGroups, useGroupsRealtime, useRecentExpenses } from '@/lib/hooks';
 import { useAuthStore } from '@/lib/stores/auth-store';
+import { formatCurrency } from '@/lib/utils';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Avatar, PressableFeedback, Spinner, Surface, useThemeColor } from 'heroui-native';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [showBalance, setShowBalance] = useState(true);
+  const [showBalance] = useState(true);
 
   // Auth state from Zustand
   const { user, isAuthenticated } = useAuthStore();
 
   // Fetch groups from Supabase with real-time updates
-  const { data: groups, isLoading, isRefetching, refetch } = useGroups();
+  const { data: groups, isLoading } = useGroups();
+
+  // Fetch recent expenses
+  const { data: recentExpenses, isLoading: isLoadingExpenses } = useRecentExpenses(5);
 
   // Enable real-time subscriptions for groups
   useGroupsRealtime();
 
   const accent = useThemeColor('accent');
   const foreground = useThemeColor('foreground');
+
+  // Calculate total balance across all groups
+  const balanceStats = useMemo(() => {
+    if (!groups || !user) return { totalOwed: 0, totalOwing: 0, balance: 0 };
+
+    let totalOwed = 0; // Others owe to user
+    let totalOwing = 0; // User owes to others
+
+    groups.forEach((group: any) => {
+      group.expenses?.forEach((expense: any) => {
+        if (expense.paid_by === user.id) {
+          // User paid, others owe to user
+          expense.expense_splits?.forEach((split: any) => {
+            if (split.user_id !== user.id) {
+              totalOwed += split.amount;
+            }
+          });
+        } else {
+          // Someone else paid, check if user owes
+          expense.expense_splits?.forEach((split: any) => {
+            if (split.user_id === user.id) {
+              totalOwing += split.amount;
+            }
+          });
+        }
+      });
+    });
+
+    return {
+      totalOwed,
+      totalOwing,
+      balance: totalOwed - totalOwing,
+    };
+  }, [groups, user]);
 
   const HOME_HEADER_HEIGHT = 140;
 
@@ -149,7 +188,6 @@ export default function HomeScreen() {
                   Số dư của bạn
                 </AppText>
                 <PressableFeedback
-                  onPress={() => setShowBalance(!showBalance)}
                   className="w-10 h-10 items-center justify-center rounded-full bg-white/10"
                 >
                   <IconSymbol name={showBalance ? 'eye' : 'eye.slash'} size={20} color="white" />
@@ -158,7 +196,7 @@ export default function HomeScreen() {
 
               <View className="flex-row items-baseline gap-2 mb-8">
                 <AppText className="text-white text-5xl font-black">
-                  {showBalance ? '1.250.000' : '••••••••'}
+                  {showBalance ? formatCurrency(balanceStats.balance, 'VND').replace('₫', '').trim() : '••••••••'}
                 </AppText>
                 <AppText className="text-white/90 text-2xl font-bold">đ</AppText>
               </View>
@@ -174,7 +212,9 @@ export default function HomeScreen() {
                       Bạn được trả
                     </AppText>
                   </View>
-                  <AppText className="text-white text-lg font-bold">+ 1.450k</AppText>
+                  <AppText className="text-white text-lg font-bold">
+                    {showBalance ? `+ ${formatCurrency(balanceStats.totalOwed, 'VND').replace('₫', '').trim()}` : '••••'}
+                  </AppText>
                 </View>
 
                 <View className="w-px bg-white/10 h-10 self-center" />
@@ -188,7 +228,9 @@ export default function HomeScreen() {
                       Bạn nợ
                     </AppText>
                   </View>
-                  <AppText className="text-white text-lg font-bold">- 200k</AppText>
+                  <AppText className="text-white text-lg font-bold">
+                    {showBalance ? `- ${formatCurrency(balanceStats.totalOwing, 'VND').replace('₫', '').trim()}` : '••••'}
+                  </AppText>
                 </View>
               </View>
             </Surface>
@@ -261,32 +303,41 @@ export default function HomeScreen() {
               </PressableFeedback>
             </View>
             <View className="gap-3">
-              <ActivityItem
-                user={{ name: 'Nam', avatar: 'https://i.pravatar.cc/150?u=nam' }}
+              {isLoadingExpenses ? (
+                <View className="h-24 items-center justify-center">
+                  <Spinner size="sm" color={accent} />
+                </View>
+              ) : recentExpenses && recentExpenses.length > 0 ? (
+                recentExpenses.map((expense: any) => {
+                  const categoryConfig = CATEGORY_CONFIG[expense.category] || CATEGORY_CONFIG.other;
+                  const isMe = expense.paid_by === user?.id;
 
-                action="đã trả"
-                subject="Ăn trưa"
-                group="Ăn trưa Cty"
-                groupIcon="fork.knife"
-                amount="+35.000đ"
-                status="đã nhận"
-                typeIcon="fork.knife"
-                typeColor="bg-success/10"
-                iconColor="#22c55e"
-              />
-              <ActivityItem
-                user={{ name: 'Bạn', avatar: 'https://i.pravatar.cc/150?u=me' }}
-
-                action="đã tạo nhóm"
-                group="Tiền nhà trọ"
-                groupIcon="house.fill"
-                amount=""
-                status=""
-                typeIcon="plus"
-                typeColor="bg-default/10"
-                iconColor="#6b7280"
-                isMe
-              />
+                  return (
+                    <ActivityItem
+                      key={expense.id}
+                      user={{
+                        name: isMe ? 'Bạn' : (expense.paid_by_user?.name || 'Ai đó'),
+                        avatar: expense.paid_by_user?.avatar_url || '',
+                      }}
+                      action="đã thêm"
+                      subject={expense.title}
+                      group={expense.group?.name || 'Nhóm'}
+                      groupIcon="person.3.fill"
+                      amount={formatCurrency(expense.amount, expense.group?.currency || 'VND')}
+                      status=""
+                      typeIcon={categoryConfig.icon}
+                      typeColor={categoryConfig.bg}
+                      iconColor={categoryConfig.color}
+                      isMe={isMe}
+                    />
+                  );
+                })
+              ) : (
+                <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                  <IconSymbol name="clock.fill" size={32} color={accent} />
+                  <AppText className="text-muted text-center mt-2">Chưa có hoạt động nào</AppText>
+                </View>
+              )}
             </View>
           </View>
 
@@ -295,3 +346,4 @@ export default function HomeScreen() {
     </View>
   );
 }
+

@@ -1,6 +1,7 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { CURRENCIES, GROUP_TYPES } from '@/constants';
 import { useCreateGroup } from '@/lib/hooks';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { uploadImage } from '@/lib/utils/storage';
@@ -44,18 +45,6 @@ export default function AddGroupScreen() {
     mode: 'onChange',
   });
 
-  const GROUP_TYPES = [
-    { value: 'trip', label: 'Chuyến đi', icon: 'airplane' },
-    { value: 'home', label: 'Nhà cửa', icon: 'house.fill' },
-    { value: 'couple', label: 'Cặp đôi', icon: 'heart.fill' },
-    { value: 'other', label: 'Khác', icon: 'ellipsis.circle.fill' },
-  ] as const;
-
-  const CURRENCIES = [
-    { value: 'VND', label: 'Việt Nam Đồng (đ)', symbol: '₫' },
-    { value: 'USD', label: 'Đô la Mỹ ($)', symbol: '$' },
-    { value: 'EUR', label: 'Euro (€)', symbol: '€' },
-  ] as const;
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({

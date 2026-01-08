@@ -1,12 +1,15 @@
 /**
- * Format number as Vietnamese currency (VND)
+ * Format number as currency
+ * @param amount - The amount to format
+ * @param currency - Optional currency code (default: VND)
  */
-export const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('vi-VN', {
+export const formatCurrency = (amount: number, currency: string = 'VND'): string => {
+    const locale = currency === 'VND' ? 'vi-VN' : 'en-US';
+    return new Intl.NumberFormat(locale, {
         style: 'currency',
-        currency: 'VND',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
+        currency,
+        minimumFractionDigits: currency === 'VND' ? 0 : 2,
+        maximumFractionDigits: currency === 'VND' ? 0 : 2,
     }).format(amount);
 };
 

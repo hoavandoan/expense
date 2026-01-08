@@ -175,7 +175,7 @@ export const Timeline = ({
 
             <View className="flex-1 ml-4 mt-1">
               <View className="flex-row justify-between items-start mb-1.5">
-                <AppText className={cn("text-base font-bold flex-1", (isComplete || isCurrent) ? "text-white" : "text-muted")}>
+                <AppText className={cn("text-base font-bold flex-1", (isComplete || isCurrent) ? "text-foreground" : "text-muted")}>
                   {item.title}
                 </AppText>
                 {item.timestamp && (

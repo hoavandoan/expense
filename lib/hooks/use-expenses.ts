@@ -3,6 +3,45 @@ import { supabase } from '../supabase';
 import type { Expense, ExpenseSplit } from '../types';
 
 /**
+ * Fetch recent expenses across all user's groups
+ */
+export const useRecentExpenses = (limit: number = 5) => {
+    return useQuery({
+        queryKey: ['recent-expenses', limit],
+        queryFn: async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return [];
+
+            // Get all group IDs the user is a member of
+            const { data: memberships, error: membershipError } = await supabase
+                .from('group_members')
+                .select('group_id')
+                .eq('user_id', user.id);
+
+            if (membershipError) throw membershipError;
+            if (!memberships || memberships.length === 0) return [];
+
+            const groupIds = memberships.map(m => m.group_id);
+
+            // Fetch recent expenses from those groups
+            const { data, error } = await supabase
+                .from('expenses')
+                .select(`
+                    *,
+                    paid_by_user:users!expenses_paid_by_fkey(id, name, avatar_url),
+                    group:groups(id, name, currency)
+                `)
+                .in('group_id', groupIds)
+                .order('created_at', { ascending: false })
+                .limit(limit);
+
+            if (error) throw error;
+            return data;
+        },
+    });
+};
+
+/**
  * Fetch expenses for a group
  */
 export const useExpenses = (groupId: string | null) => {
@@ -27,6 +66,7 @@ export const useExpenses = (groupId: string | null) => {
         enabled: !!groupId,
     });
 };
+
 
 /**
  * Create a new expense with splits

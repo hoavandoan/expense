@@ -1,31 +1,40 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useCreateExpense, useGroups } from '@/lib/hooks';
+import { EXPENSE_CATEGORIES } from '@/constants';
+import { useCreateExpense, useGroup, useGroups } from '@/lib/hooks';
 import { useAuthStore } from '@/lib/stores/auth-store';
+import { formatCurrency } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Avatar, Button, Card, Checkbox, Divider, PressableFeedback, Select, TextField, useThemeColor } from 'heroui-native';
-import React, { useMemo, useState } from 'react';
+import { Avatar, Button, Card, Select, Skeleton, TextField, useThemeColor } from 'heroui-native';
+import React, { useEffect, useMemo } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { Alert, View } from 'react-native';
+import * as z from 'zod';
 
-const CATEGORIES = [
-  { value: 'food', label: 'Ăn uống', icon: 'fork.knife', color: '#F5A623', bg: '#FFF7ED' },
-  { value: 'transport', label: 'Di chuyển', icon: 'car.fill', color: '#0070F3', bg: '#EFF6FF' },
-  { value: 'shopping', label: 'Mua sắm', icon: 'cart.fill', color: '#FF0080', bg: '#FFF1F2' },
-  { value: 'entertainment', label: 'Giải trí', icon: 'gamecontroller.fill', color: '#7928CA', bg: '#FAF5FF' },
-  { value: 'utilities', label: 'Tiện ích', icon: 'bolt.fill', color: '#EAB308', bg: '#FEFCE8' },
-  { value: 'other', label: 'Khác', icon: 'ellipsis.circle.fill', color: '#71717A', bg: '#F4F4F5' },
-];
+const expenseSchema = z.object({
+  groupId: z.string().min(1, 'Vui lòng chọn nhóm'),
+  title: z.string().min(1, 'Vui lòng nhập mô tả chi tiêu'),
+  amount: z.string().min(1, 'Vui lòng nhập số tiền').refine(
+    (val) => {
+      const num = parseInt(val.replace(/\D/g, ''));
+      return num > 0;
+    },
+    { message: 'Số tiền phải lớn hơn 0' }
+  ),
+  category: z.enum(['food', 'transport', 'shopping', 'entertainment', 'utilities', 'other']),
+  notes: z.string().optional(),
+});
 
-interface Member {
+type ExpenseFormValues = z.infer<typeof expenseSchema>;
+
+interface GroupOption {
   id: string;
   name: string;
-  avatarUrl: string | null;
-  isCurrentUser: boolean;
+  currency: string;
 }
-
-type SplitMode = 'equal' | 'custom' | 'percent';
 
 export default function AddExpenseScreen() {
   const router = useRouter();
@@ -34,103 +43,88 @@ export default function AddExpenseScreen() {
   const muted = useThemeColor('muted');
 
   const { user } = useAuthStore();
-  const { data: groups } = useGroups();
+  const { data: groups, isLoading: isLoadingGroups } = useGroups();
   const createExpense = useCreateExpense();
 
-  const [selectedGroupId, setSelectedGroupId] = useState<string>(params.groupId || '');
-  const [amount, setAmount] = useState('');
-  const [description, setDescription] = useState('');
-  const [notes, setNotes] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('food');
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-  const [splitMode, setSplitMode] = useState<SplitMode>('equal');
-  const [customSplits, setCustomSplits] = useState<Record<string, number>>({});
+  const hasPreselectedGroup = !!params.groupId;
 
-  // Get current group's members
+  // Transform groups for select
+  const groupOptions: GroupOption[] = useMemo(() => {
+    if (!groups) return [];
+    return groups.map((g: any) => ({
+      id: g.id,
+      name: g.name,
+      currency: g.currency || 'VND',
+    }));
+  }, [groups]);
+
+  // Get initial groupId
+  const initialGroupId = params.groupId || (groupOptions.length > 0 ? groupOptions[0].id : '');
+
+  const { control, handleSubmit, watch, setValue, formState: { errors, isValid } } = useForm<ExpenseFormValues>({
+    resolver: zodResolver(expenseSchema),
+    defaultValues: {
+      groupId: initialGroupId,
+      title: '',
+      amount: '',
+      category: 'food',
+      notes: '',
+    },
+    mode: 'onChange',
+  });
+
+  const selectedGroupId = watch('groupId');
+  const amountValue = watch('amount');
+
+  // Update groupId when groups load
+  useEffect(() => {
+    if (!params.groupId && groupOptions.length > 0 && !selectedGroupId) {
+      setValue('groupId', groupOptions[0].id);
+    }
+  }, [groupOptions, params.groupId, selectedGroupId, setValue]);
+
+  // Fetch group details for members
+  const { data: currentGroupDetail } = useGroup(selectedGroupId || null);
+
   const currentGroup = useMemo(() => {
-    return groups?.find(g => g.id === selectedGroupId);
-  }, [groups, selectedGroupId]);
+    if (currentGroupDetail) return currentGroupDetail as any;
+    return groupOptions.find(g => g.id === selectedGroupId);
+  }, [groupOptions, selectedGroupId, currentGroupDetail]);
 
-  const members: Member[] = useMemo(() => {
-    if (!currentGroup?.group_members) return [];
-    return currentGroup.group_members.map((m: any) => ({
+  const currency = currentGroup?.currency || 'VND';
+
+  // Get members for equal split
+  const members = useMemo(() => {
+    const groupData = currentGroupDetail as any;
+    if (!groupData?.group_members) return [];
+    return groupData.group_members.map((m: any) => ({
       id: m.user_id,
       name: m.user?.name || 'Thành viên',
-      avatarUrl: m.user?.avatar_url,
-      isCurrentUser: m.user_id === user?.id,
     }));
-  }, [currentGroup, user]);
+  }, [currentGroupDetail]);
 
-  // Auto-select all members when group changes
-  React.useEffect(() => {
-    if (members.length > 0 && selectedMembers.length === 0) {
-      setSelectedMembers(members.map((m: { id: string }) => m.id));
-    }
-  }, [members]);
+  const totalAmount = parseInt(amountValue?.replace(/\D/g, '') || '0');
+  const splitAmount = members.length > 0 ? Math.floor(totalAmount / members.length) : 0;
 
-  const toggleMember = (id: string) => {
-    setSelectedMembers(prev =>
-      prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
-    );
-  };
-
-  const totalAmount = parseInt(amount) || 0;
-  
-  // Calculate split amounts based on mode
-  const getSplitAmount = (memberId: string): number => {
-    if (!selectedMembers.includes(memberId)) return 0;
-    
-    if (splitMode === 'equal') {
-      return selectedMembers.length > 0 ? Math.floor(totalAmount / selectedMembers.length) : 0;
-    }
-    
-    if (splitMode === 'custom') {
-      return customSplits[memberId] || 0;
-    }
-    
-    if (splitMode === 'percent') {
-      const percent = customSplits[memberId] || 0;
-      return Math.floor((totalAmount * percent) / 100);
-    }
-    
-    return 0;
-  };
-
-  const updateCustomSplit = (memberId: string, value: string) => {
-    const numValue = parseInt(value) || 0;
-    setCustomSplits(prev => ({ ...prev, [memberId]: numValue }));
-  };
-
-  const splitAmount = selectedMembers.length > 0 ? Math.floor(totalAmount / selectedMembers.length) : 0;
-
-  const handleSaveExpense = async () => {
-    if (!selectedGroupId) {
-      Alert.alert('Lỗi', 'Vui lòng chọn nhóm');
-      return;
-    }
-    if (!description.trim()) {
-      Alert.alert('Lỗi', 'Vui lòng nhập mô tả');
-      return;
-    }
-    if (totalAmount <= 0) {
-      Alert.alert('Lỗi', 'Vui lòng nhập số tiền');
-      return;
-    }
-    if (selectedMembers.length === 0) {
-      Alert.alert('Lỗi', 'Vui lòng chọn người chia tiền');
+  const onSubmit = async (values: ExpenseFormValues) => {
+    if (members.length === 0) {
+      Alert.alert('Lỗi', 'Không có thành viên trong nhóm');
       return;
     }
 
     try {
+      const amount = parseInt(values.amount.replace(/\D/g, ''));
+      const splitPerPerson = Math.floor(amount / members.length);
+
       await createExpense.mutateAsync({
-        groupId: selectedGroupId,
-        title: description.trim(),
-        amount: totalAmount,
-        category: selectedCategory,
-        description: notes.trim() || undefined,
-        splits: selectedMembers.map(userId => ({
-          userId,
-          amount: getSplitAmount(userId),
+        groupId: values.groupId,
+        title: values.title,
+        amount,
+        category: values.category,
+        description: values.notes || undefined,
+        splits: members.map((m: { id: string }) => ({
+          userId: m.id,
+          amount: splitPerPerson,
         })),
       });
 
@@ -142,326 +136,305 @@ export default function AddExpenseScreen() {
     }
   };
 
+  // Loading state
+  if (isLoadingGroups) {
+    return (
+      <View className="flex-1 bg-background p-6">
+        <Skeleton className="w-full h-14 rounded-2xl mb-6" />
+        <Skeleton className="w-2/3 h-16 rounded-2xl mb-4 self-center" />
+        <Skeleton className="w-full h-32 rounded-2xl mb-6" />
+      </View>
+    );
+  }
+
+  // Empty state - No groups
+  if (!groups || groups.length === 0) {
+    return (
+      <View className="flex-1 bg-background items-center justify-center p-6">
+        <View className="bg-accent/10 p-6 rounded-full mb-6">
+          <IconSymbol name="person.3.fill" size={48} color={accent} />
+        </View>
+        <AppText className="text-xl font-bold mb-2">Chưa có nhóm nào</AppText>
+        <AppText className="text-muted text-center mb-8">
+          Bạn cần tham gia hoặc tạo một nhóm trước khi thêm khoản chi tiêu
+        </AppText>
+        <View className="flex-row gap-3">
+          <Button
+            variant="secondary"
+            className="flex-1 h-14 rounded-2xl"
+            onPress={() => router.replace('/(modal)/join-group')}
+          >
+            <Button.Label className="font-bold">Tham gia nhóm</Button.Label>
+          </Button>
+          <Button
+            variant="primary"
+            className="flex-1 h-14 rounded-2xl bg-accent"
+            onPress={() => router.replace('/(modal)/add-group')}
+          >
+            <Button.Label className="font-bold text-white">Tạo nhóm mới</Button.Label>
+          </Button>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1 bg-background">
       <ScreenScrollView>
-        <View className="px-5 pt-8">
-          {/* Group Selector */}
-          {groups && groups.length > 0 && (
-            <View className="mb-6">
-              <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">NHÓM</AppText>
-              <Select
-                value={groups.find(g => g.id === selectedGroupId) || null}
-                onValueChange={(opt: any) => {
-                  if (opt) {
-                    setSelectedGroupId(opt.id);
-                    setSelectedMembers([]);
-                  }
-                }}
-              >
-                <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
-                  <Select.Value className="text-base font-medium" placeholder="Chọn nhóm" />
-                  <IconSymbol name="chevron.right" size={16} color={muted} className="rotate-90" />
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Overlay className='bg-black/20' />
-                  <Select.Content
-                    placement="bottom"
-                    className="rounded-2xl bg-surface border border-divider/10"
-                    width={300}
-                  >
-                    {groups.map(group => (
-                      <Select.Item key={group.id} value={group.id} label={group.name} className="p-4">
-                        <Select.ItemLabel className="text-base" />
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Portal>
-              </Select>
+        <View className="px-6 pb-10">
+          {/* Group Header (when preselected) */}
+          {hasPreselectedGroup && currentGroup && (
+            <View className="mb-6 p-4 bg-surface rounded-2xl border border-divider/10 mt-4">
+              <View className="flex-row items-center">
+                <View className="w-12 h-12 rounded-xl bg-accent/10 items-center justify-center mr-4">
+                  <IconSymbol name="person.3.fill" size={24} color={accent} />
+                </View>
+                <View className="flex-1">
+                  <AppText className="font-bold text-base">{currentGroup.name}</AppText>
+                  <AppText className="text-muted text-sm">Thêm khoản chi mới</AppText>
+                </View>
+              </View>
             </View>
           )}
 
-          {/* Amount Section */}
-          <View className="items-center mb-8">
-            <View className="flex-row items-center justify-center mb-2">
-              <View className='w-2/3'>
-                <TextField>
+          {/* Group Selector (when NOT preselected) */}
+          {!hasPreselectedGroup && (
+            <View className="mb-6 mt-4">
+              <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">NHÓM</AppText>
+              <Controller
+                control={control}
+                name="groupId"
+                render={({ field: { onChange, value } }) => (
+                  <Select
+                    value={groupOptions.find(g => g.id === value) || null}
+                    onValueChange={(opt: any) => opt && onChange(opt.id)}
+                  >
+                    <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                      <View className="flex-row items-center gap-3">
+                        <IconSymbol name="person.3.fill" size={20} color={accent} />
+                        <Select.Value className="text-base font-medium" placeholder="Chọn nhóm" />
+                      </View>
+                      <IconSymbol name="chevron.right" size={16} color={muted} className="rotate-90" />
+                    </Select.Trigger>
+                    <Select.Portal>
+                      <Select.Overlay className='bg-black/20' />
+                      <Select.Content
+                        placement="bottom"
+                        className="rounded-2xl bg-surface border border-divider/10"
+                        width={300}
+                      >
+                        {groupOptions.map(group => (
+                          <Select.Item key={group.id} value={group.id} label={group.name} className="p-4">
+                            <View className="flex-row items-center gap-3">
+                              <IconSymbol name="person.3.fill" size={18} color={accent} />
+                              <Select.ItemLabel className="text-base" />
+                            </View>
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Portal>
+                  </Select>
+                )}
+              />
+              {errors.groupId && (
+                <AppText className="text-danger text-sm mt-1 ml-1">{errors.groupId.message}</AppText>
+              )}
+            </View>
+          )}
+
+          {/* Amount Input */}
+          <View className="mb-6">
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">SỐ TIỀN</AppText>
+            <Controller
+              control={control}
+              name="amount"
+              render={({ field: { onChange, value } }) => (
+                <TextField isInvalid={!!errors.amount}>
                   <TextField.Input
-                    autoFocus
                     placeholder="0"
-                    value={amount}
-                    onChangeText={setAmount}
+                    value={value}
+                    onChangeText={onChange}
                     keyboardType="numeric"
-                    className="bg-surface border border-divider/10 h-16 rounded-2xl px-4 w-full text-center text-2xl font-bold"
+                    className="bg-surface border border-divider/10 h-16 rounded-2xl px-4 text-2xl font-bold text-center"
                   >
                     <TextField.InputEndContent>
-                      <IconSymbol name="dongsign" size={24} color={muted} className="mr-3" />
+                      <AppText className="text-muted text-xl font-bold mr-2">
+                        {currency === 'VND' ? '₫' : currency === 'USD' ? '$' : '€'}
+                      </AppText>
                     </TextField.InputEndContent>
                   </TextField.Input>
+                  {errors.amount && <TextField.ErrorMessage className="ml-1 mt-1">{errors.amount.message}</TextField.ErrorMessage>}
                 </TextField>
-              </View>
-            </View>
-            <AppText className="text-muted text-sm font-medium">Nhập số tiền chi tiêu</AppText>
+              )}
+            />
           </View>
 
-          {/* Description & Category Selection */}
-          <Card variant="default" className="p-4 rounded-2xl border border-divider/10 mb-6">
-            <View className="flex-row items-center mb-4">
-              <View
-                className="w-12 h-12 rounded-xl items-center justify-center mr-3"
-                style={{ backgroundColor: CATEGORIES.find(c => c.value === selectedCategory)?.bg }}
-              >
-                <IconSymbol
-                  name={CATEGORIES.find(c => c.value === selectedCategory)?.icon as any || 'doc.text.fill'}
-                  size={24}
-                  color={CATEGORIES.find(c => c.value === selectedCategory)?.color || accent}
-                />
-              </View>
-              <TextField className="bg-transparent flex-1 border-0 h-10 px-0">
-                <TextField.Input
-                  placeholder="Bạn đã chi cho việc gì?"
-                  value={description}
-                  onChangeText={setDescription}
-                  className="text-lg text-foreground font-semibold"
-                />
-              </TextField>
-            </View>
-
-            <Divider className="mb-4" />
-
-            <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest mb-3 px-1">PHÂN LOẠI</AppText>
-            <Select
-              value={CATEGORIES.find(c => c.value === selectedCategory)!}
-              onValueChange={(opt) => opt && setSelectedCategory(opt.value)}
-            >
-              <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-xl px-4 flex-row items-center justify-between">
-                <View className="flex-row items-center gap-3">
-                  <IconSymbol
-                    name={CATEGORIES.find(c => c.value === selectedCategory)?.icon as any || 'doc.text.fill'}
-                    size={20}
-                    color={CATEGORIES.find(c => c.value === selectedCategory)?.color || accent}
-                    className="mr-3"
-                  />
-                  <Select.Value
-                    className="text-base font-medium text-foreground"
-                    placeholder="Chọn phân loại"
-                  />
-                </View>
-                <IconSymbol name="chevron.right" size={16} color={muted} className="rotate-90" />
-              </Select.Trigger>
-              <Select.Portal>
-                <Select.Overlay className='bg-black/20' />
-                <Select.Content
-                  placement="bottom"
-                  className="rounded-2xl bg-surface border border-divider/10"
-                  width={300}
-                >
-                  {CATEGORIES.map(category => (
-                    <Select.Item
-                      key={category.value}
-                      value={category.value}
-                      label={category.label}
-                      className='p-4'
-                    >
-                      <View className="flex-row items-center gap-3">
-                        <View
-                          className="w-8 h-8 rounded-lg items-center justify-center mr-3"
-                          style={{ backgroundColor: category.bg }}
-                        >
-                          <IconSymbol name={category.icon as any} size={18} color={category.color} />
-                        </View>
-                        <Select.ItemLabel className="text-base" />
-                      </View>
-                      <Select.ItemIndicator />
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Portal>
-            </Select>
-          </Card>
-
-          {/* Details Section */}
+          {/* Title Input */}
           <View className="mb-6">
-            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">CHI TIẾT</AppText>
-            <Card variant="default" className="rounded-2xl overflow-hidden border border-divider/10">
-              <PressableFeedback className="flex-row items-center p-4">
-                <View className="w-10 h-10 rounded-lg bg-surface-secondary items-center justify-center mr-4">
-                  <IconSymbol name="calendar" size={20} color={accent} />
-                </View>
-                <AppText className="flex-1 text-base font-medium">Ngày</AppText>
-                <AppText className="text-muted mr-2">Hôm nay, 24/10</AppText>
-                <IconSymbol name="chevron.right" size={16} color={muted} />
-              </PressableFeedback>
-              <Divider className="mx-4" />
-              <PressableFeedback className="flex-row items-center p-4">
-                <View className="w-10 h-10 rounded-lg bg-surface-secondary items-center justify-center mr-4">
-                  <IconSymbol name="creditcard.fill" size={20} color="#8B5CF6" />
-                </View>
-                <AppText className="flex-1 text-base font-medium">Người trả tiền</AppText>
-                <View className="flex-row items-center mr-2">
-                  <Avatar size="sm" alt="Bạn" className="w-8 h-8 mr-2 border-2 border-surface">
-                    <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=1' }} asChild>
-                      <Image source={{ uri: 'https://i.pravatar.cc/150?u=1' }} style={{ width: '100%', height: '100%' }} />
-                    </Avatar.Image>
-                    <Avatar.Fallback>B</Avatar.Fallback>
-                  </Avatar>
-                  <AppText className="font-semibold">Bạn</AppText>
-                </View>
-                <IconSymbol name="chevron.right" size={16} color={muted} />
-              </PressableFeedback>
-              <Divider className="mx-4" />
-              <View className="p-4 gap-4">
-                <View>
-                  <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">GHI CHÚ</AppText>
-                  <TextField className="bg-surface-secondary border border-divider/5 rounded-xl min-h-[80px]">
-                    <TextField.Input
-                      placeholder="Ghi chú thêm về khoản chi này..."
-                      value={notes}
-                      onChangeText={setNotes}
-                      multiline
-                      numberOfLines={3}
-                      className="p-3 text-base"
-                    />
-                  </TextField>
-                </View>
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">MÔ TẢ</AppText>
+            <Controller
+              control={control}
+              name="title"
+              render={({ field: { onChange, value } }) => (
+                <TextField isInvalid={!!errors.title}>
+                  <TextField.Input
+                    placeholder="Bạn đã chi cho việc gì? (e.g. Ăn trưa)"
+                    value={value}
+                    onChangeText={onChange}
+                    className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
+                  />
+                  {errors.title && <TextField.ErrorMessage className="ml-1 mt-1">{errors.title.message}</TextField.ErrorMessage>}
+                </TextField>
+              )}
+            />
+          </View>
 
-                <View>
-                  <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">ẢNH HÓA ĐƠN</AppText>
-                  <PressableFeedback className="border-2 border-dashed border-divider/20 rounded-xl h-32 items-center justify-center bg-surface-secondary/50">
-                    <View className="bg-accent/10 p-3 rounded-full mb-2">
-                      <IconSymbol name="camera.fill" size={24} color={accent} />
+          {/* Category Selector */}
+          <View className="mb-6">
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">PHÂN LOẠI</AppText>
+            <Controller
+              control={control}
+              name="category"
+              render={({ field: { onChange, value } }) => (
+                <Select
+                  value={EXPENSE_CATEGORIES.find(c => c.value === value)!}
+                  onValueChange={(opt) => opt && onChange(opt.value)}
+                >
+                  <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                    <View className="flex-row items-center gap-3">
+                      <View
+                        className="w-8 h-8 rounded-lg items-center justify-center"
+                        style={{ backgroundColor: EXPENSE_CATEGORIES.find(c => c.value === value)?.bg }}
+                      >
+                        <IconSymbol
+                          name={EXPENSE_CATEGORIES.find(c => c.value === value)?.icon as any}
+                          size={18}
+                          color={EXPENSE_CATEGORIES.find(c => c.value === value)?.color}
+                        />
+                      </View>
+                      <Select.Value className="text-base font-medium" placeholder="Chọn phân loại" />
                     </View>
-                    <AppText className="text-muted text-sm">Chụp hoặc tải ảnh lên</AppText>
-                  </PressableFeedback>
+                    <IconSymbol name="chevron.right" size={16} color={muted} className="rotate-90" />
+                  </Select.Trigger>
+                  <Select.Portal>
+                    <Select.Overlay className='bg-black/20' />
+                    <Select.Content
+                      placement="bottom"
+                      className="rounded-2xl bg-surface border border-divider/10"
+                      width={300}
+                    >
+                      {EXPENSE_CATEGORIES.map(category => (
+                        <Select.Item
+                          key={category.value}
+                          value={category.value}
+                          label={category.label}
+                          className='p-4'
+                        >
+                          <View className="flex-row items-center gap-3">
+                            <View
+                              className="w-8 h-8 rounded-lg items-center justify-center"
+                              style={{ backgroundColor: category.bg }}
+                            >
+                              <IconSymbol name={category.icon as any} size={18} color={category.color} />
+                            </View>
+                            <Select.ItemLabel className="text-base" />
+                          </View>
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Portal>
+                </Select>
+              )}
+            />
+          </View>
+
+          {/* Notes Input */}
+          <View className="mb-6">
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">GHI CHÚ (TÙY CHỌN)</AppText>
+            <Controller
+              control={control}
+              name="notes"
+              render={({ field: { onChange, value } }) => (
+                <TextField>
+                  <TextField.Input
+                    placeholder="Ghi chú thêm về khoản chi này..."
+                    value={value}
+                    onChangeText={onChange}
+                    multiline
+                    numberOfLines={3}
+                    className="bg-surface border border-divider/10 rounded-2xl px-4 py-3 text-base min-h-[80px]"
+                  />
+                </TextField>
+              )}
+            />
+          </View>
+
+          {/* Paid By Section */}
+          <View className="mb-6">
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">NGƯỜI TRẢ TIỀN</AppText>
+            <Card variant="default" className="rounded-2xl overflow-hidden border border-divider/10 bg-surface-secondary/50">
+              <View className="flex-row items-center p-4">
+                <Avatar size="sm" alt={user?.name || 'Bạn'} className="mr-3">
+                  {user?.avatarUrl ? (
+                    <Avatar.Image source={{ uri: user.avatarUrl }} asChild>
+                      <Image source={{ uri: user.avatarUrl }} style={{ width: '100%', height: '100%' }} />
+                    </Avatar.Image>
+                  ) : (
+                    <Avatar.Fallback className="bg-accent/10">
+                      <AppText className="font-bold text-accent">{user?.name?.charAt(0) || 'B'}</AppText>
+                    </Avatar.Fallback>
+                  )}
+                </Avatar>
+                <View className="flex-1">
+                  <AppText className="font-bold text-base">{user?.name || 'Bạn'}</AppText>
+                  <AppText className="text-muted text-xs">Trả cho tất cả</AppText>
                 </View>
               </View>
             </Card>
           </View>
 
-          {/* Split Section */}
-          <View className="mb-8">
-            <View className="flex-row items-center justify-between mb-3 px-1">
-              <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest">CHIA CHO</AppText>
-              <PressableFeedback onPress={() => setSelectedMembers(members.map(m => m.id))}>
-                <AppText className="text-accent text-xs font-bold uppercase">Chọn tất cả</AppText>
-              </PressableFeedback>
-            </View>
-
-            {/* Split Mode Tabs */}
-            <View className="flex-row gap-2 mb-4">
-              {[
-                { id: 'equal', label: 'Chia đều' },
-                { id: 'custom', label: 'Tự nhập' },
-                { id: 'percent', label: 'Theo %' },
-              ].map(mode => (
-                <PressableFeedback 
-                  key={mode.id}
-                  className="flex-1"
-                  onPress={() => setSplitMode(mode.id as SplitMode)}
-                >
-                  <View className={`py-3 rounded-xl items-center ${splitMode === mode.id ? 'bg-accent' : 'bg-surface border border-divider/10'}`}>
-                    <AppText className={`font-bold text-sm ${splitMode === mode.id ? 'text-white' : 'text-muted'}`}>
-                      {mode.label}
-                    </AppText>
-                  </View>
-                </PressableFeedback>
-              ))}
-            </View>
-
-            {members.length === 0 ? (
-              <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
-                <AppText className="text-muted text-center">
-                  {selectedGroupId ? 'Không có thành viên trong nhóm' : 'Vui lòng chọn nhóm trước'}
-                </AppText>
-              </View>
-            ) : (
-              <Card variant="default" className="rounded-2xl overflow-hidden border border-divider/10">
-                {members.map((member, index) => {
-                  const isSelected = selectedMembers.includes(member.id);
-                  const memberSplit = getSplitAmount(member.id);
-                  return (
-                    <View key={member.id}>
-                      <View className="p-4 flex-row items-center">
-                        <PressableFeedback onPress={() => toggleMember(member.id)} className="flex-row items-center flex-1">
-                          <View className="relative">
-                            <Avatar size="md" alt={member.name} className="mr-4 bg-accent-soft">
-                              {member.avatarUrl ? (
-                                <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
-                                  <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} />
-                                </Avatar.Image>
-                              ) : (
-                                <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
-                              )}
-                            </Avatar>
-                            {member.isCurrentUser && (
-                              <View className="absolute bottom-0 right-4 w-3.5 h-3.5 bg-success rounded-full border-2 border-surface" />
-                            )}
-                          </View>
-                          <View className="flex-1">
-                            <AppText className="text-base font-bold">
-                              {member.name}{member.isCurrentUser ? ' (Bạn)' : ''}
-                            </AppText>
-                            {splitMode === 'equal' && (
-                              <AppText className="text-muted text-[13px]">
-                                {isSelected ? `${memberSplit.toLocaleString()} ₫` : '0 ₫'}
-                              </AppText>
-                            )}
-                          </View>
-                        </PressableFeedback>
-
-                        {/* Custom/Percent Input */}
-                        {splitMode !== 'equal' && isSelected && (
-                          <View className="flex-row items-center mr-3">
-                            <TextField className="w-24 h-10 bg-surface-secondary border border-divider/10 rounded-lg">
-                              <TextField.Input
-                                placeholder="0"
-                                keyboardType="number-pad"
-                                value={customSplits[member.id]?.toString() || ''}
-                                onChangeText={(v) => updateCustomSplit(member.id, v)}
-                                className="text-center font-bold"
-                              />
-                            </TextField>
-                            <AppText className="ml-2 text-muted font-medium">
-                              {splitMode === 'percent' ? '%' : '₫'}
-                            </AppText>
-                          </View>
-                        )}
-
-                        <Checkbox
-                          isSelected={isSelected}
-                          onSelectedChange={() => toggleMember(member.id)}
-                          className="size-6"
-                        />
-                      </View>
-                      {index < members.length - 1 && <Divider className="mx-4" />}
-                    </View>
-                  );
-                })}
+          {/* Split Preview */}
+          {members.length > 0 && totalAmount > 0 && (
+            <View className="mb-8">
+              <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
+                CHIA ĐỀU CHO {members.length} NGƯỜI
+              </AppText>
+              <Card variant="default" className="rounded-2xl border border-divider/10 p-4">
+                <View className="flex-row items-center justify-between">
+                  <AppText className="text-muted">Mỗi người trả</AppText>
+                  <AppText className="font-bold text-lg text-accent">
+                    {formatCurrency(splitAmount, currency)}
+                  </AppText>
+                </View>
               </Card>
-            )}
-          </View>
-
-          {/* Footer Summary & Button */}
-          <View className="mb-10">
-            <View className="flex-row items-center justify-between mb-4 px-1">
-              <AppText className="text-muted font-medium">Đã chọn {selectedMembers.length} người</AppText>
-              <AppText className="font-bold text-lg">Tổng: {totalAmount.toLocaleString()} đ</AppText>
             </View>
-            <Button
-              variant="primary"
-              className="w-full h-16 rounded-2xl shadow-xl shadow-accent/20 bg-accent"
-              onPress={handleSaveExpense}
-              isDisabled={createExpense.isPending || !selectedGroupId || !description.trim() || totalAmount <= 0}
-            >
-              <Button.Label className="text-lg font-bold">
+          )}
+
+          {/* Submit Button */}
+          <Button
+            variant="primary"
+            size="lg"
+            className="h-16 rounded-2xl bg-accent shadow-xl shadow-accent/20"
+            onPress={handleSubmit(onSubmit)}
+            isDisabled={createExpense.isPending || !isValid || members.length === 0}
+          >
+            <View className="flex-row items-center gap-2">
+              {createExpense.isPending ? (
+                <View className="animate-spin">
+                  <IconSymbol name="gearshape.fill" size={20} color="white" />
+                </View>
+              ) : (
+                <IconSymbol name="plus" size={20} color="white" />
+              )}
+              <Button.Label className="text-white font-bold text-lg">
                 {createExpense.isPending ? 'Đang lưu...' : 'Lưu khoản chi'}
               </Button.Label>
-            </Button>
-          </View>
+            </View>
+          </Button>
         </View>
       </ScreenScrollView>
     </View>
   );
 }
-
