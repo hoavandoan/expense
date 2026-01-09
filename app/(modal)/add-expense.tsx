@@ -8,7 +8,7 @@ import { formatCurrency } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Avatar, Button, Card, Select, Skeleton, TextField, useThemeColor } from 'heroui-native';
+import { Avatar, Button, Card, Checkbox, PressableFeedback, Select, Skeleton, TextField, useThemeColor } from 'heroui-native';
 import React, { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Alert, View } from 'react-native';
@@ -16,6 +16,8 @@ import * as z from 'zod';
 
 const expenseSchema = z.object({
   groupId: z.string().min(1, 'Vui lòng chọn nhóm'),
+  paidById: z.string().min(1, 'Vui lòng chọn người trả tiền'),
+  participantIds: z.array(z.string()).min(1, 'Vui lòng chọn ít nhất một người tham gia'),
   title: z.string().min(1, 'Vui lòng nhập mô tả chi tiêu'),
   amount: z.string().min(1, 'Vui lòng nhập số tiền').refine(
     (val) => {
@@ -34,6 +36,12 @@ interface GroupOption {
   id: string;
   name: string;
   currency: string;
+}
+
+interface MemberOption {
+  id: string;
+  name: string;
+  avatarUrl?: string;
 }
 
 export default function AddExpenseScreen() {
@@ -65,6 +73,8 @@ export default function AddExpenseScreen() {
     resolver: zodResolver(expenseSchema),
     defaultValues: {
       groupId: initialGroupId,
+      paidById: user?.id || '',
+      participantIds: [],
       title: '',
       amount: '',
       category: 'food',
@@ -75,6 +85,8 @@ export default function AddExpenseScreen() {
 
   const selectedGroupId = watch('groupId');
   const amountValue = watch('amount');
+  const participantIds = watch('participantIds');
+  const paidById = watch('paidById');
 
   // Update groupId when groups load
   useEffect(() => {
@@ -93,37 +105,52 @@ export default function AddExpenseScreen() {
 
   const currency = currentGroup?.currency || 'VND';
 
-  // Get members for equal split
-  const members = useMemo(() => {
+  // Get members
+  const members: MemberOption[] = useMemo(() => {
     const groupData = currentGroupDetail as any;
     if (!groupData?.group_members) return [];
     return groupData.group_members.map((m: any) => ({
       id: m.user_id,
       name: m.user?.name || 'Thành viên',
+      avatarUrl: m.user?.avatar_url,
     }));
   }, [currentGroupDetail]);
 
+  // Set default participantIds when members load
+  useEffect(() => {
+    if (members.length > 0 && participantIds.length === 0) {
+      setValue('participantIds', members.map(m => m.id));
+    }
+  }, [members, setValue, participantIds.length]);
+
+  // Ensure paidById is valid when members change
+  useEffect(() => {
+    if (members.length > 0 && !members.find(m => m.id === paidById)) {
+      if (user && members.find(m => m.id === user.id)) {
+        setValue('paidById', user.id);
+      } else {
+        setValue('paidById', members[0].id);
+      }
+    }
+  }, [members, paidById, setValue, user]);
+
   const totalAmount = parseInt(amountValue?.replace(/\D/g, '') || '0');
-  const splitAmount = members.length > 0 ? Math.floor(totalAmount / members.length) : 0;
+  const splitAmount = participantIds.length > 0 ? Math.floor(totalAmount / participantIds.length) : 0;
 
   const onSubmit = async (values: ExpenseFormValues) => {
-    if (members.length === 0) {
-      Alert.alert('Lỗi', 'Không có thành viên trong nhóm');
-      return;
-    }
-
     try {
       const amount = parseInt(values.amount.replace(/\D/g, ''));
-      const splitPerPerson = Math.floor(amount / members.length);
+      const splitPerPerson = Math.floor(amount / values.participantIds.length);
 
       await createExpense.mutateAsync({
         groupId: values.groupId,
+        paidById: values.paidById,
         title: values.title,
         amount,
         category: values.category,
         description: values.notes || undefined,
-        splits: members.map((m: { id: string }) => ({
-          userId: m.id,
+        splits: values.participantIds.map(userId => ({
+          userId,
           amount: splitPerPerson,
         })),
       });
@@ -136,7 +163,6 @@ export default function AddExpenseScreen() {
     }
   };
 
-  // Loading state
   if (isLoadingGroups) {
     return (
       <View className="flex-1 bg-background p-6">
@@ -147,7 +173,6 @@ export default function AddExpenseScreen() {
     );
   }
 
-  // Empty state - No groups
   if (!groups || groups.length === 0) {
     return (
       <View className="flex-1 bg-background items-center justify-center p-6">
@@ -182,7 +207,6 @@ export default function AddExpenseScreen() {
     <View className="flex-1 bg-background">
       <ScreenScrollView>
         <View className="px-6 pb-10">
-          {/* Group Header (when preselected) */}
           {hasPreselectedGroup && currentGroup && (
             <View className="mb-6 p-4 bg-surface rounded-2xl border border-divider/10 mt-4">
               <View className="flex-row items-center">
@@ -197,7 +221,6 @@ export default function AddExpenseScreen() {
             </View>
           )}
 
-          {/* Group Selector (when NOT preselected) */}
           {!hasPreselectedGroup && (
             <View className="mb-6 mt-4">
               <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">NHÓM</AppText>
@@ -207,7 +230,7 @@ export default function AddExpenseScreen() {
                 render={({ field: { onChange, value } }) => (
                   <Select
                     value={groupOptions.find(g => g.id === value) || null}
-                    onValueChange={(opt: any) => opt && onChange(opt.id)}
+                    onValueChange={(opt: any) => opt && onChange(opt.id || opt)}
                   >
                     <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                       <View className="flex-row items-center gap-3">
@@ -243,7 +266,6 @@ export default function AddExpenseScreen() {
             </View>
           )}
 
-          {/* Amount Input */}
           <View className="mb-6">
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">SỐ TIỀN</AppText>
             <Controller
@@ -270,7 +292,6 @@ export default function AddExpenseScreen() {
             />
           </View>
 
-          {/* Title Input */}
           <View className="mb-6">
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">MÔ TẢ</AppText>
             <Controller
@@ -290,7 +311,6 @@ export default function AddExpenseScreen() {
             />
           </View>
 
-          {/* Category Selector */}
           <View className="mb-6">
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">PHÂN LOẠI</AppText>
             <Controller
@@ -299,7 +319,7 @@ export default function AddExpenseScreen() {
               render={({ field: { onChange, value } }) => (
                 <Select
                   value={EXPENSE_CATEGORIES.find(c => c.value === value)!}
-                  onValueChange={(opt) => opt && onChange(opt.value)}
+                  onValueChange={(opt: any) => opt && onChange(opt.value || opt)}
                 >
                   <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                     <View className="flex-row items-center gap-3">
@@ -350,7 +370,115 @@ export default function AddExpenseScreen() {
             />
           </View>
 
-          {/* Notes Input */}
+          <View className="mb-6">
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">NGƯỜI TRẢ TIỀN</AppText>
+            <Controller
+              control={control}
+              name="paidById"
+              render={({ field: { onChange, value } }) => {
+                const selectedPayer = members.find(m => m.id === value);
+                const payerOptions = members.map(m => ({
+                  value: m.id,
+                  label: m.id === user?.id ? 'Bạn' : m.name,
+                  initial: m.name.charAt(0),
+                }));
+                const currentPayerOption = payerOptions.find(p => p.value === value);
+                return (
+                  <Select
+                    value={currentPayerOption}
+                    onValueChange={(opt: any) => opt && onChange(opt.value)}
+                  >
+                    <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                      <View className="flex-row items-center gap-3">
+                        <View className="w-8 h-8 rounded-full bg-accent/10 items-center justify-center">
+                          <AppText className="font-bold text-accent text-sm">
+                            {selectedPayer?.name?.charAt(0) || '?'}
+                          </AppText>
+                        </View>
+                        <Select.Value className="text-base font-medium" placeholder="Chọn người trả" />
+                      </View>
+                      <IconSymbol name="chevron.right" size={16} color={muted} className="rotate-90" />
+                    </Select.Trigger>
+                    <Select.Portal>
+                      <Select.Overlay className='bg-black/20' />
+                      <Select.Content
+                        placement="bottom"
+                        className="rounded-2xl bg-surface border border-divider/10"
+                        width={300}
+                      >
+                        {payerOptions.map(option => (
+                          <Select.Item 
+                            key={option.value} 
+                            value={option.value} 
+                            label={option.label} 
+                            className="p-4"
+                          >
+                            <View className="flex-row items-center gap-3">
+                              <View className="w-8 h-8 rounded-full bg-accent/10 items-center justify-center">
+                                <AppText className="font-bold text-accent text-sm">{option.initial}</AppText>
+                              </View>
+                              <Select.ItemLabel className="text-base" />
+                            </View>
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Portal>
+                  </Select>
+                );
+              }}
+            />
+          </View>
+
+          <View className="mb-8">
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">CHIA CHO</AppText>
+            <Card variant="default" className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
+              {members.map((member, index) => {
+                const isSelected = participantIds.includes(member.id);
+                return (
+                  <View key={member.id}>
+                    <PressableFeedback
+                      onPress={() => {
+                        const newIds = isSelected
+                          ? participantIds.filter(id => id !== member.id)
+                          : [...participantIds, member.id];
+                        setValue('participantIds', newIds, { shouldValidate: true });
+                      }}
+                      className="flex-row items-center p-4"
+                    >
+                      <Checkbox isSelected={isSelected} />
+                      <Avatar size="sm" alt={member.name} className="ml-3 mr-3">
+                        {member.avatarUrl ? (
+                          <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
+                            <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} />
+                          </Avatar.Image>
+                        ) : (
+                          <Avatar.Fallback className="bg-accent/10">
+                            <AppText className="font-bold text-accent">{member.name.charAt(0)}</AppText>
+                          </Avatar.Fallback>
+                        )}
+                      </Avatar>
+                      <View className="flex-1">
+                        <AppText className={`font-bold text-base ${!isSelected ? 'text-muted opacity-50' : ''}`}>
+                         {member.id === user?.id ? 'Bạn' : member.name}
+                        </AppText>
+                      </View>
+                      {isSelected && totalAmount > 0 && (
+                        <AppText className="font-bold text-accent mr-1">
+                          {formatCurrency(splitAmount, currency)}
+                        </AppText>
+                      )}
+                    </PressableFeedback>
+                    {index < members.length - 1 && <View className="h-[1px] bg-divider/10 mx-4" />}
+                  </View>
+                );
+              })}
+            </Card>
+            {errors.participantIds && (
+              <AppText className="text-danger text-sm mt-2 ml-1">{errors.participantIds.message}</AppText>
+            )}
+          </View>
+
           <View className="mb-6">
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">GHI CHÚ (TÙY CHỌN)</AppText>
             <Controller
@@ -371,54 +499,12 @@ export default function AddExpenseScreen() {
             />
           </View>
 
-          {/* Paid By Section */}
-          <View className="mb-6">
-            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">NGƯỜI TRẢ TIỀN</AppText>
-            <Card variant="default" className="rounded-2xl overflow-hidden border border-divider/10 bg-surface-secondary/50">
-              <View className="flex-row items-center p-4">
-                <Avatar size="sm" alt={user?.name || 'Bạn'} className="mr-3">
-                  {user?.avatarUrl ? (
-                    <Avatar.Image source={{ uri: user.avatarUrl }} asChild>
-                      <Image source={{ uri: user.avatarUrl }} style={{ width: '100%', height: '100%' }} />
-                    </Avatar.Image>
-                  ) : (
-                    <Avatar.Fallback className="bg-accent/10">
-                      <AppText className="font-bold text-accent">{user?.name?.charAt(0) || 'B'}</AppText>
-                    </Avatar.Fallback>
-                  )}
-                </Avatar>
-                <View className="flex-1">
-                  <AppText className="font-bold text-base">{user?.name || 'Bạn'}</AppText>
-                  <AppText className="text-muted text-xs">Trả cho tất cả</AppText>
-                </View>
-              </View>
-            </Card>
-          </View>
-
-          {/* Split Preview */}
-          {members.length > 0 && totalAmount > 0 && (
-            <View className="mb-8">
-              <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-                CHIA ĐỀU CHO {members.length} NGƯỜI
-              </AppText>
-              <Card variant="default" className="rounded-2xl border border-divider/10 p-4">
-                <View className="flex-row items-center justify-between">
-                  <AppText className="text-muted">Mỗi người trả</AppText>
-                  <AppText className="font-bold text-lg text-accent">
-                    {formatCurrency(splitAmount, currency)}
-                  </AppText>
-                </View>
-              </Card>
-            </View>
-          )}
-
-          {/* Submit Button */}
           <Button
             variant="primary"
             size="lg"
             className="h-16 rounded-2xl bg-accent shadow-xl shadow-accent/20"
             onPress={handleSubmit(onSubmit)}
-            isDisabled={createExpense.isPending || !isValid || members.length === 0}
+            isDisabled={createExpense.isPending || !isValid || participantIds.length === 0}
           >
             <View className="flex-row items-center gap-2">
               {createExpense.isPending ? (

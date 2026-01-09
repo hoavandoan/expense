@@ -79,6 +79,7 @@ export const useCreateExpense = () => {
             groupId: string;
             title: string;
             amount: number;
+            paidById?: string;
             category?: string;
             description?: string;
             expenseDate?: string;
@@ -92,7 +93,7 @@ export const useCreateExpense = () => {
                 .from('expenses')
                 .insert({
                     group_id: input.groupId,
-                    paid_by: user.id,
+                    paid_by: input.paidById || user.id,
                     title: input.title,
                     amount: input.amount,
                     category: input.category || 'other',

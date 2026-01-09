@@ -1,8 +1,34 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../supabase';
 import type { Group, GroupWithDetails } from '../types';
+import { generateInviteCode } from '../utils/format';
 
 const GROUPS_KEY = ['groups'];
+const GROUP_KEY = (groupId: string) => ['group', groupId];
+
+/**
+ * Generate a unique invite code (checks database for uniqueness)
+ */
+const generateUniqueInviteCode = async (): Promise<string> => {
+    const MAX_ATTEMPTS = 10;
+
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+        const code = generateInviteCode();
+
+        // Check if code already exists
+        const { data: existing } = await supabase
+            .from('groups')
+            .select('id')
+            .eq('invite_code', code)
+            .single();
+
+        if (!existing) {
+            return code;
+        }
+    }
+
+    throw new Error('Không thể tạo mã mời. Vui lòng thử lại.');
+};
 
 /**
  * Fetch all groups for the current user
@@ -85,6 +111,9 @@ export const useCreateGroup = () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('Not authenticated');
 
+            // Generate a unique invite code
+            const inviteCode = await generateUniqueInviteCode();
+
             const { data, error } = await supabase
                 .from('groups')
                 .insert({
@@ -94,6 +123,7 @@ export const useCreateGroup = () => {
                     currency: input.currency || 'VND',
                     group_type: input.groupType || 'trip',
                     created_by: user.id,
+                    invite_code: inviteCode,
                 })
                 .select()
                 .single();
@@ -108,49 +138,86 @@ export const useCreateGroup = () => {
 };
 
 /**
- * Join a group using invite code
+ * Join a group using invite code or group ID
  */
 export const useJoinGroup = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (inviteCode: string) => {
+        mutationFn: async (inviteCodeOrId: string) => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('Not authenticated');
 
-            // Find group by invite code
-            const { data: group, error: findError } = await supabase
-                .from('groups')
-                .select('id')
-                .eq('invite_code', inviteCode.toUpperCase())
-                .single();
+            const code = inviteCodeOrId.trim().toUpperCase();
+            let groupId: string | null = null;
 
-            if (findError || !group) throw new Error('Invalid invite code');
+            // Check if input looks like a UUID (group ID)
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(inviteCodeOrId.trim());
+
+            if (isUUID) {
+                // Direct group ID lookup
+                const { data: group, error } = await supabase
+                    .from('groups')
+                    .select('id')
+                    .eq('id', inviteCodeOrId.trim())
+                    .single();
+
+                if (!error && group) {
+                    groupId = group.id;
+                }
+            }
+
+            // If not found by ID, try invite code
+            if (!groupId) {
+                console.log('Searching for invite_code:', code);
+
+                const { data: group, error } = await supabase
+                    .from('groups')
+                    .select('id, invite_code')
+                    .eq('invite_code', code)
+                    .maybeSingle();
+
+                console.log('Query result - group:', group, 'error:', error);
+
+                if (error) {
+                    console.error('Error finding group by invite_code:', error);
+                }
+
+                if (group) {
+                    groupId = group.id;
+                }
+            }
+
+            if (!groupId) {
+                throw new Error('Mã mời không hợp lệ hoặc nhóm không tồn tại');
+            }
 
             // Check if already a member
             const { data: existing } = await supabase
                 .from('group_members')
                 .select('id')
-                .eq('group_id', group.id)
+                .eq('group_id', groupId)
                 .eq('user_id', user.id)
                 .single();
 
-            if (existing) throw new Error('Already a member of this group');
+            if (existing) throw new Error('Bạn đã là thành viên của nhóm này');
 
             // Add user to group
             const { error: joinError } = await supabase
                 .from('group_members')
                 .insert({
-                    group_id: group.id,
+                    group_id: groupId,
                     user_id: user.id,
                     role: 'member',
                 });
 
             if (joinError) throw joinError;
-            return group.id;
+            return groupId;
         },
-        onSuccess: () => {
+        onSuccess: (groupId) => {
             queryClient.invalidateQueries({ queryKey: GROUPS_KEY });
+            queryClient.invalidateQueries({ queryKey: ['group', groupId] });
+            queryClient.invalidateQueries({ queryKey: ['recent-expenses'] });
         },
     });
 };
