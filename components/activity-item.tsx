@@ -1,8 +1,8 @@
-import { AppText } from '@/components/app-text';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Avatar, cn, PressableFeedback, useThemeColor } from 'heroui-native';
-import React from 'react';
-import { View } from 'react-native';
+import { AppText } from "@/components/app-text";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Avatar, cn, PressableFeedback, useThemeColor } from "heroui-native";
+import React from "react";
+import { View } from "react-native";
 
 export interface ActivityItemProps {
   user: { name: string; avatar: string };
@@ -31,8 +31,8 @@ export const ActivityItem = ({
   iconColor,
   isMe,
 }: ActivityItemProps) => {
-  const accent = useThemeColor('accent');
-  const muted = useThemeColor('muted');
+  const accent = useThemeColor("accent");
+  const muted = useThemeColor("muted");
 
   return (
     <PressableFeedback className="bg-surface p-4 rounded-2xl border border-divider/10">
@@ -41,7 +41,9 @@ export const ActivityItem = ({
           <Avatar size="lg" alt={user.name} className="w-14 h-14">
             {isMe ? (
               <View className="w-full h-full bg-accent-soft items-center justify-center">
-                <AppText className="text-accent font-bold text-xs uppercase">Bạn</AppText>
+                <AppText className="text-accent font-bold text-xs uppercase">
+                  Bạn
+                </AppText>
               </View>
             ) : (
               <Avatar.Image source={{ uri: user.avatar }} />
@@ -49,13 +51,9 @@ export const ActivityItem = ({
           </Avatar>
           <View
             className={cn(
-              "absolute w-6 h-6 rounded-full items-center justify-center border-2 border-surface shadow-lg",
+              "absolute w-6 h-6 bottom-0 right-0 rounded-full items-center justify-center border-2 border-surface shadow-lg",
               typeColor
             )}
-            style={{
-              bottom: 0,
-              right: 0,
-            }}
           >
             <IconSymbol name={typeIcon} size={10} color={iconColor} />
           </View>
@@ -66,12 +64,17 @@ export const ActivityItem = ({
             <AppText className="font-bold">{user.name}</AppText>
             <AppText className="text-foreground/70"> {action}</AppText>
             {subject && (
-              <AppText className="text-foreground/70"> {subject}</AppText>
+              <AppText className="text-foreground font-semibold">
+                {" "}
+                {subject}
+              </AppText>
             )}
           </AppText>
           <View className="flex-row items-center mt-1">
             <IconSymbol name={groupIcon} size={14} color={muted} />
-            <AppText className="text-muted text-xs ml-1 font-medium">{group}</AppText>
+            <AppText className="text-muted text-xs ml-1 font-medium">
+              {group}
+            </AppText>
           </View>
         </View>
 
@@ -80,17 +83,22 @@ export const ActivityItem = ({
             <AppText
               className={cn(
                 "text-lg font-bold",
-                amount.startsWith('+') ? "text-success" : (status ? "text-accent" : "text-foreground")
+                amount.startsWith("+")
+                  ? "text-success"
+                  : status
+                  ? "text-accent"
+                  : "text-foreground"
               )}
             >
               {amount}
             </AppText>
           )}
           {status && (
-            <AppText className="text-muted text-[11px] font-medium">{status}</AppText>
+            <AppText className="text-muted text-[11px] font-medium">
+              {status}
+            </AppText>
           )}
         </View>
-
       </View>
     </PressableFeedback>
   );

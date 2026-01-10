@@ -1,5 +1,6 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { StickyHeader } from '@/components/ui/sticky-header';
 import { useGroup, useLeaveGroup, useUpdateGroup } from '@/lib/hooks';
@@ -36,6 +37,11 @@ export default function GroupSettingsScreen() {
     }
   }, [group]);
 
+  // const { toast } = useToast();
+  const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const handleSaveChanges = async () => {
     if (!groupName.trim()) {
       Alert.alert('Lỗi', 'Tên nhóm không được để trống');
@@ -57,53 +63,38 @@ export default function GroupSettingsScreen() {
     }
   };
 
+  const onConfirmLeave = async () => {
+    try {
+      await leaveGroup.mutateAsync(id as string);
+      router.replace('/(tabs)');
+    } catch (error: any) {
+      Alert.alert('Lỗi', error.message);
+    }
+  };
+
   const handleLeaveGroup = () => {
-    Alert.alert(
-      'Rời khỏi nhóm',
-      'Bạn có chắc chắn muốn rời khỏi nhóm này? Các khoản nợ của bạn sẽ vẫn được giữ lại.',
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Rời nhóm',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await leaveGroup.mutateAsync(id as string);
-              router.replace('/(tabs)');
-            } catch (error: any) {
-              Alert.alert('Lỗi', error.message);
-            }
-          },
-        },
-      ]
-    );
+    setIsLeaveDialogOpen(true);
+  };
+
+  const onConfirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('groups')
+        .delete()
+        .eq('id', id as string);
+
+      if (error) throw error;
+      router.replace('/(tabs)');
+    } catch (error: any) {
+      Alert.alert('Lỗi', error.message);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleDeleteGroup = () => {
-    Alert.alert(
-      'Xóa nhóm',
-      'Bạn có chắc chắn muốn xóa nhóm này? Tất cả dữ liệu sẽ bị xóa vĩnh viễn và không thể khôi phục.',
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Xóa nhóm',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              const { error } = await supabase
-                .from('groups')
-                .delete()
-                .eq('id', id as string);
-
-              if (error) throw error;
-              router.replace('/(tabs)');
-            } catch (error: any) {
-              Alert.alert('Lỗi', error.message);
-            }
-          },
-        },
-      ]
-    );
+    setIsDeleteDialogOpen(true);
   };
 
   if (isLoading) {
@@ -237,6 +228,27 @@ export default function GroupSettingsScreen() {
           )}
         </View>
       </ScreenScrollView>
+      <ConfirmDialog
+        isOpen={isLeaveDialogOpen}
+        onOpenChange={setIsLeaveDialogOpen}
+        title="Rời khỏi nhóm"
+        description="Bạn có chắc chắn muốn rời khỏi nhóm này? Các khoản nợ của bạn sẽ vẫn được giữ lại."
+        confirmLabel="Rời nhóm"
+        variant="danger"
+        onConfirm={onConfirmLeave}
+        isLoading={leaveGroup.isPending}
+      />
+
+      <ConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Xóa nhóm"
+        description="Bạn có chắc chắn muốn xóa nhóm này? Tất cả dữ liệu sẽ bị xóa vĩnh viễn và không thể khôi phục."
+        confirmLabel="Xóa nhóm"
+        variant="danger"
+        onConfirm={onConfirmDelete}
+        isLoading={isDeleting}
+      />
     </View>
   );
 }

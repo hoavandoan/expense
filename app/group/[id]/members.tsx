@@ -19,6 +19,8 @@ export default function GroupMembersScreen() {
 
   const inviteCode = (group as any)?.invite_code || '';
 
+  // const { toast } = useToast();
+
   const handleCopyInviteCode = async () => {
     if (!inviteCode) {
       Alert.alert('Lỗi', 'Không tìm thấy mã mời');
@@ -37,7 +39,7 @@ export default function GroupMembersScreen() {
 
     try {
       await Share.share({
-        message: `Tham gia nhóm "${group?.name}" trên SplitGroup!\n\nMã mời: ${inviteCode}\n\nTải app và nhập mã để tham gia.`,
+        message: `Tham gia nhóm "${group?.name}" trên SplitSmart!\n\nMã mời: ${inviteCode}\n\nTải app và nhập mã để tham gia.`,
       });
     } catch (error: any) {
       Alert.alert('Lỗi', error.message);

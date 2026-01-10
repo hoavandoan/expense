@@ -35,8 +35,8 @@ UI and Styling
 
 - Use Expo's built-in components for common UI patterns and layouts.
 - Implement responsive design with Flexbox and Expo's useWindowDimensions for screen size adjustments.
-- Use Tailwind CSS for component styling follow HeroUI Native documentation from https://v3.heroui.com/native/llms.txt.
-- Implement dark mode support using Expo's useAppTheme.
+- Use Tailwind CSS for component styling follow heroui-native.
+- Implement dark mode support using Expo's useColorScheme.
 - Ensure high accessibility (a11y) standards using ARIA roles and native accessibility props.
 - Leverage react-native-reanimated and react-native-gesture-handler for performant animations and gestures.
 
@@ -44,7 +44,7 @@ Safe Area Management
 
 - Use SafeAreaProvider from react-native-safe-area-context to manage safe areas globally in your app.
 - Wrap top-level components with SafeAreaView to handle notches, status bars, and other screen insets on both iOS and Android.
-- Use ScreenScrollView for scrollable content to ensure it respects safe area boundaries.
+- Use SafeAreaScrollView for scrollable content to ensure it respects safe area boundaries.
 - Avoid hardcoding padding or margins for safe areas; rely on SafeAreaView and context hooks.
 
 Performance Optimization
@@ -64,15 +64,14 @@ Navigation
 
 State Management
 
-- Use React Context and useReducer for managing global state.
-- Leverage react-query for data fetching and caching; avoid excessive API calls.
-- For complex state management, consider using Zustand or Redux Toolkit.
+- Use React Context managing global state.
+- Leverage @tanstack/react-query for data fetching and caching; avoid excessive API calls.
+- For complex state management, consider using Zustand.
 - Handle URL search parameters using libraries like expo-linking.
 
 Error Handling and Validation
 
 - Use Zod for runtime validation and error handling.
-- Implement proper error logging using Sentry or a similar service.
 - Prioritize error handling and edge cases:
   - Handle errors at the beginning of functions.
   - Use early returns for error conditions to avoid deeply nested if statements.

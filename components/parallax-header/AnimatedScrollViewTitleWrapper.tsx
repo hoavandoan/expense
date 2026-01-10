@@ -7,13 +7,10 @@ interface AnimatedScrollViewTitleWrapperProps {
   className?: string;
 }
 
-export const AnimatedScrollViewTitleWrapper: React.FC<AnimatedScrollViewTitleWrapperProps> = ({
-  children,
-  className,
-}) => {
+export const AnimatedScrollViewTitleWrapper: React.FC<
+  AnimatedScrollViewTitleWrapperProps
+> = ({ children, className }) => {
   return (
-    <View className={cn("relative w-full px-4 pb-4", className)}>
-      {children}
-    </View>
+    <View className={cn("relative w-full pb-4", className)}>{children}</View>
   );
 };

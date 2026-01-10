@@ -14,11 +14,17 @@ export default function SearchScreen() {
       <StickyHeader title="Tìm kiếm" />
 
       <View className="px-6 py-4">
-        <TextField className="bg-surface border border-divider/10 rounded-2xl px-4 h-16">
-          <TextField.InputStartContent>
-            <IconSymbol name="magnifyingglass" size={18} color="gray" />
-          </TextField.InputStartContent>
-          <TextField.Input placeholder="Tìm nhóm, bạn bè, khoản chi..." placeholderTextColor="gray" className="text-foreground" />
+        <TextField>
+          <View className="justify-center">
+            <TextField.Input
+              placeholder="Tìm nhóm, bạn bè, khoản chi..."
+              placeholderTextColor="gray"
+              className="bg-surface border border-divider/10 rounded-2xl pl-12 h-16 text-foreground"
+            />
+            <View className="absolute left-4" pointerEvents="none">
+              <IconSymbol name="magnifyingglass" size={18} color="gray" />
+            </View>
+          </View>
         </TextField>
       </View>
 

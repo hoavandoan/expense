@@ -5,7 +5,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useRouter } from 'expo-router';
 import { Button, Divider, PressableFeedback, TextField } from 'heroui-native';
 import React, { useState } from 'react';
-import { Alert, ScrollView, TextInput, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function JoinGroupScreen() {
@@ -13,6 +13,8 @@ export default function JoinGroupScreen() {
   const insets = useSafeAreaInsets();
   const [inviteCode, setInviteCode] = useState('');
   const joinGroup = useJoinGroup();
+
+  // const { toast } = useToast();
 
   const handlePaste = async () => {
     const text = await Clipboard.getStringAsync();
@@ -34,7 +36,9 @@ export default function JoinGroupScreen() {
       Alert.alert('Thành công', 'Đã tham gia nhóm', [
         {
           text: 'OK',
-          onPress: () => router.replace(`/group/${groupId}` as any),
+          onPress: () => {
+            router.replace(`/group/${groupId}` as any);
+          },
         },
       ]);
     } catch (error: any) {
@@ -102,29 +106,31 @@ export default function JoinGroupScreen() {
           </AppText>
 
           <View className="flex-row gap-2">
-            <TextField className="flex-1 h-16 bg-surface border border-divider/10 rounded-2xl px-4">
-              <TextField.InputStartContent>
-                <IconSymbol name="link" size={18} color="gray" />
-              </TextField.InputStartContent>
-              <TextInput
-                placeholder="Mã hoặc liên kết mời"
-                className="flex-1 ml-2 text-foreground"
-                placeholderTextColor="gray"
-                value={inviteCode}
-                onChangeText={(text) => setInviteCode(text.toUpperCase())}
-                autoCapitalize="characters"
-              />
-              <TextField.InputEndContent>
-                <PressableFeedback
-                  className="bg-surface-secondary px-4 py-2 rounded-xl border border-divider/10 shadow-sm"
-                  onPress={handlePaste}
-                >
-                  <View className="flex-row items-center gap-1.5">
-                    <IconSymbol name="doc.on.clipboard" size={14} color="gray" />
-                    <AppText className="text-xs font-bold">Dán</AppText>
-                  </View>
-                </PressableFeedback>
-              </TextField.InputEndContent>
+            <TextField className="flex-1">
+              <View className="justify-center">
+                <TextField.Input
+                  placeholder="Mã hoặc liên kết mời"
+                  className="bg-surface border border-divider/10 h-16 rounded-2xl pl-12 pr-20 text-foreground"
+                  placeholderTextColor="gray"
+                  value={inviteCode}
+                  onChangeText={(text) => setInviteCode(text.toUpperCase())}
+                  autoCapitalize="characters"
+                />
+                <View className="absolute left-4" pointerEvents="none">
+                  <IconSymbol name="link" size={18} color="gray" />
+                </View>
+                <View className="absolute right-4">
+                  <PressableFeedback
+                    className="bg-surface-secondary px-4 py-2 rounded-xl border border-divider/10"
+                    onPress={handlePaste}
+                  >
+                    <View className="flex-row items-center gap-1.5">
+                      <IconSymbol name="doc.on.clipboard" size={14} color="gray" />
+                      <AppText className="text-xs font-bold">Dán</AppText>
+                    </View>
+                  </PressableFeedback>
+                </View>
+              </View>
             </TextField>
           </View>
         </View>

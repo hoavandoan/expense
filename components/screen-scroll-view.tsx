@@ -1,14 +1,13 @@
-import { useHeaderHeight } from '@react-navigation/elements';
-import { cn, useThemeColor } from 'heroui-native';
+import { useHeaderHeight } from "@react-navigation/elements";
+import { cn, useThemeColor } from "heroui-native";
 
-import { type FC, type PropsWithChildren } from 'react';
-import { Platform, RefreshControl, ScrollView, type ScrollViewProps, View } from 'react-native';
+import { type FC, type PropsWithChildren } from "react";
+import { RefreshControl, ScrollView, type ScrollViewProps } from "react-native";
 
-import Animated, { type AnimatedProps } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { type AnimatedProps } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
-
 
 interface Props extends AnimatedProps<ScrollViewProps> {
   className?: string;
@@ -32,21 +31,17 @@ export const ScreenScrollView: FC<PropsWithChildren<Props>> = ({
   ...props
 }) => {
   const insets = useSafeAreaInsets();
-  let headerHeight = 0;
-  const isIOS = Platform.OS === 'ios';
-
-  try {
-    headerHeight = useHeaderHeight();
-  } catch (e) {
-    headerHeight = insets.top;
-  }
+  let headerHeight = useHeaderHeight();
 
   // Calculate bottom padding: insets.bottom + a small buffer for the end of content
   const bottomPadding = (withTabBarOffset ? 32 : 16) + insets.bottom;
 
+  const accent = useThemeColor("accent");
+
   return (
     <AnimatedScrollView
-      className={cn('bg-background flex-1', className)}
+      className={cn("bg-background flex-1", className)}
+      contentContainerClassName={cn("px-6", contentContainerClassName)}
       contentContainerStyle={[
         {
           paddingTop: headerHeight,
@@ -60,16 +55,13 @@ export const ScreenScrollView: FC<PropsWithChildren<Props>> = ({
           <RefreshControl
             refreshing={refreshing || false}
             onRefresh={onRefresh}
-            tintColor={useThemeColor('accent')}
+            tintColor={accent}
           />
         ) : undefined
       }
       {...props}
     >
-      <View className={cn('px-6', contentContainerClassName)}>
-        {children}
-      </View>
+      {children}
     </AnimatedScrollView>
   );
 };
-

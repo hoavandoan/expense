@@ -1,35 +1,35 @@
-import { AppText } from '@/components/app-text';
+import { AppText } from "@/components/app-text";
 
 import {
-    AnimatedScrollView,
-    HeaderComponentWrapper,
-    HeaderNavBar,
-} from '@/components/parallax-header';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { SettingsItem } from '@/components/ui/settings-item';
-import { useAppTheme } from '@/contexts/app-theme-context';
-import { useAuth } from '@/lib/hooks';
-import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
+  AnimatedScrollView,
+  HeaderComponentWrapper,
+  HeaderNavBar,
+} from "@/components/parallax-header";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { SettingsItem } from "@/components/ui/settings-item";
+import { useAppTheme } from "@/contexts/app-theme-context";
+import { useAuth } from "@/lib/hooks";
+import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import {
-    Avatar,
-    Button,
-    Card,
-    Divider,
-    PressableFeedback,
-    Switch,
-    useThemeColor,
-} from 'heroui-native';
-import React, { useState } from 'react';
-import { View } from 'react-native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+  Avatar,
+  Button,
+  Card,
+  Divider,
+  PressableFeedback,
+  Switch,
+  useThemeColor,
+} from "heroui-native";
+import React, { useState } from "react";
+import { View } from "react-native";
+import Animated, { ZoomIn } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
   const { user, isAuthenticated, signOut, setLoginSheetOpen } = useAuth();
   const { isDark, toggleTheme } = useAppTheme();
-  const foreground = useThemeColor('foreground');
+  const foreground = useThemeColor("foreground");
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -37,10 +37,10 @@ export default function SettingsScreen() {
 
   const renderTopNavBarComponent = () => (
     <HeaderNavBar useBlur={true} className="border-b border-divider/10">
-      <View className="flex-row items-center justify-between px-6 h-full">
+      <View className="flex-row items-center justify-between h-full">
         <PressableFeedback
           onPress={() => router.back()}
-          className="w-8 h-8 rounded-full items-center justify-center"
+          className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10"
         >
           <IconSymbol name="chevron.left" size={24} color={foreground} />
         </PressableFeedback>
@@ -72,19 +72,23 @@ export default function SettingsScreen() {
         <View className="relative">
           <Avatar
             size="lg"
-            alt={isAuthenticated ? user?.name || '' : 'Guest'}
+            alt={isAuthenticated ? user?.name || "" : "Guest"}
             className="w-28 h-28 border-4 border-surface shadow-xl"
           >
             {isAuthenticated && user?.avatarUrl ? (
               <Avatar.Image source={{ uri: user.avatarUrl }} asChild>
                 <Image
                   source={{ uri: user.avatarUrl }}
-                  style={{ width: '100%', height: '100%' }}
+                  style={{ width: "100%", height: "100%" }}
                 />
               </Avatar.Image>
             ) : (
               <Avatar.Fallback className="bg-accent/10">
-                <IconSymbol name="person" size={40} color={useThemeColor('accent')} />
+                <IconSymbol
+                  name="person"
+                  size={40}
+                  color={useThemeColor("accent")}
+                />
               </Avatar.Fallback>
             )}
           </Avatar>
@@ -95,15 +99,22 @@ export default function SettingsScreen() {
           )}
         </View>
         <AppText className="text-xl font-bold mt-4">
-          {isAuthenticated ? user?.name : 'Chưa đăng nhập'}
+          {isAuthenticated ? user?.name : "Chưa đăng nhập"}
         </AppText>
         {isAuthenticated ? (
           <View className="bg-surface px-4 py-1 rounded-full mt-2 border border-divider/10">
-            <AppText className="text-muted text-sm font-medium">{user?.email}</AppText>
+            <AppText className="text-muted text-sm font-medium">
+              {user?.email}
+            </AppText>
           </View>
         ) : (
-          <PressableFeedback onPress={() => setLoginSheetOpen(true)} className="mt-2">
-            <AppText className="text-accent font-medium">Đăng nhập ngay để trải nghiệm</AppText>
+          <PressableFeedback
+            onPress={() => setLoginSheetOpen(true)}
+            className="mt-2"
+          >
+            <AppText className="text-accent font-medium">
+              Đăng nhập ngay để trải nghiệm
+            </AppText>
           </PressableFeedback>
         )}
       </View>
@@ -121,16 +132,29 @@ export default function SettingsScreen() {
         <View className="px-6 gap-8 pb-10 mt-6">
           {/* Pro Upgrade Card */}
           <PressableFeedback>
-            <Card variant="default" className="bg-accent rounded-2xl p-5 border-0 shadow-xl shadow-accent/30 flex-row items-center overflow-hidden">
+            <Card
+              variant="default"
+              className="bg-accent rounded-2xl p-5 border-0 shadow-xl shadow-accent/30 flex-row items-center overflow-hidden"
+            >
               <View className="flex-1">
                 <View className="bg-white/20 px-2 py-0.5 rounded-full self-start mb-2">
-                  <AppText className="text-white text-[10px] font-bold">PREMIUM</AppText>
+                  <AppText className="text-white text-[10px] font-bold">
+                    PREMIUM
+                  </AppText>
                 </View>
-                <AppText className="text-white text-lg font-bold">Nâng cấp lên Pro</AppText>
-                <AppText className="text-white/80 text-xs mt-1">Sử dụng không giới hạn nhóm và tính năng cao cấp</AppText>
+                <AppText className="text-white text-lg font-bold">
+                  Nâng cấp lên Pro
+                </AppText>
+                <AppText className="text-white/80 text-xs mt-1">
+                  Sử dụng không giới hạn nhóm và tính năng cao cấp
+                </AppText>
               </View>
               <View className="w-12 h-12 bg-white/20 rounded-2xl items-center justify-center">
-                <IconSymbol name="chart.line.uptrend.xyv" size={24} color="white" />
+                <IconSymbol
+                  name="chart.line.uptrend.xyv"
+                  size={24}
+                  color="white"
+                />
               </View>
               <View className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full" />
             </Card>
@@ -141,16 +165,27 @@ export default function SettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
               TÀI KHOẢN
             </AppText>
-            <Card variant="default" className="overflow-hidden border border-divider/10 rounded-2xl">
+            <Card
+              variant="default"
+              className="overflow-hidden border border-divider/10 rounded-2xl"
+            >
               <SettingsItem
                 icon="creditcard"
                 iconBgColor="#17C964"
                 label="Phương thức thanh toán"
               />
               <Divider className="my-3" />
-              <SettingsItem icon="lock" iconBgColor="#F5A623" label="Đổi mật khẩu" />
+              <SettingsItem
+                icon="lock"
+                iconBgColor="#F5A623"
+                label="Đổi mật khẩu"
+              />
               <Divider className="my-3" />
-              <SettingsItem icon="shield" iconBgColor="#0070F3" label="Quyền riêng tư" />
+              <SettingsItem
+                icon="shield"
+                iconBgColor="#0070F3"
+                label="Quyền riêng tư"
+              />
             </Card>
           </View>
 
@@ -159,7 +194,10 @@ export default function SettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
               CÀI ĐẶT CHUNG
             </AppText>
-            <Card variant="default" className="overflow-hidden border border-divider/10 rounded-2xl">
+            <Card
+              variant="default"
+              className="overflow-hidden border border-divider/10 rounded-2xl"
+            >
               <SettingsItem
                 icon="moon.fill"
                 iconBgColor="#3F3F46"
@@ -170,10 +208,9 @@ export default function SettingsScreen() {
                   <Switch
                     isSelected={isDark}
                     className="w-[56px] h-8"
-
                     animation={{
                       backgroundColor: {
-                        value: ['#172554', '#eab308'],
+                        value: ["#172554", "#eab308"],
                       },
                     }}
                   >
@@ -200,7 +237,11 @@ export default function SettingsScreen() {
                     <Switch.EndContent className="right-2">
                       {!isDark && (
                         <Animated.View key="moon" entering={ZoomIn.springify()}>
-                          <IconSymbol name="moon.fill" size={16} color="white" />
+                          <IconSymbol
+                            name="moon.fill"
+                            size={16}
+                            color="white"
+                          />
                         </Animated.View>
                       )}
                     </Switch.EndContent>
@@ -214,7 +255,10 @@ export default function SettingsScreen() {
                 label="Thông báo"
                 showChevron={false}
                 rightElement={
-                  <Switch isSelected={notifications} onSelectedChange={setNotifications}>
+                  <Switch
+                    isSelected={notifications}
+                    onSelectedChange={setNotifications}
+                  >
                     <Switch.Thumb />
                   </Switch>
                 }
@@ -225,7 +269,9 @@ export default function SettingsScreen() {
                 iconBgColor="#17C964"
                 label="Ngôn ngữ"
                 rightElement={
-                  <AppText className="text-muted text-sm font-medium">Tiếng Việt</AppText>
+                  <AppText className="text-muted text-sm font-medium">
+                    Tiếng Việt
+                  </AppText>
                 }
               />
               <Divider className="my-3" />
@@ -234,7 +280,9 @@ export default function SettingsScreen() {
                 iconBgColor="#F5A623"
                 label="Tiền tệ"
                 rightElement={
-                  <AppText className="text-muted text-sm font-medium">VNĐ (₫)</AppText>
+                  <AppText className="text-muted text-sm font-medium">
+                    VNĐ (₫)
+                  </AppText>
                 }
               />
             </Card>
@@ -245,12 +293,27 @@ export default function SettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
               HỖ TRỢ & KHÁC
             </AppText>
-            <Card variant="default" className="overflow-hidden border border-divider/10 rounded-2xl">
-              <SettingsItem icon="heart" iconBgColor="#F31260" label="Mời bạn bè" />
+            <Card
+              variant="default"
+              className="overflow-hidden border border-divider/10 rounded-2xl"
+            >
+              <SettingsItem
+                icon="heart"
+                iconBgColor="#F31260"
+                label="Mời bạn bè"
+              />
               <Divider className="my-3" />
-              <SettingsItem icon="questionmark.circle" iconBgColor="#0070F3" label="Trợ giúp" />
+              <SettingsItem
+                icon="questionmark.circle"
+                iconBgColor="#0070F3"
+                label="Trợ giúp"
+              />
               <Divider className="my-3" />
-              <SettingsItem icon="info.circle" iconBgColor="#06B6D4" label="Về chúng tôi" />
+              <SettingsItem
+                icon="info.circle"
+                iconBgColor="#06B6D4"
+                label="Về chúng tôi"
+              />
             </Card>
           </View>
 

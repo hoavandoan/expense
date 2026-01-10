@@ -1,37 +1,41 @@
-import { LoginBottomSheet } from '@/components/auth/LoginBottomSheet';
-import { ErrorBoundary } from '@/components/error-boundary';
-import { AppThemeProvider } from '@/contexts/app-theme-context';
-import { useAuth } from '@/lib/hooks';
+import { LoginBottomSheet } from "@/components/auth/LoginBottomSheet";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { AppThemeProvider } from "@/contexts/app-theme-context";
+import { useAuth } from "@/lib/hooks";
 import {
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
   Inter_700Bold,
   useFonts,
-} from '@expo-google-fonts/inter';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Stack } from 'expo-router';
-import { HeroUINativeConfig, HeroUINativeProvider } from 'heroui-native';
-import { useCallback } from 'react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+} from "@expo-google-fonts/inter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Stack } from "expo-router";
+import { HeroUINativeConfig, HeroUINativeProvider } from "heroui-native";
+import { useCallback } from "react";
 import {
   KeyboardAvoidingView,
+  Platform,
+  View,
+} from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import {
   KeyboardProvider,
-} from 'react-native-keyboard-controller';
+} from "react-native-keyboard-controller";
 import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
-} from 'react-native-reanimated';
-import './global.css';
+} from "react-native-reanimated";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import "./global.css";
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
   strict: false,
 });
-
-// export const unstable_settings = {
-//   anchor: '(tabs)',
-// };
 
 const config: HeroUINativeConfig = {
   textProps: {
@@ -39,19 +43,6 @@ const config: HeroUINativeConfig = {
     maxFontSizeMultiplier: 1.5,
     allowFontScaling: true,
     adjustsFontSizeToFit: false,
-  },
-  toast: {
-    defaultProps: {
-      variant: 'default',
-      placement: 'top',
-    },
-    insets: {
-      top: 0,
-      bottom: 6,
-      left: 12,
-      right: 12,
-    },
-    maxVisibleToasts: 3,
   },
 };
 
@@ -73,45 +64,59 @@ function AuthListener() {
 
 function AppContent() {
   const { isLoginSheetOpen, setLoginSheetOpen } = useAuth();
+  const insets = useSafeAreaInsets();
+
   const contentWrapper = useCallback(
     (children: React.ReactNode) => (
       <KeyboardAvoidingView
         pointerEvents="box-none"
-        behavior="padding"
-        keyboardVerticalOffset={12}
-        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 12 : 0}
+        className="flex-1 items-center justify-start"
       >
-        {children}
+        <View className="w-full max-w-[500px]" pointerEvents="box-none">
+          {children}
+        </View>
       </KeyboardAvoidingView>
     ),
     []
   );
 
   return (
-    <>
-      <AuthListener />
-      <HeroUINativeProvider
-        config={{
-          ...config,
-          toast: {
-            ...config.toast,
-            contentWrapper,
+    <HeroUINativeProvider
+      config={{
+        ...config,
+        toast: {
+          defaultProps: {
+            placement: "top",
           },
+          insets: {
+            top: insets.top > 0 ? insets.top + 8 : 48,
+            bottom: insets.bottom > 0 ? insets.bottom + 12 : 40,
+            left: 16,
+            right: 16,
+          },
+          maxVisibleToasts: 5,
+          contentWrapper,
+        },
+      }}
+    >
+      <AuthListener />
+      <Stack
+        screenOptions={{
+          headerShown: false,
         }}
       >
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="(onboarding)" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="group/[id]/index" />
-          <Stack.Screen name="(modal)" options={{ presentation: 'modal' }} />
-        </Stack>
-        <LoginBottomSheet isOpen={isLoginSheetOpen} onOpenChange={setLoginSheetOpen} />
-      </HeroUINativeProvider>
-    </>
+        <Stack.Screen name="(onboarding)" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="group/[id]/index" />
+        <Stack.Screen name="(modal)" options={{ presentation: "modal" }} />
+      </Stack>
+      <LoginBottomSheet
+        isOpen={isLoginSheetOpen}
+        onOpenChange={setLoginSheetOpen}
+      />
+    </HeroUINativeProvider>
   );
 }
 
@@ -128,16 +133,18 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <KeyboardProvider>
-            <AppThemeProvider>
-              <AppContent />
-            </AppThemeProvider>
-          </KeyboardProvider>
-        </QueryClientProvider>
-      </ErrorBoundary>
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ErrorBoundary>
+          <QueryClientProvider client={queryClient}>
+            <KeyboardProvider>
+              <AppThemeProvider>
+                <AppContent />
+              </AppThemeProvider>
+            </KeyboardProvider>
+          </QueryClientProvider>
+        </ErrorBoundary>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }

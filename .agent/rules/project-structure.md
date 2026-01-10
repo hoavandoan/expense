@@ -10,7 +10,7 @@ This document defines the project structure, technical stack, and development wo
 
 - **Framework**: [Expo](https://expo.dev/) (Managed Workflow)
 - **Core**: React Native & TypeScript
-- **UI Components**: [HeroUI Native](https://heroui.com/native)
+- **UI Components**: [HeroUI Native](https://v3.heroui.com/docs/native/getting-started)
 - **Styling**: [Uniwind](https://uniwind.dev/) (Tailwind CSS for React Native)
 - **Navigation**: [Expo Router](https://docs.expo.dev/router/introduction/)
 - **State Management**: React Props/State (Local), Context/Zustand (Global if needed), React Query (Server Types)
@@ -48,18 +48,22 @@ This document defines the project structure, technical stack, and development wo
 ## 3. UI & Theming System
 
 ### Design Patterns
+
 - **Premium Aesthetics**: Use refined styling, shadows, and spacing.
 - **HeroUI Anatomy**: Strictly follow component anatomy (e.g., `Card.Header`, `Card.Body`).
 - **Feedback**: Use `PressableFeedback` for all interactive elements.
 - **Standard Layout**: Use `ScreenSurface` or `ScreenScrollView` as the base for all screens.
 - **Spacing Standards**: Use `px-6` (24px) for horizontal padding of main content.
 - **Border Standards**: Use `border-divider/10` as the default border for cards and containers.
+- **Toast**: Use useToast.
+- **Confirm Dialog: Use `confirm-dialog.tsx`.
 - **Component Consistency**: Use `Card` for interactive list items or bounded data sections. Use `Surface` for general background surfaces.
-- **Mobile Responsiveness**: 
+- **Mobile Responsiveness**:
   - Use `adjustsFontSizeToFit` and `numberOfLines={1}` for currency and large numerical displays to prevent overflow on small screens.
   - Avoid hardcoded fixed widths unless necessary; use flex or relative percentages.
 
 ### Theming (`global.css`)
+
 - Use CSS variables for colors to support Dark/Light modes:
   - `--background`: Main background
   - `--surface`: Card/Section background
@@ -70,6 +74,7 @@ This document defines the project structure, technical stack, and development wo
 ## 4. Coding Standards
 
 Refer to `code-style-guide.md` for detailed coding rules. Key highlights:
+
 - **Immutability**: Prefer `const`, avoid mutation.
 - **Early Return**: Simplify logic flow.
 - **Declarative**: Use Array methods (`map`, `filter`) over loops.
@@ -78,11 +83,13 @@ Refer to `code-style-guide.md` for detailed coding rules. Key highlights:
 ## 5. Development Workflows
 
 ### Adding New Screens
+
 1.  **Route**: Create file in `app/`. Use `(modal)` group for modals.
 2.  **Structure**: Wrap in `ScreenSurface` > `ScreenScrollView`.
 3.  **Components**: Use `heroui-native` components.
 
 ### Adding New Components
+
 1.  **Location**: `components/ui` for atoms, `components/` for molecules/organisms.
 2.  **Props**: Always explicitly type props. Support `className`.
 3.  **Icons**: Update `IconSymbol` mapping if introducing new icons.
@@ -90,13 +97,16 @@ Refer to `code-style-guide.md` for detailed coding rules. Key highlights:
 ## 6. Future Expansion Guidelines (Constants, Utils, Lib, API)
 
 ### Constants (`constants/`)
+
 - Store strictly constant values (Config, Strings, Colors).
 - Do not put logic here.
 
 ### Utilities (`utils/` or `lib/`)
+
 - **Utils**: Pure functions, formatting helpers (currency, date).
 - **Lib**: Third-party library wrappers or complex business logic configurations.
 
 ### API Layer
+
 - Define clear interfaces for API responses.
 - Use hooks (e.g., React Query) for data fetching to handle caching/loading states.

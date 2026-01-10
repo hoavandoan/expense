@@ -1,9 +1,9 @@
-import { AppText } from '@/components/app-text';
-import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Avatar, Card, cn, PressableFeedback } from 'heroui-native';
-import React, { FC } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { AppText } from "@/components/app-text";
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
+import { Avatar, Card, cn, PressableFeedback } from "heroui-native";
+import React, { FC } from "react";
+import { StyleSheet, View } from "react-native";
 
 interface Member {
   id: string;
@@ -18,7 +18,7 @@ interface GroupCardProps {
   members: Member[];
   className?: string;
   onPress?: () => void;
-  variant?: 'default' | 'horizontal';
+  variant?: "default" | "horizontal";
   bgImage?: string;
 }
 
@@ -29,32 +29,40 @@ export const GroupCard: FC<GroupCardProps> = ({
   members,
   className,
   onPress,
-  variant = 'default',
-  bgImage,
+  variant = "default",
+  bgImage = "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1000",
 }) => {
   const isPositive = balance >= 0;
   const balanceText = isPositive
     ? `+${(balance / 1000).toFixed(0)}k`
     : `-${(Math.abs(balance) / 1000).toFixed(0)}k`;
 
-  const balanceColor = isPositive ? 'text-success' : 'text-danger';
+  const balanceColor = isPositive ? "text-success" : "text-danger";
 
-
-  if (variant === 'horizontal') {
+  if (variant === "horizontal") {
     return (
-      <PressableFeedback onPress={onPress} className='w-[220px] bg-accent-soft rounded-2xl'>
-        <Card variant="default" className={cn('relative p-0 w-full rounded-2xl border border-divider/10 shadow-sm', className)}>
+      <PressableFeedback
+        onPress={onPress}
+        className="w-[220px] bg-accent-soft rounded-2xl"
+      >
+        <Card
+          variant="default"
+          className={cn(
+            "relative p-0 w-full rounded-2xl border border-divider/10",
+            className
+          )}
+        >
           {bgImage && (
             <Image
               source={{ uri: bgImage }}
               contentFit="cover"
-              className='absolute h-[140px] w-full'
+              className="absolute h-[140px] w-full"
             />
           )}
           <LinearGradient
-            colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.5)']}
+            colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.5)"]}
             style={StyleSheet.absoluteFill}
-            className='w-full'
+            className="w-full"
           />
           <Card.Body className="flex-row items-center justify-between p-4 gap-2 w-full">
             <View className="flex-row items-center">
@@ -63,23 +71,47 @@ export const GroupCard: FC<GroupCardProps> = ({
                   key={member.id}
                   size="sm"
                   alt={member.name}
-                  className={cn('w-8 h-8', index > 0 && '-ml-4', 'rounded-full')}
+                  className={cn(
+                    "w-8 h-8",
+                    index > 0 && "-ml-4",
+                    "rounded-full"
+                  )}
                 >
                   <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
-                    <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} contentFit='cover' />
+                    <Image
+                      source={{ uri: member.avatarUrl }}
+                      style={{ width: "100%", height: "100%" }}
+                      contentFit="cover"
+                    />
                   </Avatar.Image>
-                  <Avatar.Fallback className="w-8 h-8">{member.name.charAt(0)}</Avatar.Fallback>
+                  <Avatar.Fallback className="w-8 h-8">
+                    {member.name.charAt(0)}
+                  </Avatar.Fallback>
                 </Avatar>
               ))}
               {memberCount > 3 && (
                 <View className="w-8 h-8 rounded-full bg-surface-secondary border-2 border-surface items-center justify-center -ml-3">
-                  <AppText className="text-[10px] text-muted font-bold">+{memberCount - 3}</AppText>
+                  <AppText className="text-[10px] text-muted font-bold">
+                    +{memberCount - 3}
+                  </AppText>
                 </View>
               )}
             </View>
             <View className="items-end flex-1 ml-2">
-              <AppText className="text-muted text-[8px] uppercase font-bold" numberOfLines={1} adjustsFontSizeToFit>BẠN ĐƯỢC TRẢ</AppText>
-              <AppText className={cn('font-bold text-sm', balanceColor)} numberOfLines={1} adjustsFontSizeToFit>{balanceText}</AppText>
+              <AppText
+                className="text-muted text-[8px] uppercase font-bold"
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                BẠN ĐƯỢC TRẢ
+              </AppText>
+              <AppText
+                className={cn("font-bold text-sm", balanceColor)}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                {balanceText}
+              </AppText>
             </View>
           </Card.Body>
         </Card>
@@ -92,13 +124,15 @@ export const GroupCard: FC<GroupCardProps> = ({
     : `Bạn nợ: ${Math.abs(balance).toLocaleString()}đ`;
 
   const Content = (
-    <Card 
-      variant="default" 
-      className={cn('mb-4 p-4 rounded-2xl border border-divider/10', className)}
+    <Card
+      variant="default"
+      className={cn("mb-4 p-4 rounded-2xl border border-divider/10", className)}
     >
       <Card.Body className="flex-row items-center justify-between">
         <View className="flex-1 mr-4">
-          <AppText className="text-lg font-bold text-foreground mb-1">{title}</AppText>
+          <AppText className="text-lg font-bold text-foreground mb-1">
+            {title}
+          </AppText>
           <AppText className="text-muted text-sm mb-2">
             {memberCount} thành viên
           </AppText>
@@ -109,11 +143,18 @@ export const GroupCard: FC<GroupCardProps> = ({
                 key={member.id}
                 size="sm"
                 alt={member.name}
-                className={cn(index !== 0 && '-ml-3', 'border-background border-[2px]')}
+                className={cn(
+                  index !== 0 && "-ml-3",
+                  "border-background border-[2px]"
+                )}
               >
                 {member.avatarUrl ? (
                   <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
-                    <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} contentFit='cover' />
+                    <Image
+                      source={{ uri: member.avatarUrl }}
+                      style={{ width: "100%", height: "100%" }}
+                      contentFit="cover"
+                    />
                   </Avatar.Image>
                 ) : (
                   <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
@@ -133,7 +174,7 @@ export const GroupCard: FC<GroupCardProps> = ({
         </View>
 
         <View className="items-end">
-          <AppText className={cn('text-sm font-semibold', balanceColor)}>
+          <AppText className={cn("text-sm font-semibold", balanceColor)}>
             {balanceDisplay}
           </AppText>
         </View>
@@ -142,9 +183,7 @@ export const GroupCard: FC<GroupCardProps> = ({
   );
 
   if (onPress) {
-    return (
-      <PressableFeedback onPress={onPress}>{Content}</PressableFeedback>
-    );
+    return <PressableFeedback onPress={onPress}>{Content}</PressableFeedback>;
   }
 
   return Content;

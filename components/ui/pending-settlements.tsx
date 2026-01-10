@@ -1,10 +1,11 @@
 import { AppText } from '@/components/app-text';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useCompleteSettlement, usePendingSettlements, useRejectSettlement } from '@/lib/hooks';
 import type { Settlement } from '@/lib/types';
 import { Image } from 'expo-image';
-import { Avatar, Button, Card, useThemeColor } from 'heroui-native';
-import React from 'react';
+import { Avatar, Button, Card } from 'heroui-native';
+import React, { useState } from 'react';
 import { Alert, View } from 'react-native';
 
 interface PendingSettlementsProps {
@@ -12,58 +13,49 @@ interface PendingSettlementsProps {
 }
 
 export function PendingSettlements({ groupId }: PendingSettlementsProps) {
-  const accent = useThemeColor('accent');
+  // const { toast } = useToast();
   const { data: pendingSettlements, isLoading } = usePendingSettlements(groupId);
   const completeSettlement = useCompleteSettlement();
   const rejectSettlement = useRejectSettlement();
 
-  const handleConfirm = (settlement: Settlement) => {
-    Alert.alert(
-      'Xác nhận đã nhận tiền',
-      `Bạn xác nhận đã nhận ${settlement.amount.toLocaleString()}đ từ ${(settlement as any).from_user?.name || 'thành viên'}?`,
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Xác nhận',
-          onPress: async () => {
-            try {
-              await completeSettlement.mutateAsync({
-                settlementId: settlement.id,
-                groupId: groupId,
-              });
-              Alert.alert('Thành công', 'Đã xác nhận thanh toán');
-            } catch (error: any) {
-              Alert.alert('Lỗi', error.message);
-            }
-          },
-        },
-      ]
-    );
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    settlement?: Settlement;
+  }>({ isOpen: false });
+
+  const [rejectDialog, setRejectDialog] = useState<{
+    isOpen: boolean;
+    settlement?: Settlement;
+  }>({ isOpen: false });
+
+  const handleConfirm = async () => {
+    const settlement = confirmDialog.settlement;
+    if (!settlement) return;
+
+    try {
+      await completeSettlement.mutateAsync({
+        settlementId: settlement.id,
+        groupId: groupId,
+      });
+      Alert.alert('Thành công', 'Đã xác nhận thanh toán');
+    } catch (error: any) {
+      Alert.alert('Lỗi', error.message);
+    }
   };
 
-  const handleReject = (settlement: Settlement) => {
-    Alert.alert(
-      'Từ chối thanh toán',
-      'Bạn chắc chắn muốn từ chối yêu cầu thanh toán này?',
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Từ chối',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await rejectSettlement.mutateAsync({
-                settlementId: settlement.id,
-                groupId: groupId,
-              });
-              Alert.alert('Đã từ chối', 'Yêu cầu thanh toán đã bị từ chối');
-            } catch (error: any) {
-              Alert.alert('Lỗi', error.message);
-            }
-          },
-        },
-      ]
-    );
+  const handleReject = async () => {
+    const settlement = rejectDialog.settlement;
+    if (!settlement) return;
+
+    try {
+      await rejectSettlement.mutateAsync({
+        settlementId: settlement.id,
+        groupId: groupId,
+      });
+      Alert.alert('Đã từ chối', 'Yêu cầu thanh toán đã bị từ chối');
+    } catch (error: any) {
+      Alert.alert('Lỗi', error.message);
+    }
   };
 
   if (isLoading || !pendingSettlements || pendingSettlements.length === 0) {
@@ -117,7 +109,7 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
                   <Button
                     variant="danger-soft"
                     className="flex-1 h-12 rounded-xl"
-                    onPress={() => handleReject(settlement)}
+                    onPress={() => setRejectDialog({ isOpen: true, settlement })}
                     isDisabled={rejectSettlement.isPending}
                   >
                     <Button.Label className="font-bold">Từ chối</Button.Label>
@@ -125,7 +117,7 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
                   <Button
                     variant="primary"
                     className="flex-1 h-12 rounded-xl bg-accent"
-                    onPress={() => handleConfirm(settlement)}
+                    onPress={() => setConfirmDialog({ isOpen: true, settlement })}
                     isDisabled={completeSettlement.isPending}
                   >
                     <View className="flex-row items-center gap-2">
@@ -140,6 +132,26 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
           );
         })}
       </Card>
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onOpenChange={(open) => setConfirmDialog(prev => ({ ...prev, isOpen: open }))}
+        title="Xác nhận đã nhận tiền"
+        description={`Bạn xác nhận đã nhận ${confirmDialog.settlement?.amount.toLocaleString()}đ từ ${(confirmDialog.settlement as any)?.from_user?.name || 'thành viên'}?`}
+        onConfirm={handleConfirm}
+        isLoading={completeSettlement.isPending}
+      />
+
+      <ConfirmDialog
+        isOpen={rejectDialog.isOpen}
+        onOpenChange={(open) => setRejectDialog(prev => ({ ...prev, isOpen: open }))}
+        title="Từ chối thanh toán"
+        description="Bạn chắc chắn muốn từ chối yêu cầu thanh toán này?"
+        confirmLabel="Từ chối"
+        variant="danger"
+        onConfirm={handleReject}
+        isLoading={rejectSettlement.isPending}
+      />
     </View>
   );
 }

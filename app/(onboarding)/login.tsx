@@ -24,6 +24,8 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSocialLoading, setIsSocialLoading] = useState(false);
 
+  // const { toast } = useToast();
+
   const handleEmailAuth = async () => {
     if (!email || !password) {
       Alert.alert('Lỗi', 'Vui lòng nhập email và mật khẩu');

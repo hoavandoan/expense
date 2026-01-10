@@ -30,6 +30,7 @@ export default function SettleUpScreen() {
   const { user } = useAuthStore();
   const { data: group, isLoading } = useGroup(params.groupId || null);
   const createSettlement = useCreateSettlement();
+  // const { toast } = useToast();
 
   // Calculate debts from group data
   const debts = useMemo((): DebtItem[] => {

@@ -3,17 +3,14 @@ import React from "react";
 import { Text, useWindowDimensions, View } from "react-native";
 import { AnimatedScrollViewTitleProps } from "./types";
 
-export const AnimatedScrollViewTitle: React.FC<AnimatedScrollViewTitleProps> = ({
-  children,
-  size,
-  style,
-  className,
-}) => {
+export const AnimatedScrollViewTitle: React.FC<
+  AnimatedScrollViewTitleProps
+> = ({ children, size, style, className }) => {
   const { width } = useWindowDimensions();
   const maxWidth = 0.5 * width;
 
   return (
-    <View className={cn("px-[10px]", className)}>
+    <View className={cn(className)}>
       <Text
         numberOfLines={2}
         className="text-white font-bold text-left"

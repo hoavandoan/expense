@@ -1,8 +1,7 @@
 import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Button, useThemeColor } from 'heroui-native';
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 interface Props {
   children: ReactNode;
@@ -56,15 +55,13 @@ interface ErrorFallbackProps {
 }
 
 /**
- * Default error fallback UI
+ * Default error fallback UI - Uses native components since this renders outside HeroUINativeProvider
  */
 export function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
-  const danger = useThemeColor('danger');
-
   return (
     <View className="flex-1 bg-background items-center justify-center px-8">
       <View className="w-24 h-24 rounded-full bg-danger/10 items-center justify-center mb-6">
-        <IconSymbol name="xmark.circle.fill" size={48} color={danger} />
+        <IconSymbol name="xmark.circle.fill" size={48} color="#F31260" />
       </View>
       
       <AppText className="text-2xl font-bold text-foreground text-center mb-2">
@@ -85,14 +82,12 @@ export function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
       )}
 
       {onRetry && (
-        <Button
-          variant="primary"
-          size="lg"
-          className="h-14 rounded-xl px-8"
+        <Pressable
           onPress={onRetry}
+          className="h-14 rounded-xl px-8 bg-accent items-center justify-center"
         >
-          <Button.Label className="font-bold">Thử lại</Button.Label>
-        </Button>
+          <AppText className="font-bold text-white">Thử lại</AppText>
+        </Pressable>
       )}
     </View>
   );
