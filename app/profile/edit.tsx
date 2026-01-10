@@ -13,7 +13,7 @@ export default function ProfileEditScreen() {
     <View className="flex-1 bg-background">
       <StickyHeader title="Chỉnh sửa hồ sơ" />
 
-      <ScreenScrollView contentContainerStyle={{ padding: 20 }}>
+      <ScreenScrollView>
         <View className="items-center mb-8">
           <Avatar size="lg" alt="User Profile" className="mb-4 w-24 h-24">
             <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=1' }} />

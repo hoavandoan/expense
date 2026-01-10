@@ -24,17 +24,25 @@ This document defines the project structure, technical stack, and development wo
 ├── app/                     # Expo Router (Filesystem-based navigation)
 │   ├── (tabs)/              # Main tab-based screens
 │   ├── (modal)/             # Modal screens (Stack presentation)
-│   ├── group/[id]/          # Dynamic routes
+│   ├── group/[id]/          # Group-specific screens
+│   ├── expense/[id]/        # Expense-specific screens
 │   └── _layout.tsx          # Root layout config
-├── components/              # Shared React components
-│   ├── ui/                  # Atomic UI components (HeroUI based)
+├── components/              # React components
+│   ├── ui/                  # Atomic & HeroUI-based components
+│   ├── auth/                # Authentication-related components
 │   └── ...                  # Feature-specific components
-├── constants/               # App constants (Colors, Config)
-├── src/                     # Core configuration
-│   ├── uniwind.d.ts         # Type definitions (e.g., className)
-│   └── ...
+├── constants/               # Global constants & config
+├── contexts/                # React Context providers
+├── hooks/                   # Custom React hooks (UI & Logic)
+├── lib/                     # Business logic & external service wrappers
+│   ├── auth/                # Auth logic (Supabase)
+│   ├── stores/              # State management (Zustand)
+│   ├── utils/               # Helper functions
+│   ├── types/               # Global TypeScript definitions
+│   └── supabase.ts          # Supabase client config
+├── src/                     # Core framework configuration (Uniwind/Tailwind)
 ├── assets/                  # Static assets (Images, Fonts)
-├── global.css               # Global styling & design tokens
+├── global.css               # Design system tokens & global styles
 ```
 
 ## 3. UI & Theming System
@@ -43,6 +51,13 @@ This document defines the project structure, technical stack, and development wo
 - **Premium Aesthetics**: Use refined styling, shadows, and spacing.
 - **HeroUI Anatomy**: Strictly follow component anatomy (e.g., `Card.Header`, `Card.Body`).
 - **Feedback**: Use `PressableFeedback` for all interactive elements.
+- **Standard Layout**: Use `ScreenSurface` or `ScreenScrollView` as the base for all screens.
+- **Spacing Standards**: Use `px-6` (24px) for horizontal padding of main content.
+- **Border Standards**: Use `border-divider/10` as the default border for cards and containers.
+- **Component Consistency**: Use `Card` for interactive list items or bounded data sections. Use `Surface` for general background surfaces.
+- **Mobile Responsiveness**: 
+  - Use `adjustsFontSizeToFit` and `numberOfLines={1}` for currency and large numerical displays to prevent overflow on small screens.
+  - Avoid hardcoded fixed widths unless necessary; use flex or relative percentages.
 
 ### Theming (`global.css`)
 - Use CSS variables for colors to support Dark/Light modes:

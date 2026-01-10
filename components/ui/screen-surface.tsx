@@ -20,7 +20,7 @@ export const ScreenSurface: FC<PropsWithChildren<Props>> = ({
   return (
     <Surface variant={variant} className={cn('flex-1', className)} {...props}>
       <SafeAreaView className="flex-1">
-        <Surface variant="transparent" className="flex-1 px-5">
+        <Surface variant="transparent" className="flex-1 px-6">
           {children}
         </Surface>
       </SafeAreaView>

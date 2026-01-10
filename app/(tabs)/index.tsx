@@ -78,7 +78,7 @@ export default function HomeScreen() {
   const HOME_HEADER_HEIGHT = 140;
 
   const renderTopNavBarComponent = () => (
-    <HeaderNavBar useBlur={true} className="border-b border-divider/5">
+    <HeaderNavBar useBlur={true} className="border-b border-divider/10">
       <View className="flex-row items-center justify-between px-6 h-full">
         <View className="flex-row items-center gap-3">
           <PressableFeedback
@@ -152,14 +152,14 @@ export default function HomeScreen() {
         <View className="flex-row gap-2">
           <PressableFeedback
             onPress={() => router.push('/search' as any)}
-            className="w-10 h-10 rounded-full bg-surface items-center justify-center border border-divider/5"
+            className="w-10 h-10 rounded-full bg-surface items-center justify-center border border-divider/10"
           >
             <IconSymbol name="magnifyingglass" size={20} color={foreground} />
           </PressableFeedback>
           <View>
             <PressableFeedback
               onPress={() => router.push('/notifications' as any)}
-              className="w-10 h-10 rounded-full bg-surface items-center justify-center border border-divider/5"
+              className="w-10 h-10 rounded-full bg-surface items-center justify-center border border-divider/10"
             >
               <IconSymbol name="bell" size={20} color={foreground} />
             </PressableFeedback>
@@ -181,7 +181,7 @@ export default function HomeScreen() {
       >
         <View className="mb-8">
           {/* Hero Balance Section with Accent Gradient */}
-          <View className="px-5 mb-8">
+          <View className="px-6 mb-8">
             <Surface variant="default" className="p-8 rounded-3xl shadow-2xl overflow-hidden bg-accent relative">
               <LinearGradient
                 colors={['rgba(0,0,0,0.5)', 'transparent']}
@@ -201,7 +201,7 @@ export default function HomeScreen() {
               </View>
 
               <View className="flex-row items-baseline gap-2 mb-8">
-                <AppText className="text-white text-5xl font-black">
+                <AppText className="text-white text-5xl font-black" numberOfLines={1} adjustsFontSizeToFit>
                   {showBalance ? formatCurrency(balanceStats.balance, 'VND').replace('₫', '').trim() : '••••••••'}
                 </AppText>
                 <AppText className="text-white/90 text-2xl font-bold">đ</AppText>
@@ -218,7 +218,7 @@ export default function HomeScreen() {
                       Bạn được trả
                     </AppText>
                   </View>
-                  <AppText className="text-white text-lg font-bold">
+                  <AppText className="text-white text-lg font-bold" numberOfLines={1} adjustsFontSizeToFit>
                     {showBalance ? `+ ${formatCurrency(balanceStats.totalOwed, 'VND').replace('₫', '').trim()}` : '••••'}
                   </AppText>
                 </View>
@@ -234,7 +234,7 @@ export default function HomeScreen() {
                       Bạn nợ
                     </AppText>
                   </View>
-                  <AppText className="text-white text-lg font-bold">
+                  <AppText className="text-white text-lg font-bold" numberOfLines={1} adjustsFontSizeToFit>
                     {showBalance ? `- ${formatCurrency(balanceStats.totalOwing, 'VND').replace('₫', '').trim()}` : '••••'}
                   </AppText>
                 </View>
@@ -243,7 +243,7 @@ export default function HomeScreen() {
           </View>
 
           {/* Quick Actions Row */}
-          <View className="flex-row justify-between px-20 mb-8">
+          <View className="flex-row justify-between px-6 mb-8">
             <ActionIcon
               name="creditcard"
               label="Chi tiêu"

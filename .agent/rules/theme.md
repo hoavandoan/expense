@@ -385,3 +385,19 @@ function ThemeToggle() {
 ```
 
 All theme variables automatically adjust based on the active color scheme.
+## Standard Design Tokens
+
+To maintain visual consistency across the application, follow these standard design tokens for frequent UI properties:
+
+### Spacing & Padding
+- **Horizontal Screen Padding**: Use `px-6` (24px) for the main horizontal padding of screens and major sections.
+- **Vertical Spacing**: Align with the 4px-based spacing scale (e.g., `mb-4`, `gap-4`).
+
+### Borders & Dividers
+- **Standard Border**: Use `border-divider/10` for most card and container borders.
+- **Thin Border**: Use `border-divider/5` only for extremely subtle separation on large surfaces.
+- **Standard Divider**: Use the HeroUI `Divider` component or `border-b border-divider/10`.
+
+### Layout Components
+- **ScreenSurface**: Base wrapper for static screens, automatically applies standard background and padding.
+- **ScreenScrollView**: Standard scrollable container for screens, handles top/bottom safe areas and standard horizontal padding (`px-6`).

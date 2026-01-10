@@ -138,7 +138,7 @@ export default function ActivityScreen() {
           </TextField>
         </View>
 
-        <View className='flex-row justify-center px-4'>
+        <View className='flex-row justify-center px-6'>
           <Tabs
             value={activeFilter}
             onValueChange={setActiveFilter}

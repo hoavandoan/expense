@@ -120,7 +120,7 @@ export default function GroupSettingsScreen() {
     <View className="flex-1 bg-background">
       <StickyHeader title="Cài đặt nhóm" />
 
-      <ScreenScrollView contentContainerStyle={{ padding: 20 }}>
+      <ScreenScrollView>
         {/* Group Image */}
         <View className="items-center mb-8">
           <Avatar size="lg" alt="Group Image" className="mb-4 w-24 h-24">

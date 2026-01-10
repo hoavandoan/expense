@@ -41,8 +41,8 @@ export const ScreenScrollView: FC<PropsWithChildren<Props>> = ({
     headerHeight = insets.top;
   }
 
-  // Calculate bottom padding: insets.bottom + optional tab bar height (roughly 100px)
-  const bottomPadding = (withTabBarOffset ? 100 : 0) + (isIOS ? insets.bottom : insets.bottom + 16);
+  // Calculate bottom padding: insets.bottom + a small buffer for the end of content
+  const bottomPadding = (withTabBarOffset ? 32 : 16) + insets.bottom;
 
   return (
     <AnimatedScrollView
@@ -66,7 +66,7 @@ export const ScreenScrollView: FC<PropsWithChildren<Props>> = ({
       }
       {...props}
     >
-      <View className={cn('px-5', contentContainerClassName)}>
+      <View className={cn('px-6', contentContainerClassName)}>
         {children}
       </View>
     </AnimatedScrollView>

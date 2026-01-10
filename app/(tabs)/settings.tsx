@@ -1,9 +1,9 @@
 import { AppText } from '@/components/app-text';
 
 import {
-  AnimatedScrollView,
-  HeaderComponentWrapper,
-  HeaderNavBar,
+    AnimatedScrollView,
+    HeaderComponentWrapper,
+    HeaderNavBar,
 } from '@/components/parallax-header';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { SettingsItem } from '@/components/ui/settings-item';
@@ -12,13 +12,13 @@ import { useAuth } from '@/lib/hooks';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import {
-  Avatar,
-  Button,
-  Card,
-  Divider,
-  PressableFeedback,
-  Switch,
-  useThemeColor,
+    Avatar,
+    Button,
+    Card,
+    Divider,
+    PressableFeedback,
+    Switch,
+    useThemeColor,
 } from 'heroui-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
@@ -36,7 +36,7 @@ export default function SettingsScreen() {
   const SETTINGS_HEADER_HEIGHT = 360;
 
   const renderTopNavBarComponent = () => (
-    <HeaderNavBar useBlur={true} className="border-b border-divider/5">
+    <HeaderNavBar useBlur={true} className="border-b border-divider/10">
       <View className="flex-row items-center justify-between px-6 h-full">
         <PressableFeedback
           onPress={() => router.back()}

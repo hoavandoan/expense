@@ -136,6 +136,63 @@ const SLIDES: Slide[] = [
       </View>
     )
   },
+  {
+    id: 4,
+    title: 'Phân tích ',
+    accent: 'thông minh',
+    description: 'Dễ dàng nắm bắt thói quen chi tiêu thông qua các biểu đồ phân tích hàng tháng.',
+    image: 'https://images.unsplash.com/photo-1551288049-bbbda536339a?q=80&w=600',
+    renderOverlay: (accent) => (
+      <View className="absolute inset-x-10 bottom-1/4 items-center gap-6">
+        <View className="w-48 h-48 bg-surface rounded-full items-center justify-center shadow-2xl border-4 border-accent/10">
+          <IconSymbol name="chart.pie.fill" size={80} color={accent} />
+          <View className="absolute -top-2 -right-2 bg-success p-2 rounded-full border-4 border-surface shadow-lg">
+             <IconSymbol name="checkmark" size={16} color="white" />
+          </View>
+        </View>
+        <View className="bg-surface px-6 py-3 rounded-2xl border border-divider/10 shadow-lg flex-row gap-4 items-center">
+          <View className="items-center">
+            <AppText className="text-[10px] text-muted font-bold">ĂN UỐNG</AppText>
+            <AppText className="font-bold">45%</AppText>
+          </View>
+          <View className="w-px h-6 bg-divider/20" />
+          <View className="items-center">
+            <AppText className="text-[10px] text-muted font-bold">DU LỊCH</AppText>
+            <AppText className="font-bold">30%</AppText>
+          </View>
+          <View className="w-px h-6 bg-divider/20" />
+          <View className="items-center">
+            <AppText className="text-[10px] text-muted font-bold">KHÁC</AppText>
+            <AppText className="font-bold">25%</AppText>
+          </View>
+        </View>
+      </View>
+    )
+  },
+  {
+    id: 5,
+    title: 'An toàn & ',
+    accent: 'Bảo mật',
+    description: 'Dữ liệu của bạn luôn được mã hóa và bảo mật tuyệt đối theo tiêu chuẩn cao nhất.',
+    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=600',
+    renderOverlay: (accent) => (
+      <View className="absolute inset-0 items-center justify-center p-8">
+        <View className="bg-surface/90 p-8 rounded-[40px] items-center border border-white/20 shadow-2xl">
+          <View className="w-24 h-24 bg-accent/10 rounded-full items-center justify-center mb-6">
+            <IconSymbol name="shield" size={48} color={accent} />
+          </View>
+          <AppText className="text-xl font-bold mb-2">Đã được mã hóa</AppText>
+          <AppText className="text-sm text-muted text-center leading-5">
+            Tất cả các giao dịch và dữ liệu cá nhân của bạn được bảo mật 256-bit.
+          </AppText>
+          <View className="mt-8 flex-row items-center gap-2 bg-success-soft px-4 py-2 rounded-full">
+            <IconSymbol name="checkmark.circle.fill" size={16} color="#10b981" />
+            <AppText className="text-[#10b981] font-bold text-xs">Verify by SplitGroup</AppText>
+          </View>
+        </View>
+      </View>
+    )
+  },
 ];
 
 export default function TutorialScreen() {

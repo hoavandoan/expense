@@ -75,16 +75,13 @@ export default function TabLayout() {
           headerShown: false,
           title: 'Trang chủ',
           tabBarStyle: {
-            height: 64 + (insets.bottom > 0 ? insets.bottom : 0),
+            height: 64 + (insets.bottom > 0 ? insets.bottom : 12),
             backgroundColor: surface,
             borderTopWidth: 1,
             borderTopColor: divider,
             paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
             paddingTop: 8,
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
+            overflow: 'visible',
           },
 
         }}>

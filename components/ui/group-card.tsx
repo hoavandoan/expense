@@ -42,8 +42,8 @@ export const GroupCard: FC<GroupCardProps> = ({
 
   if (variant === 'horizontal') {
     return (
-      <PressableFeedback onPress={onPress} className='w-1/2 bg-accent-soft rounded-2xl'>
-        <Card variant="default" className={cn('relative p-0 w-full rounded-2xl border-none shadow-sm', className)}>
+      <PressableFeedback onPress={onPress} className='w-[220px] bg-accent-soft rounded-2xl'>
+        <Card variant="default" className={cn('relative p-0 w-full rounded-2xl border border-divider/10 shadow-sm', className)}>
           {bgImage && (
             <Image
               source={{ uri: bgImage }}
@@ -77,9 +77,9 @@ export const GroupCard: FC<GroupCardProps> = ({
                 </View>
               )}
             </View>
-            <View className="items-end flex-shrink-0">
-              <AppText className="text-muted text-[8px] uppercase font-bold" numberOfLines={1}>BẠN ĐƯỢC TRẢ</AppText>
-              <AppText className={cn('font-bold text-sm', balanceColor)} numberOfLines={1}>{balanceText}</AppText>
+            <View className="items-end flex-1 ml-2">
+              <AppText className="text-muted text-[8px] uppercase font-bold" numberOfLines={1} adjustsFontSizeToFit>BẠN ĐƯỢC TRẢ</AppText>
+              <AppText className={cn('font-bold text-sm', balanceColor)} numberOfLines={1} adjustsFontSizeToFit>{balanceText}</AppText>
             </View>
           </Card.Body>
         </Card>
