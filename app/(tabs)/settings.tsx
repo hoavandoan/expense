@@ -37,15 +37,23 @@ export default function SettingsScreen() {
 
   const renderTopNavBarComponent = () => (
     <HeaderNavBar useBlur={true} className="border-b border-divider/10">
-      <View className="flex-row items-center justify-between h-full">
-        <PressableFeedback
-          onPress={() => router.back()}
-          className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10"
-        >
-          <IconSymbol name="chevron.left" size={24} color={foreground} />
-        </PressableFeedback>
-        <AppText className="text-lg font-bold text-foreground">Cài đặt</AppText>
-        <View className="w-8" />
+      <View className="flex-row items-center h-full w-full">
+        <View className="flex-1 items-start">
+          <Button
+            isIconOnly
+            variant="ghost"
+            onPress={() => router.back()}
+                  className="w-10 h-10 bg-black/20 border border-white/10"
+          >
+            <IconSymbol name="chevron.left" size={24} color={foreground} />
+          </Button>
+        </View>
+        <View className="flex-2 items-center">
+          <AppText className="text-lg font-bold text-foreground">
+            Cài đặt
+          </AppText>
+        </View>
+        <View className="flex-1 items-end" />
       </View>
     </HeaderNavBar>
   );
@@ -57,12 +65,13 @@ export default function SettingsScreen() {
         style={{ paddingTop: insets.top + 16 }}
         className="px-6 pb-4 flex-row items-center justify-between"
       >
-        <PressableFeedback
+        <Button
+        isIconOnly
           onPress={() => router.back()}
-          className="w-10 h-10 rounded-full bg-surface items-center justify-center shadow-sm"
+                  className="w-10 h-10 bg-black/20 border border-white/10"
         >
           <IconSymbol name="chevron.left" size={20} color={foreground} />
-        </PressableFeedback>
+        </Button>
         <AppText className="text-lg font-bold">Cài đặt</AppText>
         <View className="w-10" />
       </View>

@@ -55,6 +55,7 @@ export const useRealtime = (options: UseRealtimeOptions) => {
                                 queryClient.invalidateQueries({ queryKey: ['group', payload.new.group_id] });
                             }
                             queryClient.invalidateQueries({ queryKey: ['groups'] });
+                            queryClient.invalidateQueries({ queryKey: ['recent-expenses'] });
                             break;
                         case 'settlements':
                             if (payload.new && 'group_id' in payload.new) {
@@ -116,4 +117,13 @@ export const useGroupRealtime = (groupId: string | null) => {
 export const useGroupsRealtime = () => {
     useRealtime({ table: 'groups' });
     useRealtime({ table: 'group_members' });
+};
+
+/**
+ * Hook to subscribe to expenses changes for realtime updates
+ * This enables the "Recent Activities" section to update in realtime
+ */
+export const useExpensesRealtime = () => {
+    useRealtime({ table: 'expenses' });
+    useRealtime({ table: 'expense_splits' });
 };

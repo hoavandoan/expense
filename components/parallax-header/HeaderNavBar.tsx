@@ -25,14 +25,14 @@ export const HeaderNavBar: React.FC<HeaderNavBarProps> = ({
         <BlurView
           intensity={intensity}
           tint={tint}
-          className="flex-1 flex-row items-center justify-between"
+          className="flex-1 flex-row items-center justify-between px-6 py-4"
           style={{ paddingTop: insets.top }}
         >
           {children}
         </BlurView>
       ) : (
         <View
-          className="flex-1 flex-row items-center justify-between"
+          className="flex-1 flex-row items-center justify-between px-6 py-4"
           style={{ paddingTop: insets.top }}
         >
           {children}

@@ -17,6 +17,7 @@ import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   Avatar,
+  Button,
   Card,
   cn,
   Divider,
@@ -171,45 +172,68 @@ export default function GroupDetailScreen() {
         }
         renderHeaderNavBarComponent={() => (
           <HeaderNavBar className="bg-transparent">
-            <PressableFeedback
-              className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10"
-              onPress={() => router.back()}
-            >
-              <IconSymbol name="chevron.left" size={24} color="white" />
-            </PressableFeedback>
-            <View className="flex-row gap-2">
-              <PressableFeedback className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10">
-                <IconSymbol
-                  name="square.and.arrow.up"
-                  size={18}
-                  color="white"
-                />
-              </PressableFeedback>
-              <PressableFeedback
-                className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10"
-                onPress={() => router.push(`/group/${id}/settings`)}
+            <View className="flex-row items-center justify-between h-full w-full">
+              <Button
+                isIconOnly
+                variant="ghost"
+                className="w-10 h-10 bg-black/20 border border-white/10"
+                onPress={() => router.back()}
               >
-                <IconSymbol name="gearshape.fill" size={20} color="white" />
-              </PressableFeedback>
+                <IconSymbol name="chevron.left" size={24} color="white" />
+              </Button>
+              <View className="flex-row gap-2">
+                <Button
+                  isIconOnly
+                  variant="ghost"
+                  className="w-10 h-10 bg-black/20 border border-white/10"
+                >
+                  <IconSymbol
+                    name="square.and.arrow.up"
+                    size={18}
+                    color="white"
+                  />
+                </Button>
+                <Button
+                  isIconOnly
+                  variant="ghost"
+                  className="w-10 h-10 bg-black/20 border border-white/10"
+                  onPress={() => router.push(`/group/${id}/settings`)}
+                >
+                  <IconSymbol name="gearshape.fill" size={20} color="white" />
+                </Button>
+              </View>
             </View>
           </HeaderNavBar>
         )}
         renderTopNavBarComponent={() => (
           <HeaderNavBar useBlur={true}>
-            <PressableFeedback
-              className="w-10 h-10 rounded-full bg-black/20 items-center justify-center border border-white/10"
-              onPress={() => router.back()}
-            >
-              <IconSymbol name="chevron.left" size={24} color="white" />
-            </PressableFeedback>
-            <AppText className="text-white text-lg font-bold">
-              {group.name}
-            </AppText>
-            <PressableFeedback
-              onPress={() => router.push(`/group/${id}/settings`)}
-            >
-              <IconSymbol name="ellipsis" size={20} color="white" />
-            </PressableFeedback>
+            <View className="flex-row items-center h-full w-full">
+              <View className="flex-1 items-start">
+                <Button
+                  isIconOnly
+                  variant="ghost"
+                  className="w-10 h-10 bg-black/20 border border-white/10"
+                  onPress={() => router.back()}
+                >
+                  <IconSymbol name="chevron.left" size={24} color="white" />
+                </Button>
+              </View>
+              <View className="flex-2 items-center">
+                <AppText className="text-white text-lg font-bold">
+                  {group.name}
+                </AppText>
+              </View>
+              <View className="flex-1 items-end">
+                <Button
+                  isIconOnly
+                  variant="ghost"
+                  className="w-10 h-10 bg-black/20 border border-white/10"
+                  onPress={() => router.push(`/group/${id}/settings`)}
+                >
+                  <IconSymbol name="ellipsis" size={20} color="white" />
+                </Button>
+              </View>
+            </View>
           </HeaderNavBar>
         )}
         renderOveralComponent={() => (

@@ -126,6 +126,7 @@ export const useCreateExpense = () => {
             queryClient.invalidateQueries({ queryKey: ['expenses', groupId] });
             queryClient.invalidateQueries({ queryKey: ['group', groupId] });
             queryClient.invalidateQueries({ queryKey: ['groups'] });
+            queryClient.invalidateQueries({ queryKey: ['recent-expenses'] });
         },
     });
 };
@@ -185,6 +186,7 @@ export const useDeleteExpense = () => {
             queryClient.invalidateQueries({ queryKey: ['expenses', groupId] });
             queryClient.invalidateQueries({ queryKey: ['group', groupId] });
             queryClient.invalidateQueries({ queryKey: ['groups'] });
+            queryClient.invalidateQueries({ queryKey: ['recent-expenses'] });
         },
     });
 };

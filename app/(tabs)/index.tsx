@@ -10,7 +10,7 @@ import { ActionIcon } from "@/components/ui/action-icon";
 import { GroupCard } from "@/components/ui/group-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { CATEGORY_CONFIG } from "@/constants";
-import { useGroups, useGroupsRealtime, useRecentExpenses } from "@/lib/hooks";
+import { useExpensesRealtime, useGroups, useGroupsRealtime, useRecentExpenses } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatCurrency } from "@/lib/utils";
 import { Image } from "expo-image";
@@ -18,6 +18,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import {
   Avatar,
+  Button,
   PressableFeedback,
   Spinner,
   Surface,
@@ -44,6 +45,9 @@ export default function HomeScreen() {
 
   // Enable real-time subscriptions for groups
   useGroupsRealtime();
+
+  // Enable real-time subscriptions for expenses (updates "Hoạt động gần đây")
+  useExpensesRealtime();
 
   const accent = useThemeColor("accent");
   const foreground = useThemeColor("foreground");
@@ -86,8 +90,8 @@ export default function HomeScreen() {
 
   const renderTopNavBarComponent = () => (
     <HeaderNavBar useBlur={true} className="border-b border-divider/10">
-      <View className="flex-row items-center justify-between h-full w-full ">
-        <View className="flex-row items-center gap-3">
+      <View className="flex-row items-center h-full w-full">
+        <View className="flex-1 items-start">
           <PressableFeedback
             onPress={() => router.push("/settings")}
             className="rounded-full"
@@ -107,23 +111,33 @@ export default function HomeScreen() {
               )}
             </Avatar>
           </PressableFeedback>
-          <AppText className="font-bold text-foreground">
-            {user?.name || "Chào bạn!"}
-          </AppText>
         </View>
-        <View className="flex-row gap-2">
-          <PressableFeedback
+
+        <View className="flex-2 items-center">
+          {/* <AppText className="text-lg font-bold text-foreground">
+            SplitSmart
+          </AppText> */}
+        </View>
+
+        <View className="flex-1 flex-row justify-end gap-2">
+          <Button
+            isIconOnly
+            size="sm"
+            variant="ghost"
             onPress={() => router.push("/search" as any)}
-            className="w-8 h-8 rounded-full items-center justify-center"
+                  className="w-10 h-10 bg-black/20 border border-white/10"
           >
             <IconSymbol name="magnifyingglass" size={18} color={foreground} />
-          </PressableFeedback>
-          <PressableFeedback
+          </Button>
+          <Button
+            isIconOnly
+            size="sm"
+            variant="ghost"
             onPress={() => router.push("/notifications" as any)}
-            className="w-8 h-8 rounded-full items-center justify-center"
+                  className="w-10 h-10 bg-black/20 border border-white/10"
           >
             <IconSymbol name="bell" size={18} color={foreground} />
-          </PressableFeedback>
+          </Button>
         </View>
       </View>
     </HeaderNavBar>
