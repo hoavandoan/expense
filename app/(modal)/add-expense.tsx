@@ -4,9 +4,10 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { EXPENSE_CATEGORIES } from "@/constants";
 import { useCreateExpense, useGroup, useGroups } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, uploadImage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   Avatar,
@@ -20,7 +21,7 @@ import {
   useThemeColor,
   useToast,
 } from "heroui-native";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, View } from "react-native";
 import * as z from "zod";
@@ -77,6 +78,9 @@ export default function AddExpenseScreen() {
   const { user } = useAuthStore();
   const { data: groups, isLoading: isLoadingGroups } = useGroups();
   const createExpense = useCreateExpense();
+
+  const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
+  const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
 
   const hasPreselectedGroup = !!params.groupId;
 
@@ -174,8 +178,38 @@ export default function AddExpenseScreen() {
       ? Math.floor(totalAmount / participantIds.length)
       : 0;
 
+  const pickReceipt = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setSelectedReceipt(result.assets[0].uri);
+    }
+  };
+
+  const removeReceipt = () => {
+    setSelectedReceipt(null);
+  };
+
   const onSubmit = async (values: ExpenseFormValues) => {
     try {
+      setIsUploadingReceipt(true);
+      let receiptUrl: string | undefined = undefined;
+
+      // Upload receipt if selected
+      if (selectedReceipt && user?.id) {
+        const fileName = `receipt-${Date.now()}`;
+        receiptUrl = await uploadImage(
+          selectedReceipt,
+          "receipts",
+          `${user.id}/${fileName}`
+        );
+      }
+
       const amount = parseInt(values.amount.replace(/\D/g, ""));
       const splitPerPerson = Math.floor(amount / values.participantIds.length);
 
@@ -186,6 +220,7 @@ export default function AddExpenseScreen() {
         amount,
         category: values.category,
         description: values.notes || undefined,
+        receiptUrl,
         splits: values.participantIds.map((userId) => ({
           userId,
           amount: splitPerPerson,
@@ -196,6 +231,8 @@ export default function AddExpenseScreen() {
       router.back();
     } catch (error: any) {
       Alert.alert("Lỗi", error.message || "Đã có lỗi xảy ra");
+    } finally {
+      setIsUploadingReceipt(false);
     }
   };
 
@@ -645,13 +682,66 @@ export default function AddExpenseScreen() {
           />
         </View>
 
+        {/* Receipt Upload */}
+        <View className="mb-6">
+          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
+            ẢNH HÓA ĐƠN (TÙY CHỌN)
+          </AppText>
+          {selectedReceipt ? (
+            <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
+              <View className="relative">
+                <Image
+                  source={{ uri: selectedReceipt }}
+                  style={{ width: "100%", height: 200 }}
+                  contentFit="cover"
+                />
+                <PressableFeedback
+                  onPress={removeReceipt}
+                  className="absolute top-2 right-2 bg-black/50 rounded-full p-2"
+                >
+                  <IconSymbol
+                    name="xmark.circle.fill"
+                    size={24}
+                    color="white"
+                  />
+                </PressableFeedback>
+              </View>
+              <PressableFeedback
+                onPress={pickReceipt}
+                className="p-4 border-t border-divider/10"
+              >
+                <AppText className="text-accent text-center font-semibold">
+                  Thay đổi ảnh
+                </AppText>
+              </PressableFeedback>
+            </Card>
+          ) : (
+            <PressableFeedback onPress={pickReceipt}>
+              <Card className="rounded-2xl border border-dashed border-divider/20 bg-surface-secondary p-8 items-center justify-center">
+                <View className="bg-accent/10 p-4 rounded-full mb-3">
+                  <IconSymbol name="camera.fill" size={32} color={accent} />
+                </View>
+                <AppText className="text-accent font-semibold text-base">
+                  Tải lên ảnh hóa đơn
+                </AppText>
+                <AppText className="text-muted text-xs mt-1">
+                  Chụp hoặc chọn từ thư viện
+                </AppText>
+              </Card>
+            </PressableFeedback>
+          )}
+        </View>
+
         <Button
           variant="primary"
           size="lg"
           className="rounded-2xl shadow-xl shadow-accent/20"
           onPress={handleSubmit(onSubmit)}
           isDisabled={
-            createExpense.isPending || !isValid || participantIds.length === 0
+            createExpense.isPending ||
+            isUploadingReceipt ||
+            !isValid ||
+            participantIds.length === 0
           }
         >
           <View className="flex-row items-center gap-2">
@@ -663,7 +753,11 @@ export default function AddExpenseScreen() {
               <IconSymbol name="plus" size={20} color="white" />
             )}
             <Button.Label className="text-white font-bold text-lg">
-              {createExpense.isPending ? "Đang lưu..." : "Lưu khoản chi"}
+              {createExpense.isPending || isUploadingReceipt
+                ? isUploadingReceipt
+                  ? "Đang tải ảnh..."
+                  : "Đang lưu..."
+                : "Lưu khoản chi"}
             </Button.Label>
           </View>
         </Button>

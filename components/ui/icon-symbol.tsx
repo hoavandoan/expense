@@ -88,6 +88,10 @@ const MAPPING = {
   'wineglass.fill': 'local-bar',
   'person.fill.badge.plus': 'person-add',
   'xmark.circle.fill': 'cancel',
+  'exclamationmark.triangle.fill': 'warning',
+  'trash': 'delete',
+  'doc.on.doc': 'content-copy',
+  'arrow.right.square': 'exit-to-app',
 } as const;
 
 /**

@@ -1,115 +1,229 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { StickyHeader } from '@/components/ui/sticky-header';
-import { cn, PressableFeedback, Tabs, useThemeColor } from 'heroui-native';
-import React, { useState } from 'react';
+import { useMarkAllNotificationsAsRead, useMarkNotificationAsRead, useNotifications } from '@/lib/hooks';
+import { cn, PressableFeedback, Spinner, Tabs, useThemeColor } from 'heroui-native';
+import React, { useMemo, useState } from 'react';
 import { View } from 'react-native';
 
-const NOTIFICATIONS = [
-  {
-    id: '1',
-    type: 'request',
-    title: 'Minh đã yêu cầu bạn tất toán',
-    desc: 'Số tiền: 200.000 đ trong nhóm "Đà Lạt 2024"',
-    time: '5 phút trước',
-    isUnread: true,
-    group: 'Today',
-  },
-  {
-    id: '2',
-    type: 'group',
-    title: 'Bạn được thêm vào nhóm "Nhà trọ Happy"',
-    desc: 'Bởi Thành (thanh.nd)',
-    time: '1 giờ trước',
-    isUnread: false,
-    group: 'Today',
-  },
-  {
-    id: '3',
-    type: 'expense',
-    title: 'Chi tiêu mới: "Tiền điện tháng 12"',
-    desc: 'Thành vừa cập nhật trong nhóm "Nhà trọ Happy"',
-    time: 'Hôm qua',
-    isUnread: false,
-    group: 'Yesterday',
+const getNotificationIcon = (type: string) => {
+  const iconMap: Record<string, string> = {
+    expense_created: 'doc.text.fill',
+    expense_updated: 'doc.text.fill',
+    settlement_requested: 'bank',
+    settlement_completed: 'checkmark.circle.fill',
+    group_member_added: 'person.2.fill',
+    group_member_removed: 'person.2.slash.fill',
+    debt_assignment_requested: 'arrow.triangle.2.circlepath',
+    debt_assignment_approved: 'checkmark.seal.fill',
+    debt_assignment_rejected: 'xmark.seal.fill',
+  };
+  return iconMap[type] || 'bell';
+};
+
+const formatTimeAgo = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) {
+    return 'Vừa xong';
   }
-];
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} phút trước`;
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) {
+    return `${diffInHours} giờ trước`;
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays === 1) {
+    return 'Hôm qua';
+  }
+  if (diffInDays < 7) {
+    return `${diffInDays} ngày trước`;
+  }
+
+  return date.toLocaleDateString('vi-VN');
+};
+
+const groupNotificationsByDate = (notifications: any[]) => {
+  const groups: Record<string, any[]> = {};
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  notifications.forEach((notif) => {
+    const notifDate = new Date(notif.createdAt);
+    notifDate.setHours(0, 0, 0, 0);
+
+    let groupKey: string;
+    if (notifDate.getTime() === today.getTime()) {
+      groupKey = 'Today';
+    } else if (notifDate.getTime() === yesterday.getTime()) {
+      groupKey = 'Yesterday';
+    } else {
+      groupKey = notifDate.toLocaleDateString('vi-VN');
+    }
+
+    if (!groups[groupKey]) {
+      groups[groupKey] = [];
+    }
+    groups[groupKey].push(notif);
+  });
+
+  return groups;
+};
 
 export default function NotificationsScreen() {
   const accent = useThemeColor('accent');
   const muted = useThemeColor('muted');
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
+  const [refreshing, setRefreshing] = useState(false);
 
-  const groups = ['Today', 'Yesterday'];
+  const { data: notifications, isLoading, error, refetch } = useNotifications({
+    unreadOnly: activeTab === 'unread',
+  });
+
+  const markAsRead = useMarkNotificationAsRead();
+  const markAllAsRead = useMarkAllNotificationsAsRead();
+
+  const groupedNotifications = useMemo(() => {
+    if (!notifications) return {};
+    return groupNotificationsByDate(notifications);
+  }, [notifications]);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, [refetch]);
+
+  const handleNotificationPress = async (notification: any) => {
+    if (!notification.isRead) {
+      await markAsRead.mutateAsync(notification.id);
+    }
+    // TODO: Navigate to relevant screen based on notification type
+  };
+
+  const handleMarkAllAsRead = async () => {
+    await markAllAsRead.mutateAsync();
+  };
+
+  if (error) {
+    return (
+      <View className="flex-1 bg-background">
+        <StickyHeader title="Thông báo" />
+        <ErrorState
+          title="Không thể tải thông báo"
+          message={error instanceof Error ? error.message : 'Đã xảy ra lỗi'}
+          onRetry={() => refetch()}
+        />
+      </View>
+    );
+  }
+
+  const groupKeys = Object.keys(groupedNotifications).sort((a, b) => {
+    if (a === 'Today') return -1;
+    if (b === 'Today') return 1;
+    if (a === 'Yesterday') return -1;
+    if (b === 'Yesterday') return 1;
+    return b.localeCompare(a);
+  });
 
   return (
     <View className="flex-1 bg-background">
-      <StickyHeader title="Thông báo" />
+      <StickyHeader
+        title="Thông báo"
+        rightElement={
+          notifications && notifications.length > 0 && notifications.some((n) => !n.isRead) ? (
+            <PressableFeedback onPress={handleMarkAllAsRead}>
+              <AppText className="text-accent font-semibold text-sm">Đánh dấu tất cả</AppText>
+            </PressableFeedback>
+          ) : null
+        }
+      />
 
       <View className="px-6 py-4 flex-row justify-center">
-        <Tabs value={activeTab} onValueChange={setActiveTab} variant="pill" className="bg-surface-secondary rounded-full p-1">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'all' | 'unread')} variant="pill" className="bg-surface-secondary rounded-full p-1">
           <Tabs.List>
             <Tabs.Indicator className="bg-accent shadow-none" />
             <Tabs.Trigger value="all" className="px-6 py-2 rounded-full">
               {({ isSelected }) => (
-                <Tabs.Label className={cn("font-bold text-[13px]", isSelected ? "text-white" : "text-foreground")}>All</Tabs.Label>
+                <Tabs.Label className={cn("font-bold text-[13px]", isSelected ? "text-white" : "text-foreground")}>Tất cả</Tabs.Label>
               )}
             </Tabs.Trigger>
-            <Tabs.Trigger value="income" className="px-6 py-2 rounded-full">
+            <Tabs.Trigger value="unread" className="px-6 py-2 rounded-full">
               {({ isSelected }) => (
-                <Tabs.Label className={cn("font-bold text-[13px]", isSelected ? "text-white" : "text-foreground")}>Income</Tabs.Label>
-              )}
-            </Tabs.Trigger>
-            <Tabs.Trigger value="subscriptions" className="px-6 py-2 rounded-full">
-              {({ isSelected }) => (
-                <Tabs.Label className={cn("font-bold text-[13px]", isSelected ? "text-white" : "text-foreground")}>Subscriptions</Tabs.Label>
+                <Tabs.Label className={cn("font-bold text-[13px]", isSelected ? "text-white" : "text-foreground")}>Chưa đọc</Tabs.Label>
               )}
             </Tabs.Trigger>
           </Tabs.List>
         </Tabs>
       </View>
 
-      <ScreenScrollView>
-        <View className="px-6 pb-20">
-          {groups.map((groupTitle) => (
-            <View key={groupTitle} className="mb-6">
-              <AppText className="text-[13px] font-bold text-muted uppercase tracking-widest mb-4">
-                {groupTitle === 'Today' ? 'Hôm nay' : 'Hôm qua'}
-              </AppText>
-              <View className="gap-4">
-                {NOTIFICATIONS.filter(n => n.group === groupTitle).map((notif) => (
-                  <PressableFeedback key={notif.id}>
-                    <View className="flex-row items-center">
-                      <View className={cn("w-12 h-12 rounded-full items-center justify-center", notif.isUnread ? "bg-accent" : "bg-surface-secondary")}>
-                        <IconSymbol
-                          name={notif.type === 'request' ? 'bank' : notif.type === 'group' ? 'person.2.fill' : 'doc.text.fill'}
-                          size={20}
-                          color={notif.isUnread ? 'white' : muted}
-                        />
-                      </View>
-                      <View className="flex-1 ml-4 pr-2">
-                        <AppText className="text-[15px] font-bold text-foreground mb-0.5" numberOfLines={1}>
-                          {notif.title}
-                        </AppText>
-                        <AppText className="text-muted text-[13px]" numberOfLines={1}>
-                          {notif.desc}
-                        </AppText>
-                      </View>
-                      <View className="items-end">
-                        <AppText className="text-muted text-[11px] font-medium mb-1">
-                          {notif.time.split(' ')[0]} {notif.time.includes('phút') ? 'm' : 'h'}
-                        </AppText>
-                        {notif.isUnread && <View className="w-2 h-2 rounded-full bg-accent" />}
-                      </View>
-                    </View>
-                  </PressableFeedback>
-                ))}
-              </View>
-            </View>
-          ))}
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <Spinner size="lg" color={accent} />
         </View>
-      </ScreenScrollView>
+      ) : notifications && notifications.length > 0 ? (
+        <ScreenScrollView refreshing={refreshing} onRefresh={onRefresh}>
+          <View className="px-6 pb-20">
+            {groupKeys.map((groupTitle) => (
+              <View key={groupTitle} className="mb-6">
+                <AppText className="text-[13px] font-bold text-muted uppercase tracking-widest mb-4">
+                  {groupTitle === 'Today' ? 'Hôm nay' : groupTitle === 'Yesterday' ? 'Hôm qua' : groupTitle}
+                </AppText>
+                <View className="gap-4">
+                  {groupedNotifications[groupTitle].map((notif) => (
+                    <PressableFeedback key={notif.id} onPress={() => handleNotificationPress(notif)}>
+                      <View className={cn("flex-row items-center p-3 rounded-2xl", !notif.isRead && "bg-accent/5")}>
+                        <View className={cn("w-12 h-12 rounded-full items-center justify-center", !notif.isRead ? "bg-accent" : "bg-surface-secondary")}>
+                          <IconSymbol
+                            name={getNotificationIcon(notif.type)}
+                            size={20}
+                            color={!notif.isRead ? 'white' : muted}
+                          />
+                        </View>
+                        <View className="flex-1 ml-4 pr-2">
+                          <AppText className={cn("text-[15px] font-bold mb-0.5", !notif.isRead ? "text-foreground" : "text-foreground/70")} numberOfLines={2}>
+                            {notif.title}
+                          </AppText>
+                          {notif.body && (
+                            <AppText className="text-muted text-[13px]" numberOfLines={2}>
+                              {notif.body}
+                            </AppText>
+                          )}
+                        </View>
+                        <View className="items-end">
+                          <AppText className="text-muted text-[11px] font-medium mb-1">
+                            {formatTimeAgo(notif.createdAt)}
+                          </AppText>
+                          {!notif.isRead && <View className="w-2 h-2 rounded-full bg-accent" />}
+                        </View>
+                      </View>
+                    </PressableFeedback>
+                  ))}
+                </View>
+              </View>
+            ))}
+          </View>
+        </ScreenScrollView>
+      ) : (
+        <EmptyState
+          icon="bell.slash"
+          title={activeTab === 'unread' ? 'Không có thông báo chưa đọc' : 'Chưa có thông báo nào'}
+          description={activeTab === 'unread' ? 'Tất cả thông báo đã được đọc' : 'Các thông báo sẽ hiển thị ở đây'}
+        />
+      )}
     </View>
   );
 }

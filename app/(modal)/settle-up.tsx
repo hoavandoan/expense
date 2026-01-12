@@ -1,10 +1,9 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { ModalHeader } from '@/components/ui/modal-header';
-import { useCreateSettlement, useGroup } from '@/lib/hooks';
+import { useCreateSettlement, useDebtAssignment, useGroup } from '@/lib/hooks';
 import { useAuthStore } from '@/lib/stores/auth-store';
-import { assignDebtsOptimized } from '@/lib/utils/debt-calculator';
+import { assignDebtsOptimized, assignDebtsWithAssignee } from '@/lib/utils/debt-calculator';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Avatar, Button, Card, cn, PressableFeedback, Spinner, useThemeColor } from 'heroui-native';
@@ -29,6 +28,7 @@ export default function SettleUpScreen() {
 
   const { user } = useAuthStore();
   const { data: group, isLoading } = useGroup(params.groupId || null);
+  const { data: activeAssignment } = useDebtAssignment(params.groupId || null);
   const createSettlement = useCreateSettlement();
   // const { toast } = useToast();
 
@@ -69,7 +69,15 @@ export default function SettleUpScreen() {
       });
     });
 
-    const optimizedDebts = assignDebtsOptimized(balances);
+
+
+    // Check if we should use assignee mode logic
+    const shouldUseAssigneeMode = (groupData as any).has_debt_assignment && activeAssignment?.status === 'active';
+    
+    // Choose the appropriate calculation strategy
+    const optimizedDebts = shouldUseAssigneeMode && activeAssignment
+        ? assignDebtsWithAssignee(balances, activeAssignment.assigneeUserId)
+        : assignDebtsOptimized(balances);
 
     // Filter to only debts involving current user
     const userDebts: DebtItem[] = [];
@@ -138,11 +146,6 @@ export default function SettleUpScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ModalHeader 
-        title="Tất toán" 
-        variant="back" 
-      />
-
       <ScreenScrollView contentContainerStyle={{ padding: 20 }}>
         <View className="mb-10 items-center">
           <View className="w-20 h-20 rounded-full bg-accent/10 items-center justify-center mb-4">

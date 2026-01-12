@@ -1,4 +1,4 @@
-import type { Debt, Expense, GroupMember, IndividualDebt, UserBalance } from '../types';
+import type { AssigneeDebt, Debt, Expense, GroupMember, IndividualDebt, UserBalance } from '../types';
 
 /**
  * Calculate balance for each member in a group
@@ -103,6 +103,45 @@ export const assignDebtsOptimized = (
         if (creditor.balance < 0.01) i++;
         if (debtor.balance > -0.01) j--;
     }
+
+    return debts;
+};
+
+/**
+ * Assign debts with a specific assignee (Star topology)
+ * All debtors pay the assignee, assignee pays all creditors
+ */
+export const assignDebtsWithAssignee = (
+    balances: Record<string, number>,
+    assigneeUserId: string
+): AssigneeDebt[] => {
+    const debts: AssigneeDebt[] = [];
+
+    Object.entries(balances).forEach(([userId, balance]) => {
+        // Skip users with no balance or negligible balance
+        if (Math.abs(balance) < 1) return;
+
+        // Skip the assignee themselves (they are the hub)
+        if (userId === assigneeUserId) return;
+
+        if (balance < 0) {
+            // Debtor pays Assignee
+            debts.push({
+                from: userId,
+                to: assigneeUserId,
+                amount: Math.round(Math.abs(balance)),
+                isToAssignee: true,
+            });
+        } else {
+            // Assignee pays Creditor
+            debts.push({
+                from: assigneeUserId,
+                to: userId,
+                amount: Math.round(balance),
+                isToAssignee: false,
+            });
+        }
+    });
 
     return debts;
 };

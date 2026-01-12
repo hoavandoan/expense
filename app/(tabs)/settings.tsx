@@ -30,6 +30,7 @@ export default function SettingsScreen() {
   const { user, isAuthenticated, signOut, setLoginSheetOpen } = useAuth();
   const { isDark, toggleTheme } = useAppTheme();
   const foreground = useThemeColor("foreground");
+  const accent = useThemeColor("accent");
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -43,7 +44,7 @@ export default function SettingsScreen() {
             isIconOnly
             variant="ghost"
             onPress={() => router.back()}
-                  className="w-10 h-10 bg-black/20 border border-white/10"
+            className="w-10 h-10 bg-black/20 border border-white/10"
           >
             <IconSymbol name="chevron.left" size={24} color={foreground} />
           </Button>
@@ -66,9 +67,9 @@ export default function SettingsScreen() {
         className="px-6 pb-4 flex-row items-center justify-between"
       >
         <Button
-        isIconOnly
+          isIconOnly
           onPress={() => router.back()}
-                  className="w-10 h-10 bg-black/20 border border-white/10"
+          className="w-10 h-10 bg-black/20 border border-white/10"
         >
           <IconSymbol name="chevron.left" size={20} color={foreground} />
         </Button>
@@ -93,11 +94,7 @@ export default function SettingsScreen() {
               </Avatar.Image>
             ) : (
               <Avatar.Fallback className="bg-accent/10">
-                <IconSymbol
-                  name="person"
-                  size={40}
-                  color={useThemeColor("accent")}
-                />
+                <IconSymbol name="person" size={40} color={accent} />
               </Avatar.Fallback>
             )}
           </Avatar>

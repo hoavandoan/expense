@@ -1,5 +1,9 @@
 import { AppText } from "@/components/app-text";
+import { ErrorState } from "@/components/ui/error-state";
 
+import { AssigneeSelector } from "@/components/debt-assignment/assignee-selector";
+import { CreateRequestModal } from "@/components/debt-assignment/create-request-modal";
+import { PendingRequestsList } from "@/components/debt-assignment/pending-requests-list";
 import {
   AnimatedScrollView,
   AnimatedScrollViewTitle,
@@ -7,10 +11,17 @@ import {
   HeaderComponentWrapper,
   HeaderNavBar,
 } from "@/components/parallax-header";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { PendingSettlements } from "@/components/ui/pending-settlements";
-import { Timeline, type TimelineItem } from "@/components/ui/timeline";
-import { useGroup } from "@/lib/hooks";
+import { type TimelineItem } from "@/components/ui/timeline";
+import {
+  useDebtAssignment,
+  useDisableDebtAssignment,
+  useGroup,
+  useMembersBalance,
+  useUserBalanceInGroup,
+} from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatCurrency } from "@/lib/utils";
 import { Image } from "expo-image";
@@ -25,7 +36,7 @@ import {
   Skeleton,
   useThemeColor,
 } from "heroui-native";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { RefreshControl, View } from "react-native";
 
 interface MemberWithBalance {
@@ -41,6 +52,9 @@ export default function GroupDetailScreen() {
   const router = useRouter();
   const accent = useThemeColor("accent");
   const { user } = useAuthStore();
+  const [assigneeSelectorVisible, setAssigneeSelectorVisible] = useState(false);
+  const [createRequestVisible, setCreateRequestVisible] = useState(false);
+  const [isDisableConfirmOpen, setIsDisableConfirmOpen] = useState(false);
 
   const {
     data: group,
@@ -49,65 +63,24 @@ export default function GroupDetailScreen() {
     isRefetching,
   } = useGroup(id as string);
 
+  const { data: activeAssignment } = useDebtAssignment(id as string);
+  const { mutate: disableAssignment, isPending: isDisablingAssignment } = useDisableDebtAssignment();
+
   // Calculate user's balance in this group
-  const userStats = useMemo(() => {
-    if (!group || !user) return { totalPaid: 0, totalOwed: 0, balance: 0 };
-
-    let totalPaid = 0;
-    let totalOwed = 0;
-
-    group.expenses?.forEach((expense: any) => {
-      // Money user has paid
-      if (expense.paid_by === user.id) {
-        totalPaid += expense.amount;
-      }
-
-      // Money user owes from splits
-      expense.expense_splits?.forEach((split: any) => {
-        if (split.user_id === user.id) {
-          totalOwed += split.amount;
-        }
-      });
-    });
-
-    return {
-      totalPaid,
-      totalOwed,
-      balance: totalPaid - totalOwed,
-    };
-  }, [group, user]);
+  const userStats = useUserBalanceInGroup(group, user?.id || null);
 
   // Transform members with balance calculation
+  const membersWithBalanceRaw = useMembersBalance(group);
   const membersWithBalance = useMemo(() => {
-    const groupData = group as any;
-    if (!groupData?.group_members) return [];
-
-    return groupData.group_members.map((member: any) => {
-      let balance = 0;
-
-      groupData.expenses?.forEach((expense: any) => {
-        // Money this member has paid
-        if (expense.paid_by === member.user_id) {
-          balance += expense.amount;
-        }
-
-        // Money this member owes from splits
-        expense.expense_splits?.forEach((split: any) => {
-          if (split.user_id === member.user_id) {
-            balance -= split.amount;
-          }
-        });
-      });
-
-      return {
-        id: member.user_id,
-        name: member.user?.name || "Thành viên",
-        avatarUrl: member.user?.avatar_url,
-        role: member.role,
-        balance,
-      };
-    });
-  }, [group]);
+    return membersWithBalanceRaw.map((member) => ({
+      id: member.userId,
+      name: member.name,
+      avatarUrl: member.avatarUrl,
+      role: member.role,
+      balance: member.balance,
+      userId: member.userId,
+    }));
+  }, [membersWithBalanceRaw]);
 
   // Transform expenses to activity timeline
   const activities: TimelineItem[] = useMemo(() => {
@@ -126,9 +99,51 @@ export default function GroupDetailScreen() {
     }));
   }, [group]);
 
+  const memberMap = useMemo(() => {
+    const map = new Map<string, any>();
+    const groupData = group as any;
+    groupData?.group_members?.forEach((m: any) => {
+      map.set(m.user_id, m.user);
+    });
+    return map;
+  }, [group]);
+
+  const individualDebts = useMemo(() => {
+    const groupData = group as any;
+    if (!groupData?.expenses) return [];
+
+    const debts: any[] = [];
+    groupData.expenses.forEach((expense: any) => {
+      const payer = memberMap.get(expense.paid_by);
+      expense.expense_splits?.forEach((split: any) => {
+        // Only show debts where the user is not the payer
+        if (split.user_id !== expense.paid_by) {
+          debts.push({
+            id: split.id,
+            from: memberMap.get(split.user_id),
+            to: payer,
+            amount: split.amount,
+            description: expense.title,
+            date: expense.created_at,
+          });
+        }
+      });
+    });
+    // Sort by date descending
+    return debts.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+  }, [group, memberMap]);
+
   const onRefresh = React.useCallback(() => {
     refetch();
   }, [refetch]);
+
+  const handleDisableAssignment = () => {
+    if (activeAssignment?.id) {
+      disableAssignment(id as string);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -141,16 +156,14 @@ export default function GroupDetailScreen() {
     );
   }
 
-  if (!group) {
+  if (!group && !isLoading) {
     return (
-      <View className="flex-1 bg-background items-center justify-center p-6">
-        <IconSymbol name="xmark.circle.fill" size={48} color={accent} />
-        <AppText className="text-lg font-bold mt-4">
-          Không tìm thấy nhóm
-        </AppText>
-        <PressableFeedback onPress={() => router.back()} className="mt-4">
-          <AppText className="text-accent font-bold">Quay lại</AppText>
-        </PressableFeedback>
+      <View className="flex-1 bg-background">
+        <ErrorState
+          title="Không tìm thấy nhóm"
+          message="Nhóm này không tồn tại hoặc bạn không có quyền truy cập"
+          onRetry={() => refetch()}
+        />
       </View>
     );
   }
@@ -160,7 +173,14 @@ export default function GroupDetailScreen() {
     groupData?.cover_image_url ||
     "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1000";
 
-  console.log(activities);
+  const isOwnerOrAdmin = groupData?.group_members?.some(
+    (m: any) => m.user_id === user?.id && (m.role === 'owner' || m.role === 'admin')
+  );
+
+  const assigneeUser = activeAssignment && groupData?.group_members?.find(
+      (m: any) => m.user_id === activeAssignment.assigneeUserId
+  )?.user;
+
   return (
     <View className="flex-1 bg-black">
       <AnimatedScrollView
@@ -220,7 +240,7 @@ export default function GroupDetailScreen() {
               </View>
               <View className="flex-2 items-center">
                 <AppText className="text-white text-lg font-bold">
-                  {group.name}
+                  {group?.name}
                 </AppText>
               </View>
               <View className="flex-1 items-end">
@@ -242,7 +262,7 @@ export default function GroupDetailScreen() {
               size={42}
               className="text-white font-bold tracking-tighter"
             >
-              {group.name}
+              {group?.name}
             </AnimatedScrollViewTitle>
           </AnimatedScrollViewTitleWrapper>
         )}
@@ -285,7 +305,7 @@ export default function GroupDetailScreen() {
                 {userStats.balance >= 0 ? "BẠN NHẬN LẠI" : "BẠN NỢ"}:{" "}
                 {formatCurrency(
                   Math.abs(userStats.balance),
-                  group.currency || "VND"
+                  group?.currency || "VND"
                 )}
               </AppText>
             </View>
@@ -305,7 +325,7 @@ export default function GroupDetailScreen() {
                   <AppText className="text-white text-xl font-bold">
                     {formatCurrency(
                       userStats.totalPaid,
-                      group.currency || "VND"
+                      group?.currency || "VND"
                     )}
                   </AppText>
                 </View>
@@ -317,7 +337,7 @@ export default function GroupDetailScreen() {
                   <AppText className="text-white text-xl font-bold">
                     {formatCurrency(
                       Math.abs(userStats.balance),
-                      group.currency || "VND"
+                      group?.currency || "VND"
                     )}
                   </AppText>
                 </View>
@@ -367,119 +387,379 @@ export default function GroupDetailScreen() {
 
           {/* Pending Settlements */}
           <PendingSettlements groupId={id as string} />
+          
+          {/* Assignment Requests (Shown to Admin/Owner) */}
+          {isOwnerOrAdmin && (
+            <PendingRequestsList 
+                groupId={id as string} 
+                isAdminOrOwner={isOwnerOrAdmin} 
+            />
+          )}
 
-          {/* Members List */}
+          {/* Debt Assignment Status / Controls */}
+          {(isOwnerOrAdmin || activeAssignment?.status === 'active') && (
+            <View className="mb-8">
+               <View className="flex-row items-center justify-between mb-3">
+                 <AppText className="text-xl font-bold text-foreground">
+                   Gán Nợ Trung Gian
+                 </AppText>
+                 {isOwnerOrAdmin && activeAssignment?.status === 'active' && (
+                    <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        onPress={() => setIsDisableConfirmOpen(true)}
+                        isDisabled={isDisablingAssignment}
+                    >
+                        <Button.Label className="text-danger font-bold text-xs">Tắt tính năng</Button.Label>
+                    </Button>
+                 )}
+               </View>
+
+               <Card className="p-4 rounded-2xl bg-surface border border-divider/10">
+                 {activeAssignment?.status === 'active' ? (
+                   <View className="flex-row items-center">
+                     <Avatar size="md" className="mr-3" alt={assigneeUser?.name || 'Assignee'}>
+                        {assigneeUser?.avatar_url ? (
+                           <Avatar.Image source={{ uri: assigneeUser.avatar_url }} asChild>
+                              <Image source={{ uri: assigneeUser.avatar_url }} style={{ width: '100%', height: '100%' }} />
+                           </Avatar.Image>
+                        ) : (
+                           <Avatar.Fallback className="bg-primary/20">
+                              <AppText className="font-bold text-primary">{assigneeUser?.name?.charAt(0)}</AppText>
+                           </Avatar.Fallback>
+                        )}
+                     </Avatar>
+                     <View className="flex-1">
+                       <AppText className="font-bold">{assigneeUser?.name || 'Unknown'}</AppText>
+                       <AppText className="text-xs text-muted">Đang nhận tất cả khoản nợ</AppText>
+                     </View>
+                     {isOwnerOrAdmin && (
+                        <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            onPress={() => setAssigneeSelectorVisible(true)}
+                        >
+                            <Button.Label className="text-primary font-bold">Thay đổi</Button.Label>
+                        </Button>
+                     )}
+                   </View>
+                 ) : (
+                   <View className="flex-row items-center justify-between">
+                     <View>
+                        <AppText className="font-semibold text-muted">Chưa gán người nhận nợ</AppText>
+                        <AppText className="text-xs text-muted mt-1">Gán một người để đơn giản hóa việc trả nợ</AppText>
+                     </View>
+                     {isOwnerOrAdmin ? (
+                        <Button 
+                            size="sm" 
+                            variant="primary" 
+                            onPress={() => setAssigneeSelectorVisible(true)}
+                        >
+                            <Button.Label className="text-white font-bold">Thiết lập</Button.Label>
+                        </Button>
+                     ) : (
+                        <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onPress={() => setCreateRequestVisible(true)}
+                        >
+                             <Button.Label className="text-primary font-bold">Đề xuất</Button.Label>
+                        </Button>
+                     )}
+                   </View>
+                 )}
+               </Card>
+            </View>
+          )}
+
+          {/* Debts List */}
           <View className="mb-10">
             <View className="flex-row items-center justify-between mb-6">
               <AppText className="text-xl font-bold text-foreground">
-                Thành viên nợ/trả
+                Ai nợ ai
               </AppText>
-              <PressableFeedback
+              <Button
+                size="sm"
+                variant="ghost"
                 onPress={() => router.push(`/group/${id}/members`)}
               >
-                <AppText className="text-accent font-bold text-sm">
-                  Xem tất cả
-                </AppText>
-              </PressableFeedback>
+                <Button.Label className="text-accent font-bold text-sm">
+                  Thành viên
+                </Button.Label>
+              </Button>
             </View>
 
             <View className="gap-3">
-              {membersWithBalance.length === 0 ? (
+              {individualDebts.length === 0 ? (
                 <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
-                  <AppText className="text-muted">
-                    Chưa có thành viên nào
-                  </AppText>
+                  <AppText className="text-muted">Chưa có khoản nợ nào</AppText>
                 </View>
               ) : (
-                membersWithBalance
-                  .slice(0, 4)
-                  .map((member: MemberWithBalance) => (
-                    <Card
-                      key={member.id}
-                      variant="default"
-                      className="p-4 rounded-2xl bg-surface border border-divider/10"
-                    >
-                      <View className="flex-row items-center">
-                        <Avatar size="md" alt={member.name} className="mr-4">
-                          {member.avatarUrl ? (
-                            <Avatar.Image
-                              source={{ uri: member.avatarUrl }}
-                              asChild
-                            >
-                              <Image
-                                source={{ uri: member.avatarUrl }}
-                                style={{ width: "100%", height: "100%" }}
-                              />
-                            </Avatar.Image>
-                          ) : (
-                            <Avatar.Fallback className="bg-accent/10">
-                              <AppText className="font-bold text-accent">
-                                {member.name.charAt(0)}
-                              </AppText>
-                            </Avatar.Fallback>
-                          )}
-                        </Avatar>
-                        <View className="flex-1">
-                          <AppText className="font-bold text-base text-foreground">
-                            {member.name}
-                            {member.id === user?.id && " (Bạn)"}
-                          </AppText>
-                          <AppText className="text-muted text-xs capitalize">
-                            {member.role}
-                          </AppText>
-                        </View>
-                        <View className="items-end">
-                          <AppText
-                            className={cn(
-                              "font-bold text-base",
-                              member.balance >= 0
-                                ? "text-success"
-                                : "text-danger"
-                            )}
+                individualDebts.slice(0, 6).map((debt: any) => (
+                  <Card
+                    key={debt.id}
+                    variant="default"
+                    className="p-4 rounded-2xl bg-surface border border-divider/10"
+                  >
+                    <View className="flex-row items-center">
+                      <Avatar
+                        size="sm"
+                        alt={debt.from?.name || "N"}
+                        className="mr-3"
+                      >
+                        {debt.from?.avatar_url || debt.from?.avatarUrl ? (
+                          <Avatar.Image
+                            source={{
+                              uri: debt.from.avatar_url || debt.from.avatarUrl,
+                            }}
+                            asChild
                           >
-                            {member.balance >= 0 ? "+" : ""}
-                            {formatCurrency(
-                              member.balance,
-                              group.currency || "VND"
-                            )}
+                            <Image
+                              source={{
+                                uri:
+                                  debt.from.avatar_url || debt.from.avatarUrl,
+                              }}
+                              style={{ width: "100%", height: "100%" }}
+                            />
+                          </Avatar.Image>
+                        ) : (
+                          <Avatar.Fallback className="bg-danger/10">
+                            <AppText className="font-bold text-danger text-xs">
+                              {debt.from?.name?.charAt(0) || "N"}
+                            </AppText>
+                          </Avatar.Fallback>
+                        )}
+                      </Avatar>
+
+                      <View className="flex-1">
+                        <View className="flex-row items-center flex-wrap">
+                          <AppText className="font-bold text-sm text-foreground">
+                            {debt.from?.id === user?.id
+                              ? "Bạn"
+                              : debt.from?.name || "Ai đó"}
+                          </AppText>
+                          <AppText className="text-muted mx-1 text-[10px] uppercase font-bold">
+                            NỢ
+                          </AppText>
+                          <AppText className="font-bold text-sm text-foreground">
+                            {debt.to?.id === user?.id
+                              ? "Bạn"
+                              : debt.to?.name || "Ai đó"}
                           </AppText>
                         </View>
+                        <AppText
+                          className="text-muted text-[10px] mt-0.5"
+                          numberOfLines={1}
+                        >
+                          {debt.description}
+                        </AppText>
                       </View>
-                    </Card>
-                  ))
+
+                      <View className="items-end ml-2">
+                        <AppText className="font-bold text-sm text-danger">
+                          {formatCurrency(
+                            debt.amount,
+                            group?.currency || "VND"
+                          )}
+                        </AppText>
+                        <AppText className="text-[9px] text-muted">
+                          {new Date(debt.date).toLocaleDateString("vi-VN")}
+                        </AppText>
+                      </View>
+                    </View>
+                  </Card>
+                ))
               )}
             </View>
           </View>
 
-          {/* Recent Activity */}
-          <View className="pb-20">
+          {/* Expenses List */}
+          <View className="mb-10">
             <View className="flex-row items-center justify-between mb-6">
               <AppText className="text-xl font-bold text-foreground">
-                Hoạt động gần đây
+                Khoản chi
               </AppText>
-              <PressableFeedback
+              <Button
+                size="sm"
+                variant="ghost"
                 onPress={() => router.push(`/group/${id}/expenses` as any)}
               >
-                <AppText className="text-accent font-bold text-sm">
+                <Button.Label className="text-accent font-bold text-sm">
                   Xem tất cả
-                </AppText>
-              </PressableFeedback>
+                </Button.Label>
+              </Button>
             </View>
-            {activities.length === 0 ? (
-              <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
-                <AppText className="text-muted">Chưa có hoạt động nào</AppText>
-              </View>
-            ) : (
-              <Timeline
-                items={activities}
-                activeColor={accent}
-                inactiveColor="#27272a"
-                animationType="rotate"
-              />
-            )}
+
+            <View className="gap-4">
+              {groupData?.expenses?.length === 0 ? (
+                <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                  <AppText className="text-muted">Chưa có khoản chi nào</AppText>
+                </View>
+              ) : (
+                groupData?.expenses?.slice(0, 5).map((expense: any) => {
+                  const payer = memberMap.get(expense.paid_by);
+                  const participants = expense.expense_splits?.map((split: any) =>
+                    memberMap.get(split.user_id)
+                  ).filter(Boolean) || [];
+
+                  return (
+                    <Card
+                      key={expense.id}
+                      variant="default"
+                      className="p-4 rounded-2xl bg-surface border border-divider/10"
+                    >
+                      <PressableFeedback
+                        onPress={() =>
+                          router.push(`/expense/${expense.id}` as any)
+                        }
+                      >
+                        <View className="flex-row items-center justify-between mb-3">
+                          <View className="flex-row items-center flex-1">
+                            <View className="w-10 h-10 rounded-xl bg-accent/10 items-center justify-center mr-3">
+                              <IconSymbol
+                                name={getCategoryIcon(expense.category) as any}
+                                size={20}
+                                color={accent}
+                              />
+                            </View>
+                            <View className="flex-1">
+                              <AppText
+                                className="font-bold text-base text-foreground"
+                                numberOfLines={1}
+                              >
+                                {expense.title}
+                              </AppText>
+                              <AppText className="text-muted text-[10px] uppercase font-bold mt-0.5">
+                                {new Date(
+                                  expense.expense_date || expense.created_at
+                                ).toLocaleDateString("vi-VN")}
+                              </AppText>
+                            </View>
+                          </View>
+                          <View className="items-end">
+                            <AppText className="font-bold text-base text-foreground">
+                              {formatCurrency(
+                                expense.amount,
+                                group?.currency || "VND"
+                              )}
+                            </AppText>
+                          </View>
+                        </View>
+
+                        <Divider className="bg-divider/5 mb-3" />
+
+                        <View className="flex-row items-center justify-between">
+                          <View className="flex-row items-center">
+                            <Avatar
+                              size="sm"
+                              alt={payer?.name || "P"}
+                              className="mr-2 w-6 h-6"
+                            >
+                              {payer?.avatar_url ? (
+                                <Avatar.Image
+                                  source={{ uri: payer.avatar_url }}
+                                  asChild
+                                >
+                                  <Image
+                                    source={{ uri: payer.avatar_url }}
+                                    style={{ width: "100%", height: "100%" }}
+                                  />
+                                </Avatar.Image>
+                              ) : (
+                                <Avatar.Fallback className="bg-accent/10">
+                                  <AppText className="font-bold text-accent text-[8px]">
+                                    {payer?.name?.charAt(0) || "P"}
+                                  </AppText>
+                                </Avatar.Fallback>
+                              )}
+                            </Avatar>
+                            <AppText className="text-xs text-muted">
+                              Trả bởi{" "}
+                              <AppText className="text-foreground font-semibold">
+                                {expense.paid_by === user?.id
+                                  ? "Bạn"
+                                  : payer?.name || "Ai đó"}
+                              </AppText>
+                            </AppText>
+                          </View>
+
+                          <View className="flex-row items-center">
+                            {participants.slice(0, 3).map((p: any, index: number) => (
+                              <Avatar
+                                key={p.id + index}
+                                size="sm"
+                                alt={p.name}
+                                className={cn(
+                                  index !== 0 && "-ml-2",
+                                  "border-2 border-surface w-5 h-5"
+                                )}
+                              >
+                                {p.avatar_url ? (
+                                  <Avatar.Image
+                                    source={{ uri: p.avatar_url }}
+                                    asChild
+                                  >
+                                    <Image
+                                      source={{ uri: p.avatar_url }}
+                                      style={{ width: "100%", height: "100%" }}
+                                    />
+                                  </Avatar.Image>
+                                ) : (
+                                  <Avatar.Fallback className="bg-surface-tertiary">
+                                    <AppText className="text-[8px] font-bold">
+                                      {p.name?.charAt(0)}
+                                    </AppText>
+                                  </Avatar.Fallback>
+                                )}
+                              </Avatar>
+                            ))}
+                            {participants.length > 3 && (
+                              <View className="w-5 h-5 rounded-full bg-surface-tertiary border-2 border-surface items-center justify-center -ml-2">
+                                <AppText className="text-[8px] font-bold text-muted">
+                                  +{participants.length - 3}
+                                </AppText>
+                              </View>
+                            )}
+                          </View>
+                        </View>
+                      </PressableFeedback>
+                    </Card>
+                  );
+                })
+              )}
+            </View>
           </View>
         </View>
       </AnimatedScrollView>
+      
+      {/* Modals */}
+      <AssigneeSelector
+        isVisible={assigneeSelectorVisible}
+        onClose={() => setAssigneeSelectorVisible(false)}
+        groupId={id as string}
+        members={membersWithBalance}
+        currentAssigneeId={activeAssignment?.assigneeUserId}
+      />
+      
+      <CreateRequestModal
+        isVisible={createRequestVisible}
+        onClose={() => setCreateRequestVisible(false)}
+        groupId={id as string}
+        members={membersWithBalance}
+        currentUserId={user?.id || ''}
+      />
+
+      <ConfirmDialog
+        isOpen={isDisableConfirmOpen}
+        onOpenChange={setIsDisableConfirmOpen}
+        title="Tắt Gán Nợ Trung Gian"
+        description="Bạn có chắc chắn muốn tắt tính năng này? Các khoản nợ sẽ được tính toán lại theo cách tối ưu hóa thông thường."
+        confirmLabel="Tắt"
+        cancelLabel="Hủy"
+        onConfirm={handleDisableAssignment}
+        variant="danger"
+        isLoading={isDisablingAssignment}
+      />
     </View>
   );
 }

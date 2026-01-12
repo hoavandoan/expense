@@ -1,5 +1,6 @@
 import { ActivityItem } from "@/components/activity-item";
 import { AppText } from "@/components/app-text";
+import { EmptyState } from "@/components/ui/empty-state";
 
 import {
   AnimatedScrollView,
@@ -10,7 +11,16 @@ import { ActionIcon } from "@/components/ui/action-icon";
 import { GroupCard } from "@/components/ui/group-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { CATEGORY_CONFIG } from "@/constants";
-import { useExpensesRealtime, useGroups, useGroupsRealtime, useRecentExpenses } from "@/lib/hooks";
+import {
+  useActivityRealtime,
+  useExpensesRealtime,
+  useGroups,
+  useGroupsRealtime,
+  useNotificationsRealtime,
+  useRecentExpenses,
+  useTotalBalanceAcrossGroups,
+  useUnreadNotificationsCount,
+} from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatCurrency } from "@/lib/utils";
 import { Image } from "expo-image";
@@ -24,7 +34,7 @@ import {
   Surface,
   useThemeColor,
 } from "heroui-native";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -43,48 +53,26 @@ export default function HomeScreen() {
   const { data: recentExpenses, isLoading: isLoadingExpenses } =
     useRecentExpenses(5);
 
+  // Fetch unread notifications count
+  const { data: unreadCount } = useUnreadNotificationsCount();
+
   // Enable real-time subscriptions for groups
   useGroupsRealtime();
 
   // Enable real-time subscriptions for expenses (updates "Hoạt động gần đây")
   useExpensesRealtime();
 
+  // Enable real-time subscriptions for notifications
+  useNotificationsRealtime();
+
+  // Enable real-time subscriptions for activity log
+  useActivityRealtime();
+
   const accent = useThemeColor("accent");
   const foreground = useThemeColor("foreground");
 
   // Calculate total balance across all groups
-  const balanceStats = useMemo(() => {
-    if (!groups || !user) return { totalOwed: 0, totalOwing: 0, balance: 0 };
-
-    let totalOwed = 0; // Others owe to user
-    let totalOwing = 0; // User owes to others
-
-    groups.forEach((group: any) => {
-      group.expenses?.forEach((expense: any) => {
-        if (expense.paid_by === user.id) {
-          // User paid, others owe to user
-          expense.expense_splits?.forEach((split: any) => {
-            if (split.user_id !== user.id) {
-              totalOwed += split.amount;
-            }
-          });
-        } else {
-          // Someone else paid, check if user owes
-          expense.expense_splits?.forEach((split: any) => {
-            if (split.user_id === user.id) {
-              totalOwing += split.amount;
-            }
-          });
-        }
-      });
-    });
-
-    return {
-      totalOwed,
-      totalOwing,
-      balance: totalOwed - totalOwing,
-    };
-  }, [groups, user]);
+  const balanceStats = useTotalBalanceAcrossGroups(groups, user?.id || null);
 
   const HOME_HEADER_HEIGHT = 140;
 
@@ -125,19 +113,24 @@ export default function HomeScreen() {
             size="sm"
             variant="ghost"
             onPress={() => router.push("/search" as any)}
-                  className="w-10 h-10 bg-black/20 border border-white/10"
+            className="w-10 h-10 bg-black/20 border border-white/10"
           >
             <IconSymbol name="magnifyingglass" size={18} color={foreground} />
           </Button>
-          <Button
-            isIconOnly
-            size="sm"
-            variant="ghost"
-            onPress={() => router.push("/notifications" as any)}
-                  className="w-10 h-10 bg-black/20 border border-white/10"
-          >
-            <IconSymbol name="bell" size={18} color={foreground} />
-          </Button>
+          <View className="relative">
+            <Button
+              isIconOnly
+              size="sm"
+              variant="ghost"
+              onPress={() => router.push("/notifications" as any)}
+              className="w-10 h-10 bg-black/20 border border-white/10"
+            >
+              <IconSymbol name="bell" size={18} color={foreground} />
+            </Button>
+            {(unreadCount ?? 0) > 0 && (
+              <View className="absolute top-0 right-0 w-2 h-2 bg-danger rounded-full border border-white" />
+            )}
+          </View>
         </View>
       </View>
     </HeaderNavBar>
@@ -194,7 +187,9 @@ export default function HomeScreen() {
             >
               <IconSymbol name="bell" size={20} color={foreground} />
             </PressableFeedback>
-            <View className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-surface" />
+            {(unreadCount ?? 0) > 0 && (
+              <View className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-surface" />
+            )}
           </View>
         </View>
       </View>
@@ -302,7 +297,7 @@ export default function HomeScreen() {
                     adjustsFontSizeToFit
                   >
                     {showBalance
-                      ? `- ${formatCurrency(balanceStats.totalOwing, "VND")
+                      ? `- ${formatCurrency(balanceStats.totalOwed, "VND")
                           .replace("₫", "")
                           .trim()}`
                       : "••••"}
@@ -371,14 +366,14 @@ export default function HomeScreen() {
                 ))}
               </ScrollView>
             ) : (
-              <View className="mx-6 p-6 rounded-2xl bg-surface border border-divider/10 items-center">
-                <IconSymbol name="person.3.fill" size={40} color={accent} />
-                <AppText className="text-foreground font-semibold mt-3">
-                  Chưa có nhóm nào
-                </AppText>
-                <AppText className="text-muted text-sm text-center mt-1">
-                  Tạo nhóm mới hoặc tham gia nhóm bạn bè
-                </AppText>
+              <View className="mx-6">
+                <EmptyState
+                  icon="person.3.fill"
+                  title="Chưa có nhóm nào"
+                  description="Tạo nhóm mới hoặc tham gia nhóm bạn bè"
+                  actionLabel="Tạo nhóm"
+                  onAction={() => router.push("/add-group")}
+                />
               </View>
             )}
           </View>
@@ -449,12 +444,11 @@ export default function HomeScreen() {
                   );
                 })
               ) : (
-                <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
-                  <IconSymbol name="clock.fill" size={32} color={accent} />
-                  <AppText className="text-muted text-center mt-2">
-                    Chưa có hoạt động nào
-                  </AppText>
-                </View>
+                <EmptyState
+                  icon="clock.fill"
+                  title="Chưa có hoạt động nào"
+                  description="Các hoạt động chi tiêu sẽ hiển thị ở đây"
+                />
               )}
             </View>
           </View>
