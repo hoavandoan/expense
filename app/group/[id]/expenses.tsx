@@ -2,22 +2,22 @@ import { AppText } from "@/components/app-text";
 import { ScreenScrollView } from "@/components/screen-scroll-view";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
+import { ExpenseCard } from "@/components/ui/expense-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
 import { CATEGORY_CONFIG, EXPENSE_CATEGORIES } from "@/constants";
 import { useExpenses, useGroup } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  Card,
-  PressableFeedback,
-  Select,
-  Spinner,
-  Tabs,
-  TextField,
-  cn,
-  useThemeColor,
+    PressableFeedback,
+    Select,
+    Spinner,
+    Tabs,
+    TextField,
+    cn,
+    useThemeColor
 } from "heroui-native";
 import React, { useMemo, useState } from "react";
 import { View } from "react-native";
@@ -103,6 +103,18 @@ export default function GroupExpensesScreen() {
     });
     return groups;
   }, [filteredExpenses]);
+
+  const memberMap = useMemo(() => {
+    const map = new Map();
+    groupData?.group_members?.forEach((member: any) => {
+      map.set(member.user_id, {
+        id: member.user_id,
+        name: member.user?.name,
+        avatar_url: member.user?.avatar_url,
+      });
+    });
+    return map;
+  }, [groupData]);
 
   if (isLoadingGroup || isLoadingExpenses) {
     return (
@@ -273,7 +285,7 @@ export default function GroupExpensesScreen() {
           }
         />
       ) : (
-        <ScreenScrollView>
+        <ScreenScrollView withKeyboardAvoidingView>
           <View className="pb-20 pt-4">
             {Object.keys(groupedExpenses).map((dateKey) => (
               <View key={dateKey} className="mb-8">
@@ -289,49 +301,15 @@ export default function GroupExpensesScreen() {
                     const paidByUser = expense.paid_by_user;
 
                     return (
-                      <PressableFeedback
+                      <ExpenseCard
                         key={expense.id}
-                        onPress={() =>
-                          router.push(`/expense/${expense.id}` as any)
-                        }
-                      >
-                        <Card className="rounded-2xl border border-divider/10 bg-surface p-4">
-                          <View className="flex-row items-center gap-3">
-                            <View
-                              className={`w-12 h-12 rounded-xl items-center justify-center ${categoryConfig.bg}`}
-                            >
-                              <IconSymbol
-                                name={categoryConfig.icon as any}
-                                size={20}
-                                color={categoryConfig.color}
-                              />
-                            </View>
-                            <View className="flex-1">
-                              <AppText
-                                className="font-bold text-base"
-                                numberOfLines={1}
-                              >
-                                {expense.title}
-                              </AppText>
-                              <AppText
-                                className="text-muted text-sm"
-                                numberOfLines={1}
-                              >
-                                {isMe
-                                  ? "Bạn"
-                                  : paidByUser?.name || "Người dùng"}{" "}
-                                đã trả
-                              </AppText>
-                            </View>
-                            <AppText className="font-bold text-lg">
-                              {formatCurrency(
-                                expense.amount,
-                                groupData?.currency || "VND"
-                              )}
-                            </AppText>
-                          </View>
-                        </Card>
-                      </PressableFeedback>
+                        expense={expense}
+                        currency={groupData?.currency || "VND"}
+                        memberMap={memberMap}
+                        currentUserId={user?.id}
+                        onPress={() => router.push(`/expense/${expense.id}` as any)}
+                        className="mb-1"
+                      />
                     );
                   })}
                 </View>

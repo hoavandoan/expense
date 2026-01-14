@@ -12,9 +12,9 @@ import {
   HeaderNavBar,
 } from "@/components/parallax-header";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { ExpenseCard } from "@/components/ui/expense-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { PendingSettlements } from "@/components/ui/pending-settlements";
-import { type TimelineItem } from "@/components/ui/timeline";
 import {
   useDebtAssignment,
   useDisableDebtAssignment,
@@ -23,7 +23,8 @@ import {
   useUserBalanceInGroup,
 } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
-import { formatCurrency } from "@/lib/utils";
+import { assignDebtsOptimized } from "@/lib/utils/debt-calculator";
+import { formatCurrency } from "@/lib/utils/format";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -34,6 +35,7 @@ import {
   Divider,
   PressableFeedback,
   Skeleton,
+  Tabs,
   useThemeColor,
 } from "heroui-native";
 import React, { useMemo, useState } from "react";
@@ -51,10 +53,14 @@ export default function GroupDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const accent = useThemeColor("accent");
+  const muted = useThemeColor("muted");
   const { user } = useAuthStore();
   const [assigneeSelectorVisible, setAssigneeSelectorVisible] = useState(false);
   const [createRequestVisible, setCreateRequestVisible] = useState(false);
   const [isDisableConfirmOpen, setIsDisableConfirmOpen] = useState(false);
+
+  const [activeTab, setActiveTab] = useState("expenses");
+  const [showDetailedDebts, setShowDetailedDebts] = useState(false);
 
   const {
     data: group,
@@ -82,21 +88,22 @@ export default function GroupDetailScreen() {
     }));
   }, [membersWithBalanceRaw]);
 
-  // Transform expenses to activity timeline
-  const activities: TimelineItem[] = useMemo(() => {
-    if (!group?.expenses) return [];
+  // Calculate optimized debts for Summary tab
+  const optimizedDebts = useMemo(() => {
+    if (!membersWithBalanceRaw) return [];
+    
+    const balanceRecord: Record<string, number> = {};
+    membersWithBalanceRaw.forEach(m => {
+      balanceRecord[m.userId] = m.balance;
+    });
+    
+    return assignDebtsOptimized(balanceRecord);
+  }, [membersWithBalanceRaw]);
 
-    return group.expenses.slice(0, 5).map((expense: any, index: number) => ({
-      id: expense.id,
-      title: `${expense.paid_by_user?.name || "Ai đó"} đã thêm ${
-        expense.title
-      }`,
-      description: expense.description || undefined,
-      timestamp: new Date(expense.created_at).toLocaleDateString("vi-VN"),
-      icon: getCategoryIcon(expense.category),
-      status: index === 0 ? "current" : "complete",
-      meta: formatCurrency(expense.amount, group.currency || "VND"),
-    }));
+  // Calculate total group cost
+  const totalCost = useMemo(() => {
+    if (!group?.expenses) return 0;
+    return group.expenses.reduce((sum: number, exp: any) => sum + (exp.amount || 0), 0);
   }, [group]);
 
   const memberMap = useMemo(() => {
@@ -120,8 +127,8 @@ export default function GroupDetailScreen() {
         if (split.user_id !== expense.paid_by) {
           debts.push({
             id: split.id,
-            from: memberMap.get(split.user_id),
-            to: payer,
+            fromId: split.user_id,
+            toId: expense.paid_by,
             amount: split.amount,
             description: expense.title,
             date: expense.created_at,
@@ -317,12 +324,31 @@ export default function GroupDetailScreen() {
               variant="default"
               className="p-8 rounded-2xl shadow-xl overflow-hidden bg-accent"
             >
+              <View className="mb-6">
+                <View className="flex-row items-center justify-between mb-2">
+                  <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest">
+                    TỔNG CHI NHÓM
+                  </AppText>
+                  <View className="bg-white/10 px-2 py-0.5 rounded-md border border-white/10">
+                    <AppText className="text-white/80 text-[10px] font-bold">NHÓM</AppText>
+                  </View>
+                </View>
+                <AppText className="text-white text-4xl font-bold tracking-tighter" adjustsFontSizeToFit numberOfLines={1}>
+                  {formatCurrency(
+                    totalCost,
+                    group?.currency || "VND"
+                  )}
+                </AppText>
+              </View>
+
+              <View className="h-[1px] bg-white/10 w-full mb-6" />
+
               <View className="flex-row gap-4">
                 <View className="flex-1">
-                  <AppText className="text-danger text-[10px] font-bold uppercase tracking-widest mb-1">
+                  <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">
                     BẠN CHI
                   </AppText>
-                  <AppText className="text-white text-xl font-bold">
+                  <AppText className="text-white text-xl font-bold" adjustsFontSizeToFit numberOfLines={1}>
                     {formatCurrency(
                       userStats.totalPaid,
                       group?.currency || "VND"
@@ -331,10 +357,10 @@ export default function GroupDetailScreen() {
                 </View>
                 <Divider orientation="vertical" className="bg-white/20" />
                 <View className="flex-1">
-                  <AppText className="text-success text-[10px] font-bold uppercase tracking-widest mb-1">
+                  <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">
                     {userStats.balance >= 0 ? "BẠN NHẬN LẠI" : "BẠN NỢ"}
                   </AppText>
-                  <AppText className="text-white text-xl font-bold">
+                  <AppText className={cn("text-xl font-bold", userStats.balance >= 0 ? "text-success" : "text-danger")} adjustsFontSizeToFit numberOfLines={1}>
                     {formatCurrency(
                       Math.abs(userStats.balance),
                       group?.currency || "VND"
@@ -472,262 +498,203 @@ export default function GroupDetailScreen() {
             </View>
           )}
 
-          {/* Debts List */}
-          <View className="mb-10">
-            <View className="flex-row items-center justify-between mb-6">
-              <AppText className="text-xl font-bold text-foreground">
-                Ai nợ ai
-              </AppText>
-              <Button
-                size="sm"
-                variant="ghost"
-                onPress={() => router.push(`/group/${id}/members`)}
-              >
-                <Button.Label className="text-accent font-bold text-sm">
-                  Thành viên
-                </Button.Label>
-              </Button>
-            </View>
+          {/* Tabs Navigation */}
+          <View className="mb-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} variant="pill">
+              <Tabs.List className="bg-surface-secondary/50 p-1 rounded-2xl">
+                <Tabs.ScrollView>
+                  <Tabs.Indicator className="bg-background shadow-sm" />
+                  <Tabs.Trigger value="expenses" className="flex-1 py-2.5 rounded-xl">
+                    {({ isSelected }) => (
+                      <Tabs.Label className={cn("text-sm font-bold", isSelected ? "text-foreground" : "text-muted")}>
+                        Khoản chi
+                      </Tabs.Label>
+                    )}
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value="summary" className="flex-1 py-2.5 rounded-xl">
+                    {({ isSelected }) => (
+                      <Tabs.Label className={cn("text-sm font-bold", isSelected ? "text-foreground" : "text-muted")}>
+                        Tổng kết
+                      </Tabs.Label>
+                    )}
+                  </Tabs.Trigger>
+                </Tabs.ScrollView>
+              </Tabs.List>
 
-            <View className="gap-3">
-              {individualDebts.length === 0 ? (
-                <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
-                  <AppText className="text-muted">Chưa có khoản nợ nào</AppText>
-                </View>
-              ) : (
-                individualDebts.slice(0, 6).map((debt: any) => (
-                  <Card
-                    key={debt.id}
-                    variant="default"
-                    className="p-4 rounded-2xl bg-surface border border-divider/10"
+              {/* Tab Content: Expenses */}
+              <Tabs.Content value="expenses" className="mt-6">
+                <View className="flex-row items-center justify-between mb-6">
+                  <AppText className="text-xl font-bold text-foreground">
+                    Khoản chi gần đây
+                  </AppText>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onPress={() => router.push(`/group/${id}/expenses` as any)}
                   >
-                    <View className="flex-row items-center">
-                      <Avatar
-                        size="sm"
-                        alt={debt.from?.name || "N"}
-                        className="mr-3"
-                      >
-                        {debt.from?.avatar_url || debt.from?.avatarUrl ? (
-                          <Avatar.Image
-                            source={{
-                              uri: debt.from.avatar_url || debt.from.avatarUrl,
-                            }}
-                            asChild
-                          >
-                            <Image
-                              source={{
-                                uri:
-                                  debt.from.avatar_url || debt.from.avatarUrl,
-                              }}
-                              style={{ width: "100%", height: "100%" }}
-                            />
-                          </Avatar.Image>
-                        ) : (
-                          <Avatar.Fallback className="bg-danger/10">
-                            <AppText className="font-bold text-danger text-xs">
-                              {debt.from?.name?.charAt(0) || "N"}
-                            </AppText>
-                          </Avatar.Fallback>
-                        )}
-                      </Avatar>
-
-                      <View className="flex-1">
-                        <View className="flex-row items-center flex-wrap">
-                          <AppText className="font-bold text-sm text-foreground">
-                            {debt.from?.id === user?.id
-                              ? "Bạn"
-                              : debt.from?.name || "Ai đó"}
-                          </AppText>
-                          <AppText className="text-muted mx-1 text-[10px] uppercase font-bold">
-                            NỢ
-                          </AppText>
-                          <AppText className="font-bold text-sm text-foreground">
-                            {debt.to?.id === user?.id
-                              ? "Bạn"
-                              : debt.to?.name || "Ai đó"}
-                          </AppText>
-                        </View>
-                        <AppText
-                          className="text-muted text-[10px] mt-0.5"
-                          numberOfLines={1}
-                        >
-                          {debt.description}
-                        </AppText>
-                      </View>
-
-                      <View className="items-end ml-2">
-                        <AppText className="font-bold text-sm text-danger">
-                          {formatCurrency(
-                            debt.amount,
-                            group?.currency || "VND"
-                          )}
-                        </AppText>
-                        <AppText className="text-[9px] text-muted">
-                          {new Date(debt.date).toLocaleDateString("vi-VN")}
-                        </AppText>
-                      </View>
-                    </View>
-                  </Card>
-                ))
-              )}
-            </View>
-          </View>
-
-          {/* Expenses List */}
-          <View className="mb-10">
-            <View className="flex-row items-center justify-between mb-6">
-              <AppText className="text-xl font-bold text-foreground">
-                Khoản chi
-              </AppText>
-              <Button
-                size="sm"
-                variant="ghost"
-                onPress={() => router.push(`/group/${id}/expenses` as any)}
-              >
-                <Button.Label className="text-accent font-bold text-sm">
-                  Xem tất cả
-                </Button.Label>
-              </Button>
-            </View>
-
-            <View className="gap-4">
-              {groupData?.expenses?.length === 0 ? (
-                <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
-                  <AppText className="text-muted">Chưa có khoản chi nào</AppText>
+                    <Button.Label className="text-accent font-bold text-sm">
+                      Xem tất cả
+                    </Button.Label>
+                  </Button>
                 </View>
-              ) : (
-                groupData?.expenses?.slice(0, 5).map((expense: any) => {
-                  const payer = memberMap.get(expense.paid_by);
-                  const participants = expense.expense_splits?.map((split: any) =>
-                    memberMap.get(split.user_id)
-                  ).filter(Boolean) || [];
 
-                  return (
-                    <Card
-                      key={expense.id}
-                      variant="default"
-                      className="p-4 rounded-2xl bg-surface border border-divider/10"
+                <View className="gap-4">
+                  {groupData?.expenses?.length === 0 ? (
+                    <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                      <AppText className="text-muted">Chưa có khoản chi nào</AppText>
+                    </View>
+                  ) : (
+                    groupData?.expenses?.slice(0, 5).map((expense: any) => (
+                      <ExpenseCard
+                        key={expense.id}
+                        expense={expense}
+                        currency={group?.currency || "VND"}
+                        memberMap={memberMap}
+                        currentUserId={user?.id}
+                        onPress={() => router.push(`/expense/${expense.id}` as any)}
+                      />
+                    ))
+                  )}
+                </View>
+              </Tabs.Content>
+
+              {/* Tab Content: Summary */}
+              <Tabs.Content value="summary" className="mt-6">
+                {/* Settlement Table */}
+                <View className="mb-6">
+                  <View className="flex-row items-center justify-between mb-6">
+                    <AppText className="text-xl font-bold text-foreground">
+                      {showDetailedDebts ? "Chi tiết nợ nần" : "Đề xuất thanh toán"}
+                    </AppText>
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      onPress={() => setShowDetailedDebts(!showDetailedDebts)}
                     >
-                      <PressableFeedback
-                        onPress={() =>
-                          router.push(`/expense/${expense.id}` as any)
-                        }
-                      >
-                        <View className="flex-row items-center justify-between mb-3">
-                          <View className="flex-row items-center flex-1">
-                            <View className="w-10 h-10 rounded-xl bg-accent/10 items-center justify-center mr-3">
-                              <IconSymbol
-                                name={getCategoryIcon(expense.category) as any}
-                                size={20}
-                                color={accent}
-                              />
-                            </View>
-                            <View className="flex-1">
-                              <AppText
-                                className="font-bold text-base text-foreground"
-                                numberOfLines={1}
-                              >
-                                {expense.title}
-                              </AppText>
-                              <AppText className="text-muted text-[10px] uppercase font-bold mt-0.5">
-                                {new Date(
-                                  expense.expense_date || expense.created_at
-                                ).toLocaleDateString("vi-VN")}
-                              </AppText>
-                            </View>
-                          </View>
-                          <View className="items-end">
-                            <AppText className="font-bold text-base text-foreground">
-                              {formatCurrency(
-                                expense.amount,
-                                group?.currency || "VND"
-                              )}
-                            </AppText>
-                          </View>
+                      <Button.Label className="text-accent font-bold text-sm">
+                        {showDetailedDebts ? "Tóm tắt" : "Chi tiết"}
+                      </Button.Label>
+                    </Button>
+                  </View>
+                  
+                  <View className="gap-4">
+                    {showDetailedDebts ? (
+                      individualDebts.length === 0 ? (
+                        <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                          <AppText className="text-muted">Không có khoản nợ nào</AppText>
                         </View>
-
-                        <Divider className="bg-divider/5 mb-3" />
-
-                        <View className="flex-row items-center justify-between">
-                          <View className="flex-row items-center">
-                            <Avatar
-                              size="sm"
-                              alt={payer?.name || "P"}
-                              className="mr-2 w-6 h-6"
+                      ) : (
+                        individualDebts.map((debt: any) => {
+                          const fromMember = memberMap.get(debt.fromId);
+                          const toMember = memberMap.get(debt.toId);
+                          
+                          return (
+                            <Card
+                              key={debt.id}
+                              variant="default"
+                              className="p-4 rounded-2xl bg-surface border border-divider/10"
                             >
-                              {payer?.avatar_url ? (
-                                <Avatar.Image
-                                  source={{ uri: payer.avatar_url }}
-                                  asChild
-                                >
-                                  <Image
-                                    source={{ uri: payer.avatar_url }}
-                                    style={{ width: "100%", height: "100%" }}
-                                  />
-                                </Avatar.Image>
-                              ) : (
-                                <Avatar.Fallback className="bg-accent/10">
-                                  <AppText className="font-bold text-accent text-[8px]">
-                                    {payer?.name?.charAt(0) || "P"}
+                              <View className="flex-row items-center justify-between mb-2">
+                                <View className="flex-row items-center flex-1">
+                                  <Avatar size="sm" alt={fromMember?.name || "U"} className="mr-2 size-6">
+                                    {fromMember?.avatar_url && (
+                                      <Avatar.Image source={{ uri: fromMember.avatar_url }} asChild>
+                                        <Image source={{ uri: fromMember.avatar_url }} style={{ width: '100%', height: '100%' }} />
+                                      </Avatar.Image>
+                                    )}
+                                    <Avatar.Fallback><AppText className="text-[8px]">{fromMember?.name?.charAt(0)}</AppText></Avatar.Fallback>
+                                  </Avatar>
+                                  <AppText className="font-bold text-sm">
+                                    {debt.fromId === user?.id ? "Bạn" : fromMember?.name}
                                   </AppText>
-                                </Avatar.Fallback>
-                              )}
-                            </Avatar>
-                            <AppText className="text-xs text-muted">
-                              Trả bởi{" "}
-                              <AppText className="text-foreground font-semibold">
-                                {expense.paid_by === user?.id
-                                  ? "Bạn"
-                                  : payer?.name || "Ai đó"}
-                              </AppText>
-                            </AppText>
-                          </View>
-
-                          <View className="flex-row items-center">
-                            {participants.slice(0, 3).map((p: any, index: number) => (
-                              <Avatar
-                                key={p.id + index}
-                                size="sm"
-                                alt={p.name}
-                                className={cn(
-                                  index !== 0 && "-ml-2",
-                                  "border-2 border-surface w-5 h-5"
-                                )}
-                              >
-                                {p.avatar_url ? (
-                                  <Avatar.Image
-                                    source={{ uri: p.avatar_url }}
-                                    asChild
-                                  >
-                                    <Image
-                                      source={{ uri: p.avatar_url }}
-                                      style={{ width: "100%", height: "100%" }}
-                                    />
-                                  </Avatar.Image>
-                                ) : (
-                                  <Avatar.Fallback className="bg-surface-tertiary">
-                                    <AppText className="text-[8px] font-bold">
-                                      {p.name?.charAt(0)}
-                                    </AppText>
-                                  </Avatar.Fallback>
-                                )}
-                              </Avatar>
-                            ))}
-                            {participants.length > 3 && (
-                              <View className="w-5 h-5 rounded-full bg-surface-tertiary border-2 border-surface items-center justify-center -ml-2">
-                                <AppText className="text-[8px] font-bold text-muted">
-                                  +{participants.length - 3}
+                                  <AppText className="text-danger font-bold mx-1 text-[10px]">NỢ</AppText>
+                                  <AppText className="font-bold text-sm">
+                                    {debt.toId === user?.id ? "Bạn" : toMember?.name}
+                                  </AppText>
+                                </View>
+                                <AppText className="font-bold text-danger">
+                                  {formatCurrency(debt.amount, group?.currency || "VND")}
                                 </AppText>
                               </View>
-                            )}
-                          </View>
+                              <View className="flex-row items-center justify-between">
+                                <AppText className="text-muted text-xs italic" numberOfLines={1}>
+                                  cho {debt.description}
+                                </AppText>
+                                <AppText className="text-muted text-[10px]">
+                                  {new Date(debt.date).toLocaleDateString("vi-VN")}
+                                </AppText>
+                              </View>
+                            </Card>
+                          );
+                        })
+                      )
+                    ) : (
+                      optimizedDebts.length === 0 ? (
+                        <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                          <AppText className="text-muted">Tất cả nợ đã được tất toán!</AppText>
                         </View>
-                      </PressableFeedback>
-                    </Card>
-                  );
-                })
-              )}
-            </View>
+                      ) : (
+                        optimizedDebts.map((debt, index) => {
+                          const fromMember = memberMap.get(debt.from);
+                          const toMember = memberMap.get(debt.to);
+                        
+                          return (
+                            <Card
+                              key={index}
+                              variant="default"
+                              className="p-4 rounded-2xl bg-surface border border-divider/10"
+                            >
+                              <View className="flex-row items-center justify-between">
+                                <View className="flex-row items-center flex-1">
+                                  <View className="items-center">
+                                    <Avatar size="sm" alt={fromMember?.name} className="mb-1">
+                                      {fromMember?.avatar_url && (
+                                        <Avatar.Image source={{ uri: fromMember.avatar_url }} asChild>
+                                          <Image source={{ uri: fromMember.avatar_url }} style={{ width: '100%', height: '100%' }} />
+                                        </Avatar.Image>
+                                      )}
+                                      <Avatar.Fallback><AppText className="text-[8px]">{fromMember?.name?.charAt(0)}</AppText></Avatar.Fallback>
+                                    </Avatar>
+                                    <AppText className="text-[10px] font-bold text-foreground" numberOfLines={1}>
+                                      {debt.from === user?.id ? "Bạn" : fromMember?.name}
+                                    </AppText>
+                                  </View>
+                                  
+                                  <View className="flex-1 items-center px-4">
+                                    <View className="w-full h-[1px] bg-divider/20 relative items-center justify-center">
+                                      <View className="px-2 bg-surface">
+                                        <IconSymbol name="chevron.right" size={12} color={muted} />
+                                      </View>
+                                    </View>
+                                    <AppText className="text-xs font-bold text-accent mt-2">
+                                      {formatCurrency(debt.amount, group?.currency || "VND")}
+                                    </AppText>
+                                  </View>
+
+                                  <View className="items-center">
+                                    <Avatar size="sm" alt={toMember?.name} className="mb-1">
+                                      {toMember?.avatar_url && (
+                                        <Avatar.Image source={{ uri: toMember.avatar_url }} asChild>
+                                          <Image source={{ uri: toMember.avatar_url }} style={{ width: '100%', height: '100%' }} />
+                                        </Avatar.Image>
+                                      )}
+                                      <Avatar.Fallback><AppText className="text-[8px]">{toMember?.name?.charAt(0)}</AppText></Avatar.Fallback>
+                                    </Avatar>
+                                    <AppText className="text-[10px] font-bold text-foreground" numberOfLines={1}>
+                                      {debt.to === user?.id ? "Bạn" : toMember?.name}
+                                    </AppText>
+                                  </View>
+                                </View>
+                              </View>
+                            </Card>
+                          );
+                        })
+                      )
+                    )}
+                  </View>
+                </View>
+              </Tabs.Content>
+            </Tabs>
           </View>
         </View>
       </AnimatedScrollView>
@@ -764,15 +731,3 @@ export default function GroupDetailScreen() {
   );
 }
 
-function getCategoryIcon(category: string): string {
-  const iconMap: Record<string, string> = {
-    food: "fork.knife",
-    transport: "car.fill",
-    shopping: "cart.fill",
-    entertainment: "gamecontroller.fill",
-    utilities: "bolt.fill",
-    accommodation: "house.fill",
-    other: "ellipsis.circle.fill",
-  };
-  return iconMap[category] || "doc.text.fill";
-}

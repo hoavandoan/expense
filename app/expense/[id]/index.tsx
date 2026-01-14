@@ -108,7 +108,7 @@ export default function ExpenseDetailScreen() {
       <StickyHeader title="Chi tiết chi tiêu" />
 
       <ScreenScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        <View className="p-6 pb-8 items-center bg-background border-b border-divider/10">
+        <View className="py-6 pb-8 items-center bg-background border-b border-divider/10">
           <View
             className={`w-16 h-16 rounded-2xl items-center justify-center mb-4 ${categoryConfig.bg}`}
           >
@@ -159,7 +159,7 @@ export default function ExpenseDetailScreen() {
           </View>
         </View>
 
-        <View className="p-6">
+        <View className="py-6">
           {expense.description && (
             <View className="mb-10">
               <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
@@ -251,21 +251,17 @@ export default function ExpenseDetailScreen() {
             <View className="flex-row gap-3">
               <Button
                 variant="secondary"
-                className="flex-1 h-14 rounded-2xl border border-divider/10 bg-surface/5 shadow-sm"
                 onPress={handleEdit}
+                className="flex-1"
               >
-                <Button.Label className="text-accent font-bold">
                   Chỉnh sửa
-                </Button.Label>
               </Button>
               <Button
-                variant="secondary"
-                className="flex-1 h-14 rounded-2xl border border-divider/10 bg-danger/5 shadow-sm"
+                variant="danger"
                 onPress={() => setShowDeleteDialog(true)}
+                className="flex-1"
               >
-                <Button.Label className="text-danger font-bold">
                   Xóa
-                </Button.Label>
               </Button>
             </View>
           )}

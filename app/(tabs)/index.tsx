@@ -308,7 +308,7 @@ export default function HomeScreen() {
           </View>
 
           {/* Quick Actions Row */}
-          <View className="flex-row justify-center px-6 my-8 gap-4">
+          <View className="flex-row justify-center px-6 my-8 gap-6">
             <ActionIcon
               name="creditcard"
               label="Chi tiêu"
@@ -330,7 +330,7 @@ export default function HomeScreen() {
           <View className="mb-8 w-full">
             <View className="px-6 flex-row items-center justify-between mb-4">
               <AppText className="text-lg font-bold">Nhóm của bạn</AppText>
-              <PressableFeedback>
+              <PressableFeedback onPress={() => router.push("/groups" as any)}>
                 <AppText className="text-accent font-semibold text-sm">
                   Xem tất cả
                 </AppText>

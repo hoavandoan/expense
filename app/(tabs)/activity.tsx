@@ -340,6 +340,7 @@ export default function ActivityScreen() {
           onRefresh={onRefresh}
           className="pt-6"
           withTabBarOffset
+          withKeyboardAvoidingView
         >
           {groupKeys.map((groupTitle) => (
             <View key={groupTitle} className="mb-8">

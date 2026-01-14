@@ -9,12 +9,12 @@ import { formatCurrency } from "@/lib/utils";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import {
-  Avatar,
-  Card,
-  PressableFeedback,
-  Spinner,
-  TextField,
-  useThemeColor,
+    Avatar,
+    Card,
+    PressableFeedback,
+    Spinner,
+    TextField,
+    useThemeColor,
 } from "heroui-native";
 import React, { useMemo, useState } from "react";
 import { View } from "react-native";
@@ -88,7 +88,7 @@ export default function SearchScreen() {
         </View>
       ) : searchQuery.length >= 2 && searchResults ? (
         hasResults ? (
-          <ScreenScrollView>
+          <ScreenScrollView withKeyboardAvoidingView>
             <View className="px-6 pb-20">
               {/* Expenses Results */}
               {searchResults.expenses.length > 0 && (
@@ -232,7 +232,7 @@ export default function SearchScreen() {
           />
         )
       ) : (
-        <ScreenScrollView>
+        <ScreenScrollView withKeyboardAvoidingView>
           {recentSearches.length > 0 && (
             <View className="p-6">
               <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">

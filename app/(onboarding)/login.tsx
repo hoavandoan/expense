@@ -1,4 +1,5 @@
 import { AppText } from '@/components/app-text';
+import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { signInWithApple, signInWithGoogle } from '@/lib/auth/oauth';
 import { useAuth } from '@/lib/hooks';
@@ -6,13 +7,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Button, PressableFeedback, TextField, useThemeColor } from 'heroui-native';
 import React, { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Alert, View } from 'react-native';
 
 export default function LoginScreen() {
   const { signInWithEmail, signUpWithEmail } = useAuth();
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const foreground = useThemeColor('foreground');
   const accent = useThemeColor('accent');
   const background = useThemeColor('background');
@@ -23,8 +22,6 @@ export default function LoginScreen() {
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSocialLoading, setIsSocialLoading] = useState(false);
-
-  // const { toast } = useToast();
 
   const handleEmailAuth = async () => {
     if (!email || !password) {
@@ -82,11 +79,8 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-background"
-    >
-      <View className="flex-1 px-6 justify-between" style={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 16 }}>
+    <View className="flex-1 bg-background">
+      <ScreenScrollView withKeyboardAvoidingView contentContainerStyle={{ paddingVertical: 20 }}>
         {/* Header */}
         <View>
           <Button
@@ -116,30 +110,30 @@ export default function LoginScreen() {
         {/* Form */}
         <View className="gap-4 my-6">
           {isSignUp && (
-            <TextField className="bg-surface border border-divider/10 rounded-2xl h-14 px-4">
-              <TextField.Label>Tên của bạn</TextField.Label>
+            <TextField isRequired className="mb-4">
+              <TextField.Label className="mb-2 ml-1">Họ và tên</TextField.Label>
               <TextField.Input
                 value={name}
                 onChangeText={setName}
-                placeholder="Nhập tên"
+                placeholder="Nguyễn Văn A"
                 autoCapitalize="words"
               />
             </TextField>
           )}
 
-          <TextField className="bg-surface border border-divider/10 rounded-2xl h-14 px-4">
-            <TextField.Label>Email</TextField.Label>
+          <TextField isRequired className="mb-4">
+            <TextField.Label className="mb-2 ml-1">Email</TextField.Label>
             <TextField.Input
               value={email}
               onChangeText={setEmail}
-              placeholder="example@email.com"
+              placeholder="name@example.com"
               keyboardType="email-address"
               autoCapitalize="none"
             />
           </TextField>
 
-          <TextField className="bg-surface border border-divider/10 rounded-2xl h-14 px-4">
-            <TextField.Label>Mật khẩu</TextField.Label>
+          <TextField isRequired className="mb-6">
+            <TextField.Label className="mb-2 ml-1">Mật khẩu</TextField.Label>
             <TextField.Input
               value={password}
               onChangeText={setPassword}
@@ -209,7 +203,7 @@ export default function LoginScreen() {
             </AppText>
           </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </ScreenScrollView>
+    </View>
   );
 }

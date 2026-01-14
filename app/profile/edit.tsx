@@ -13,7 +13,7 @@ export default function ProfileEditScreen() {
     <View className="flex-1 bg-background">
       <StickyHeader title="Chỉnh sửa hồ sơ" />
 
-      <ScreenScrollView>
+      <ScreenScrollView withKeyboardAvoidingView>
         <View className="items-center mb-8">
           <Avatar size="lg" alt="User Profile" className="mb-4 w-24 h-24">
             <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=1' }} />
@@ -24,19 +24,19 @@ export default function ProfileEditScreen() {
         </View>
 
         <View className="mb-8 gap-4">
-          <TextField className="bg-surface border border-divider/10 rounded-2xl px-4 h-16">
-            <TextField.Label>Họ và tên</TextField.Label>
-            <TextField.Input defaultValue="Duy" />
+          <TextField isRequired className="bg-surface border border-divider/10 rounded-2xl px-4 h-20 justify-center">
+            <TextField.Label className="mb-1">HỌ VÀ TÊN</TextField.Label>
+            <TextField.Input defaultValue="Duy" className="text-base" />
           </TextField>
 
-          <TextField className="bg-surface border border-divider/10 rounded-2xl px-4 h-16">
-            <TextField.Label>Email</TextField.Label>
-            <TextField.Input defaultValue="duy@example.com" keyboardType="email-address" />
+          <TextField isRequired className="bg-surface border border-divider/10 rounded-2xl px-4 h-20 justify-center">
+            <TextField.Label className="mb-1">EMAIL</TextField.Label>
+            <TextField.Input defaultValue="duy@example.com" keyboardType="email-address" className="text-base" />
           </TextField>
 
-          <TextField className="bg-surface border border-divider/10 rounded-2xl px-4 h-16">
-            <TextField.Label>Số điện thoại</TextField.Label>
-            <TextField.Input defaultValue="0901234567" keyboardType="phone-pad" />
+          <TextField isRequired className="bg-surface border border-divider/10 rounded-2xl px-4 h-20 justify-center">
+            <TextField.Label className="mb-1">SỐ ĐIỆN THOẠI</TextField.Label>
+            <TextField.Input defaultValue="0901234567" keyboardType="phone-pad" className="text-base" />
           </TextField>
         </View>
 

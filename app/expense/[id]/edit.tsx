@@ -11,14 +11,14 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  Avatar,
-  Button,
-  Card,
-  PressableFeedback,
-  Skeleton,
-  Spinner,
-  TextField,
-  useThemeColor,
+    Avatar,
+    Button,
+    Card,
+    PressableFeedback,
+    Skeleton,
+    Spinner,
+    TextField,
+    useThemeColor
 } from "heroui-native";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -210,20 +210,18 @@ export default function EditExpenseScreen() {
     <View className="flex-1 bg-background">
       <ModalHeader title="Chỉnh sửa chi tiêu" variant="back" />
 
-      <ScreenScrollView>
+      <ScreenScrollView withKeyboardAvoidingView>
         <View className="p-6 gap-6">
           {/* Category Selection */}
-          <View>
-            <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-              DANH MỤC
-            </AppText>
+          <TextField isRequired isInvalid={!!errors.category}>
+            <TextField.Label className="mb-3 ml-1">DANH MỤC</TextField.Label>
             <View className="flex-row flex-wrap gap-3">
               {EXPENSE_CATEGORIES.map((category) => {
                 const isSelected = categoryValue === category.value;
                 return (
                   <PressableFeedback
                     key={category.value}
-                    onPress={() => setValue("category", category.value)}
+                    onPress={() => setValue("category", category.value, { shouldValidate: true })}
                   >
                     <Card
                       variant="default"
@@ -240,7 +238,7 @@ export default function EditExpenseScreen() {
                           }`}
                         >
                           <IconSymbol
-                            name={category.icon}
+                            name={category.icon as any}
                             size={24}
                             color={isSelected ? category.color : muted}
                           />
@@ -259,71 +257,69 @@ export default function EditExpenseScreen() {
               })}
             </View>
             {errors.category && (
-              <AppText className="text-danger text-xs mt-1 ml-1">
+              <TextField.ErrorMessage className="ml-1 mt-1">
                 {errors.category.message}
-              </AppText>
+              </TextField.ErrorMessage>
             )}
-          </View>
+          </TextField>
 
           {/* Title */}
           <View>
-            <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-              MÔ TẢ
-            </AppText>
             <Controller
               control={control}
               name="title"
               render={({ field: { onChange, value } }) => (
-                <TextField className="bg-surface border border-divider/10 rounded-2xl">
+                <TextField isRequired isInvalid={!!errors.title}>
+                  <TextField.Label className="mb-3 ml-1">MÔ TẢ</TextField.Label>
                   <TextField.Input
                     placeholder="Nhập mô tả chi tiêu"
                     value={value}
                     onChangeText={onChange}
-                    className="h-14"
+                    className="bg-surface border border-divider/10 h-14 rounded-2xl px-4"
                   />
+                  {errors.title && (
+                    <TextField.ErrorMessage className="ml-1 mt-1">
+                        {errors.title.message}
+                    </TextField.ErrorMessage>
+                  )}
                 </TextField>
               )}
             />
-            {errors.title && (
-              <AppText className="text-danger text-xs mt-1 ml-1">
-                {errors.title.message}
-              </AppText>
-            )}
           </View>
 
           {/* Amount */}
           <View>
-            <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-              SỐ TIỀN
-            </AppText>
             <Controller
               control={control}
               name="amount"
               render={({ field: { onChange, value } }) => (
-                <TextField className="bg-surface border border-divider/10 rounded-2xl">
-                  <TextField.Input
-                    placeholder="0"
-                    value={value}
-                    onChangeText={(text: string) => {
-                      const formatted = text.replace(/\D/g, "");
-                      onChange(formatted);
-                    }}
-                    keyboardType="numeric"
-                    className="h-14 pr-16"
-                  />
-                  <View className="absolute right-4 top-0 bottom-0 justify-center">
-                    <AppText className="text-muted font-semibold">
-                      {currency}
-                    </AppText>
+                <TextField isRequired isInvalid={!!errors.amount}>
+                  <TextField.Label className="mb-3 ml-1">SỐ TIỀN</TextField.Label>
+                  <View className="justify-center">
+                    <TextField.Input
+                      placeholder="0"
+                      value={value}
+                      onChangeText={(text: string) => {
+                        const formatted = text.replace(/\D/g, "");
+                        onChange(formatted);
+                      }}
+                      keyboardType="numeric"
+                      className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 pr-16"
+                    />
+                    <View className="absolute right-4 top-0 bottom-0 justify-center">
+                      <AppText className="text-muted font-semibold">
+                        {currency}
+                      </AppText>
+                    </View>
                   </View>
+                  {errors.amount && (
+                    <TextField.ErrorMessage className="ml-1 mt-1">
+                        {errors.amount.message}
+                    </TextField.ErrorMessage>
+                  )}
                 </TextField>
               )}
             />
-            {errors.amount && (
-              <AppText className="text-danger text-xs mt-1 ml-1">
-                {errors.amount.message}
-              </AppText>
-            )}
             {amountValue && (
               <AppText className="text-muted text-xs mt-1 ml-1">
                 Chia đều: {formatCurrency(splitAmount, currency)} mỗi người
@@ -333,21 +329,19 @@ export default function EditExpenseScreen() {
 
           {/* Notes */}
           <View>
-            <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-              GHI CHÚ (TÙY CHỌN)
-            </AppText>
             <Controller
               control={control}
               name="notes"
               render={({ field: { onChange, value } }) => (
-                <TextField className="bg-surface border border-divider/10 rounded-2xl">
+                <TextField>
+                  <TextField.Label className="mb-3 ml-1">GHI CHÚ (TÙY CHỌN)</TextField.Label>
                   <TextField.Input
                     placeholder="Thêm ghi chú..."
                     value={value}
                     onChangeText={onChange}
                     multiline
                     numberOfLines={4}
-                    className="min-h-[100px] py-4"
+                    className="min-h-[100px] py-4 bg-surface border border-divider/10 rounded-2xl px-4"
                   />
                 </TextField>
               )}
@@ -356,7 +350,7 @@ export default function EditExpenseScreen() {
 
           {/* Receipt Upload */}
           <View>
-            <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-3 ml-1">
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
               ẢNH HÓA ĐƠN (TÙY CHỌN)
             </AppText>
             {selectedReceipt ? (
@@ -408,47 +402,51 @@ export default function EditExpenseScreen() {
           {expenseData.expense_splits &&
             expenseData.expense_splits.length > 0 && (
               <View>
-                <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-3 ml-1">
+                <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
                   NGƯỜI THAM GIA ({expenseData.expense_splits.length})
                 </AppText>
-                <Card className="rounded-2xl border border-divider/10 bg-surface">
+                <Card className="rounded-2xl border border-divider/10 bg-surface overflow-hidden">
                   {expenseData.expense_splits.map((split: any, idx: number) => {
                     const splitUser = split.user || {};
                     return (
-                      <View
-                        key={split.id || idx}
-                        className="p-3 flex-row items-center gap-3"
-                      >
-                        {splitUser.avatar_url ? (
-                          <Avatar size="sm" alt={splitUser.name || ""}>
-                            <Avatar.Image
-                              source={{ uri: splitUser.avatar_url }}
-                            />
-                          </Avatar>
-                        ) : (
-                          <Avatar
-                            size="sm"
-                            alt={splitUser.name || ""}
-                            className="bg-surface-tertiary"
-                          >
-                            <Avatar.Fallback>
-                              <AppText className="text-[10px] font-bold">
-                                {splitUser.name?.charAt(0) || "U"}
-                              </AppText>
-                            </Avatar.Fallback>
-                          </Avatar>
+                      <View key={split.id || idx}>
+                        <View
+                          className="p-4 flex-row items-center gap-3"
+                        >
+                          {splitUser.avatar_url ? (
+                            <Avatar size="sm" alt={splitUser.name || ""}>
+                              <Avatar.Image
+                                source={{ uri: splitUser.avatar_url }}
+                              />
+                            </Avatar>
+                          ) : (
+                            <Avatar
+                              size="sm"
+                              alt={splitUser.name || ""}
+                              className="bg-accent/10"
+                            >
+                              <Avatar.Fallback>
+                                <AppText className="text-accent font-bold">
+                                  {splitUser.name?.charAt(0) || "U"}
+                                </AppText>
+                              </Avatar.Fallback>
+                            </Avatar>
+                          )}
+                          <AppText className="font-semibold flex-1">
+                            {splitUser.name || "Thành viên"}
+                          </AppText>
+                          <AppText className="text-accent font-bold">
+                            {formatCurrency(splitAmount, currency)}
+                          </AppText>
+                        </View>
+                        {idx < expenseData.expense_splits.length - 1 && (
+                            <View className="h-[1px] bg-divider/10 mx-4" />
                         )}
-                        <AppText className="font-semibold flex-1">
-                          {splitUser.name || "Thành viên"}
-                        </AppText>
-                        <AppText className="text-muted text-sm">
-                          {formatCurrency(splitAmount, currency)}
-                        </AppText>
                       </View>
                     );
                   })}
                 </Card>
-                <AppText className="text-muted text-xs mt-2 ml-1">
+                <AppText className="text-muted text-[10px] mt-3 ml-1">
                   Lưu ý: Không thể thay đổi người tham gia. Tạo khoản chi mới
                   nếu cần thay đổi.
                 </AppText>

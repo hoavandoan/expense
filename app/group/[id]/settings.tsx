@@ -10,15 +10,15 @@ import { useGroup, useLeaveGroup, useUpdateGroup } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  Avatar,
-  Button,
-  Card,
-  Divider,
-  PressableFeedback,
-  Skeleton,
-  Spinner,
-  TextField,
-  useThemeColor,
+    Avatar,
+    Button,
+    Card,
+    Divider,
+    PressableFeedback,
+    Skeleton,
+    Spinner,
+    TextField,
+    useThemeColor,
 } from "heroui-native";
 import React, { useState } from "react";
 import { Alert, View } from "react-native";
@@ -104,7 +104,7 @@ export default function GroupSettingsScreen() {
     <View className="flex-1 bg-background">
       <ModalHeader title="Cài đặt nhóm" variant="back" />
 
-      <ScreenScrollView>
+      <ScreenScrollView withKeyboardAvoidingView>
         <View className="gap-8">
           {/* Group Info */}
           <View>

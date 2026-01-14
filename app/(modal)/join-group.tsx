@@ -1,20 +1,17 @@
 import { AppText } from '@/components/app-text';
+import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useJoinGroup } from '@/lib/hooks';
 import * as Clipboard from 'expo-clipboard';
 import { useRouter } from 'expo-router';
 import { Button, Divider, PressableFeedback, TextField } from 'heroui-native';
 import React, { useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Alert, View } from 'react-native';
 
 export default function JoinGroupScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const [inviteCode, setInviteCode] = useState('');
   const joinGroup = useJoinGroup();
-
-  // const { toast } = useToast();
 
   const handlePaste = async () => {
     const text = await Clipboard.getStringAsync();
@@ -48,12 +45,8 @@ export default function JoinGroupScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 24 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View className="items-center mb-10">
+      <ScreenScrollView withKeyboardAvoidingView>
+        <View className="items-center mb-10 mt-6">
           <AppText className="text-3xl font-bold mb-3">Quét mã QR</AppText>
           <AppText className="text-muted text-center leading-relaxed text-base">
             Di chuyển camera đến mã QR của nhóm để{"\n"}tham gia ngay lập tức.
@@ -100,13 +93,14 @@ export default function JoinGroupScreen() {
         </View>
 
         <View className="mb-8">
-          <AppText className="text-xl font-bold mb-2">Nhập mã hoặc liên kết</AppText>
-          <AppText className="text-sm text-muted mb-6">
-            Sử dụng mã nhóm hoặc dán liên kết mời
-          </AppText>
-
           <View className="flex-row gap-2">
-            <TextField className="flex-1">
+            <TextField isRequired className="flex-1">
+              <TextField.Label className="mb-3 ml-1">
+                NHẬP MÃ HOẶC LIÊN KẾT
+              </TextField.Label>
+              <TextField.Description className="mb-3 ml-1">
+                Sử dụng mã nhóm hoặc dán liên kết mời
+              </TextField.Description>
               <View className="justify-center">
                 <TextField.Input
                   placeholder="Mã hoặc liên kết mời"
@@ -155,7 +149,7 @@ export default function JoinGroupScreen() {
             <AppText className="text-muted font-medium">Làm thế nào để tìm mã QR?</AppText>
           </View>
         </PressableFeedback>
-      </ScrollView>
+      </ScreenScrollView>
     </View>
   );
 }

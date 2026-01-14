@@ -27,6 +27,7 @@ export default function ModalLayout() {
         headerTitleStyle: {
           fontFamily: "Inter_700Bold",
           fontSize: 18,
+          color: foreground,
         },
         headerStyle: {
           backgroundColor: background,

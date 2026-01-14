@@ -70,52 +70,55 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
             Đề xuất một thành viên để làm trung gian thanh toán. Chủ nhóm sẽ duyệt yêu cầu này.
           </Dialog.Description>
           
-          <ScrollView className="max-h-60 mb-4" showsVerticalScrollIndicator={false}>
-            <View className="gap-3">
-              {members.map((member) => (
-                <Button
-                  key={member.userId}
-                  variant="ghost"
-                  className={cn(
-                    "p-3 rounded-2xl border flex-row items-center justify-between h-auto",
-                    selectedUserId === member.userId
-                      ? "border-primary bg-primary/10"
-                      : "border-divider/10"
-                  )}
-                  onPress={() => setSelectedUserId(member.userId)}
-                >
-                  <View className="flex-row items-center flex-1">
-                     <Avatar size="md" className="mr-3" alt={member.name || 'Member'}>
-                      {member.avatarUrl ? (
-                        <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
-                           <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} />
-                        </Avatar.Image>
-                      ) : (
-                        <Avatar.Fallback className="bg-default-100">
-                           <AppText className="font-bold">{member.name?.charAt(0)}</AppText>
-                        </Avatar.Fallback>
-                      )}
-                    </Avatar>
-                    <View className="items-start">
-                      <AppText className="font-bold">{member.name || 'Unknown'}</AppText>
-                      <AppText className="text-xs text-muted capitalize">
-                         {member.userId === currentUserId ? 'Bạn' : member.role}
-                      </AppText>
+          <TextField isRequired className="mb-4">
+            <TextField.Label className="mb-3 ml-1">CHỌN THÀNH VIÊN</TextField.Label>
+            <ScrollView className="max-h-60" showsVerticalScrollIndicator={false}>
+              <View className="gap-3">
+                {members.map((member) => (
+                  <Button
+                    key={member.userId}
+                    variant="ghost"
+                    className={cn(
+                      "p-3 rounded-2xl border flex-row items-center justify-between h-auto",
+                      selectedUserId === member.userId
+                        ? "border-primary bg-primary/10"
+                        : "border-divider/10"
+                    )}
+                    onPress={() => setSelectedUserId(member.userId)}
+                  >
+                    <View className="flex-row items-center flex-1">
+                       <Avatar size="md" className="mr-3" alt={member.name || 'Member'}>
+                        {member.avatarUrl ? (
+                          <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
+                             <Image source={{ uri: member.avatarUrl }} style={{ width: '100%', height: '100%' }} />
+                          </Avatar.Image>
+                        ) : (
+                          <Avatar.Fallback className="bg-default-100">
+                             <AppText className="font-bold">{member.name?.charAt(0)}</AppText>
+                          </Avatar.Fallback>
+                        )}
+                      </Avatar>
+                      <View className="items-start">
+                        <AppText className="font-bold">{member.name || 'Unknown'}</AppText>
+                        <AppText className="text-xs text-muted capitalize">
+                           {member.userId === currentUserId ? 'Bạn' : member.role}
+                        </AppText>
+                      </View>
                     </View>
-                  </View>
-                  {selectedUserId === member.userId && (
-                    <View className="w-6 h-6 rounded-full bg-primary items-center justify-center">
-                      <IconSymbol name="checkmark" size={12} color="white" />
-                    </View>
-                  )}
-                </Button>
-              ))}
-            </View>
-          </ScrollView>
+                    {selectedUserId === member.userId && (
+                      <View className="w-6 h-6 rounded-full bg-primary items-center justify-center">
+                        <IconSymbol name="checkmark" size={12} color="white" />
+                      </View>
+                    )}
+                  </Button>
+                ))}
+              </View>
+            </ScrollView>
+          </TextField>
 
           <View className="mb-6">
             <TextField>
-              <TextField.Label>Lý do (Tùy chọn)</TextField.Label>
+              <TextField.Label className="mb-3 ml-1">LÝ DO (TÙY CHỌN)</TextField.Label>
               <TextField.Input
                 placeholder="Tại sao nên chọn người này?"
                 value={reason}
@@ -147,4 +150,3 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
     </Dialog>
   );
 };
-

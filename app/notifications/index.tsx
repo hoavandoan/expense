@@ -176,7 +176,7 @@ export default function NotificationsScreen() {
         </View>
       ) : notifications && notifications.length > 0 ? (
         <ScreenScrollView refreshing={refreshing} onRefresh={onRefresh}>
-          <View className="px-6 pb-20">
+          <View className="pb-20">
             {groupKeys.map((groupTitle) => (
               <View key={groupTitle} className="mb-6">
                 <AppText className="text-[13px] font-bold text-muted uppercase tracking-widest mb-4">

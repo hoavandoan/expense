@@ -23,7 +23,7 @@ import {
 } from "heroui-native";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import * as z from "zod";
 
 const expenseSchema = z.object({
@@ -195,6 +195,14 @@ export default function AddExpenseScreen() {
     setSelectedReceipt(null);
   };
 
+  const toggleParticipant = (memberId: string) => {
+    const isSelected = participantIds.includes(memberId);
+    const newIds = isSelected
+      ? participantIds.filter((id) => id !== memberId)
+      : [...participantIds, memberId];
+    setValue("participantIds", newIds, { shouldValidate: true });
+  };
+
   const onSubmit = async (values: ExpenseFormValues) => {
     try {
       setIsUploadingReceipt(true);
@@ -227,10 +235,16 @@ export default function AddExpenseScreen() {
         })),
       });
 
-      Alert.alert("Thành công", "Đã tạo khoản chi");
+      toast.show({
+        label: "Đã tạo khoản chi thành công",
+        variant: "success",
+      });
       router.back();
     } catch (error: any) {
-      Alert.alert("Lỗi", error.message || "Đã có lỗi xảy ra");
+      toast.show({
+        label: "Đã có lỗi xảy ra",
+        variant: "danger",
+      });
     } finally {
       setIsUploadingReceipt(false);
     }
@@ -280,7 +294,7 @@ export default function AddExpenseScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ScreenScrollView>
+      <ScreenScrollView withKeyboardAvoidingView>
         {hasPreselectedGroup && currentGroup && (
           <View className="mb-6 p-4 bg-surface rounded-2xl border border-divider/10 mt-4">
             <View className="flex-row items-center">
@@ -300,16 +314,18 @@ export default function AddExpenseScreen() {
         )}
 
         {!hasPreselectedGroup && (
-          <View className="mb-6 mt-4">
-            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-              NHÓM
-            </AppText>
+          <TextField
+            isRequired
+            isInvalid={!!errors.groupId}
+            className="mb-6 mt-4"
+          >
+            <TextField.Label className="mb-3 ml-1">NHÓM</TextField.Label>
             <Controller
               control={control}
               name="groupId"
               render={({ field: { onChange, value } }) => (
                 <Select
-                  value={groupOptions.find((g) => g.id === value) || null}
+                  value={groupOptions.find((g) => g.id === value) as any}
                   onValueChange={(opt: any) => opt && onChange(opt.id || opt)}
                 >
                   <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
@@ -362,22 +378,20 @@ export default function AddExpenseScreen() {
               )}
             />
             {errors.groupId && (
-              <AppText className="text-danger text-sm mt-1 ml-1">
+              <TextField.ErrorMessage className="ml-1 mt-1">
                 {errors.groupId.message}
-              </AppText>
+              </TextField.ErrorMessage>
             )}
-          </View>
+          </TextField>
         )}
 
         <View className="mb-6">
-          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-            SỐ TIỀN
-          </AppText>
           <Controller
             control={control}
             name="amount"
             render={({ field: { onChange, value } }) => (
-              <TextField isInvalid={!!errors.amount}>
+              <TextField isRequired isInvalid={!!errors.amount}>
+                <TextField.Label className="mb-3 ml-1">SỐ TIỀN</TextField.Label>
                 <View className="justify-center">
                   <TextField.Input
                     placeholder="0"
@@ -407,14 +421,12 @@ export default function AddExpenseScreen() {
         </View>
 
         <View className="mb-6">
-          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-            MÔ TẢ
-          </AppText>
           <Controller
             control={control}
             name="title"
             render={({ field: { onChange, value } }) => (
-              <TextField isInvalid={!!errors.title}>
+              <TextField isRequired isInvalid={!!errors.title}>
+                <TextField.Label className="mb-3 ml-1">MÔ TẢ</TextField.Label>
                 <TextField.Input
                   placeholder="Bạn đã chi cho việc gì? (e.g. Ăn trưa)"
                   value={value}
@@ -431,16 +443,18 @@ export default function AddExpenseScreen() {
           />
         </View>
 
-        <View className="mb-6">
-          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-            PHÂN LOẠI
-          </AppText>
+        <TextField
+          isRequired
+          isInvalid={!!errors.category}
+          className="mb-6"
+        >
+          <TextField.Label className="mb-3 ml-1">PHÂN LOẠI</TextField.Label>
           <Controller
             control={control}
             name="category"
             render={({ field: { onChange, value } }) => (
               <Select
-                value={EXPENSE_CATEGORIES.find((c) => c.value === value)!}
+                value={EXPENSE_CATEGORIES.find((c) => c.value === value) as any}
                 onValueChange={(opt: any) => opt && onChange(opt.value || opt)}
               >
                 <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
@@ -461,7 +475,7 @@ export default function AddExpenseScreen() {
                         size={18}
                         color={
                           EXPENSE_CATEGORIES.find((c) => c.value === value)
-                            ?.color
+                            ?.color as any
                         }
                       />
                     </View>
@@ -499,7 +513,7 @@ export default function AddExpenseScreen() {
                             <IconSymbol
                               name={category.icon as any}
                               size={18}
-                              color={category.color}
+                              color={category.color as any}
                             />
                           </View>
                           <Select.ItemLabel className="text-base" />
@@ -512,12 +526,19 @@ export default function AddExpenseScreen() {
               </Select>
             )}
           />
-        </View>
+          {errors.category && (
+            <TextField.ErrorMessage className="ml-1 mt-1">
+              {errors.category.message}
+            </TextField.ErrorMessage>
+          )}
+        </TextField>
 
-        <View className="mb-6">
-          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-            NGƯỜI TRẢ TIỀN
-          </AppText>
+        <TextField
+          isRequired
+          isInvalid={!!errors.paidById}
+          className="mb-6"
+        >
+          <TextField.Label className="mb-3 ml-1">NGƯỜI TRẢ TIỀN</TextField.Label>
           <Controller
             control={control}
             name="paidById"
@@ -533,7 +554,7 @@ export default function AddExpenseScreen() {
               );
               return (
                 <Select
-                  value={currentPayerOption}
+                  value={currentPayerOption as any}
                   onValueChange={(opt: any) => opt && onChange(opt.value)}
                 >
                   <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
@@ -586,29 +607,26 @@ export default function AddExpenseScreen() {
               );
             }}
           />
-        </View>
+          {errors.paidById && (
+            <TextField.ErrorMessage className="ml-1 mt-1">
+              {errors.paidById.message}
+            </TextField.ErrorMessage>
+          )}
+        </TextField>
 
-        <View className="mb-8">
-          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-            CHIA CHO
-          </AppText>
-          <Card
-            variant="default"
-            className="rounded-2xl border border-divider/10 overflow-hidden bg-surface"
-          >
+        <TextField
+          isRequired
+          isInvalid={!!errors.participantIds}
+          className="mb-8"
+        >
+          <TextField.Label className="mb-3 ml-1">CHIA CHO</TextField.Label>
+          <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
             {members.map((member, index) => {
               const isSelected = participantIds.includes(member.id);
               return (
                 <View key={member.id}>
                   <PressableFeedback
-                    onPress={() => {
-                      const newIds = isSelected
-                        ? participantIds.filter((id) => id !== member.id)
-                        : [...participantIds, member.id];
-                      setValue("participantIds", newIds, {
-                        shouldValidate: true,
-                      });
-                    }}
+                    onPress={() => toggleParticipant(member.id)}
                     className="flex-row items-center p-4"
                   >
                     <Checkbox isSelected={isSelected} />
@@ -654,11 +672,11 @@ export default function AddExpenseScreen() {
             })}
           </Card>
           {errors.participantIds && (
-            <AppText className="text-danger text-sm mt-2 ml-1">
+            <TextField.ErrorMessage className="ml-1 mt-1">
               {errors.participantIds.message}
-            </AppText>
+            </TextField.ErrorMessage>
           )}
-        </View>
+        </TextField>
 
         <View className="mb-6">
           <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
