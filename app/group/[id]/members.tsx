@@ -7,40 +7,63 @@ import * as Clipboard from "expo-clipboard";
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import {
-  Avatar,
-  Button,
-  Card,
-  PressableFeedback,
-  Spinner,
-  useThemeColor,
+    Avatar,
+    Button,
+    Card,
+    PressableFeedback,
+    Spinner,
+    useThemeColor,
+    useToast,
 } from "heroui-native";
 import React from "react";
-import { Alert, Share, View } from "react-native";
+import { Share, View } from "react-native";
 
 export default function GroupMembersScreen() {
   const { id } = useLocalSearchParams();
   const accent = useThemeColor("accent");
   const foreground = useThemeColor("foreground");
+  const success = useThemeColor("success");
+  const danger = useThemeColor("danger");
 
   const { data: group, isLoading } = useGroup(id as string);
 
   const inviteCode = (group as any)?.invite_code || "";
 
-  // const { toast } = useToast();
+  const { toast } = useToast();
 
   const handleCopyInviteCode = async () => {
     if (!inviteCode) {
-      Alert.alert("Lỗi", "Không tìm thấy mã mời");
+      toast.show({
+        label: "Lỗi",
+        description: "Không tìm thấy mã mời cho nhóm này",
+        variant: "danger",
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: "Đóng",
+        onActionPress: ({ hide }) => hide(),
+      });
       return;
     }
 
     await Clipboard.setStringAsync(inviteCode);
-    Alert.alert("Đã sao chép", `Mã mời: ${inviteCode}`);
+    toast.show({
+      label: "Đã sao chép",
+      description: "Mã mời đã được lưu vào bộ nhớ tạm",
+      variant: "success",
+      icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
+      actionLabel: "Đóng",
+      onActionPress: ({ hide }) => hide(),
+    });
   };
 
   const handleShareInvite = async () => {
     if (!inviteCode) {
-      Alert.alert("Lỗi", "Không tìm thấy mã mời");
+      toast.show({
+        label: "Lỗi",
+        description: "Không tìm thấy mã mời cho nhóm này",
+        variant: "danger",
+        actionLabel: "Đóng",
+        onActionPress: ({ hide }) => hide(),
+      });
       return;
     }
 
@@ -49,7 +72,14 @@ export default function GroupMembersScreen() {
         message: `Tham gia nhóm "${group?.name}" trên SplitSmart!\n\nMã mời: ${inviteCode}\n\nTải app và nhập mã để tham gia.`,
       });
     } catch (error: any) {
-      Alert.alert("Lỗi", error.message);
+      toast.show({
+        label: "Lỗi chia sẻ",
+        description: error.message || "Đã có lỗi xảy ra khi thực hiện chia sẻ",
+        variant: "danger",
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: "Thử lại",
+        onActionPress: ({ hide }) => hide(),
+      });
     }
   };
 

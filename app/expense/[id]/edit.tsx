@@ -3,26 +3,37 @@ import { ScreenScrollView } from "@/components/screen-scroll-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ModalHeader } from "@/components/ui/modal-header";
 import { EXPENSE_CATEGORIES } from "@/constants";
-import { useExpense, useUpdateExpense } from "@/lib/hooks";
+import {
+  useExpense,
+  useGroup,
+  useUpdateExpense,
+} from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
-import { formatCurrency, parseFormattedNumber, uploadImage } from "@/lib/utils";
+import {
+  formatCurrency,
+  parseFormattedNumber,
+  uploadImage,
+} from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    Avatar,
-    Button,
-    Card,
-    PressableFeedback,
-    Skeleton,
-    Spinner,
-    TextField,
-    useThemeColor
+  Avatar,
+  Button,
+  Card,
+  Checkbox,
+  PressableFeedback,
+  Select,
+  Skeleton,
+  Spinner,
+  TextField,
+  useThemeColor,
+  useToast,
 } from "heroui-native";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import * as z from "zod";
 
 const expenseSchema = z.object({
@@ -45,6 +56,10 @@ const expenseSchema = z.object({
     "utilities",
     "other",
   ]),
+  paidById: z.string().min(1, "Vui lòng chọn người trả tiền"),
+  participantIds: z
+    .array(z.string())
+    .min(1, "Vui lòng chọn ít nhất một người tham gia"),
   notes: z.string().optional(),
 });
 
@@ -55,10 +70,16 @@ export default function EditExpenseScreen() {
   const { id } = useLocalSearchParams();
   const muted = useThemeColor("muted");
   const accent = useThemeColor("accent");
+  const success = useThemeColor("success");
+  const danger = useThemeColor("danger");
   const { user } = useAuthStore();
 
   const { data: expense, isLoading } = useExpense(id as string);
+  const expenseData = expense as any;
+  const groupId = expenseData?.group_id || expenseData?.groupId;
+  const { data: group } = useGroup(groupId);
   const updateExpense = useUpdateExpense();
+  const { toast } = useToast();
 
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
   const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
@@ -71,20 +92,37 @@ export default function EditExpenseScreen() {
     formState: { errors, isValid },
   } = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseSchema),
+    defaultValues: {
+      participantIds: [],
+    },
     mode: "onChange",
   });
 
   const amountValue = watch("amount");
   const categoryValue = watch("category");
+  const participantIds = watch("participantIds") || [];
+  const paidById = watch("paidById");
+
+  const members = useMemo(() => {
+    if (!group?.group_members) return [];
+    return group.group_members.map((m: any) => ({
+      id: m.user.id,
+      name: m.user.name,
+      avatarUrl: m.user.avatar_url,
+    }));
+  }, [group]);
 
   // Initialize form with expense data
   useEffect(() => {
     if (expense) {
       setValue("title", expense.title);
       setValue("amount", expense.amount.toString());
-      // Map accommodation to other if needed
-      const category =
-        expense.category === "accommodation" ? "other" : expense.category;
+      setValue("paidById", expense.paidBy || (expense as any).paid_by);
+      
+      const currentParticipants = (expense as any).expense_splits?.map((s: any) => s.user_id) || [];
+      setValue("participantIds", currentParticipants);
+
+      const category = expense.category === "accommodation" ? "other" : expense.category;
       setValue(
         "category",
         category as
@@ -96,7 +134,6 @@ export default function EditExpenseScreen() {
           | "other"
       );
       setValue("notes", expense.description || "");
-      // Set receipt if exists
       if (expense.receiptUrl) {
         setSelectedReceipt(expense.receiptUrl);
       }
@@ -104,12 +141,18 @@ export default function EditExpenseScreen() {
   }, [expense, setValue]);
 
   const splitAmount = useMemo(() => {
-    if (!expense || !amountValue) return 0;
-    const totalAmount = parseFormattedNumber(amountValue);
-    const expenseData = expense as any;
-    const participantCount = expenseData.expense_splits?.length || 1;
-    return Math.floor(totalAmount / participantCount);
-  }, [expense, amountValue]);
+    const totalAmount = parseFormattedNumber(amountValue || "0");
+    const count = participantIds.length || 1;
+    return Math.floor(totalAmount / count);
+  }, [amountValue, participantIds]);
+
+  const toggleParticipant = (memberId: string) => {
+    const isSelected = participantIds.includes(memberId);
+    const newIds = isSelected
+      ? participantIds.filter((id) => id !== memberId)
+      : [...participantIds, memberId];
+    setValue("participantIds", newIds, { shouldValidate: true });
+  };
 
   const pickReceipt = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -156,13 +199,22 @@ export default function EditExpenseScreen() {
       }
 
       const amount = parseFormattedNumber(values.amount);
-      const expenseData = expense as any;
+      const uniqueParticipantIds = Array.from(new Set(values.participantIds));
+      const participantCount = uniqueParticipantIds.length;
+      const splitBase = Math.floor(amount / participantCount);
+      const remainder = amount % participantCount;
+
+      const splits = uniqueParticipantIds.map((userId, index) => ({
+        userId,
+        amount: index === 0 ? splitBase + remainder : splitBase,
+      }));
 
       await updateExpense.mutateAsync({
         expenseId: expense.id,
         groupId: expenseData.group_id || expense.groupId,
         title: values.title,
         amount,
+        paidById: values.paidById,
         category: values.category as
           | "food"
           | "transport"
@@ -172,12 +224,27 @@ export default function EditExpenseScreen() {
           | "other",
         description: values.notes || undefined,
         receiptUrl,
+        splits,
       });
 
-      Alert.alert("Thành công", "Đã cập nhật khoản chi");
+      toast.show({
+        label: "Đã cập nhật",
+        description: "Thông tin chi tiêu đã được lưu thành công",
+        variant: "success",
+        icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
+        actionLabel: "OK",
+        onActionPress: ({ hide }) => hide(),
+      });
       router.back();
     } catch (error: any) {
-      Alert.alert("Lỗi", error.message || "Đã có lỗi xảy ra");
+      toast.show({
+        label: "Lỗi cập nhật",
+        description: error.message || "Đã có lỗi xảy ra khi lưu thay đổi",
+        variant: "danger",
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: "Thử lại",
+        onActionPress: ({ hide }) => hide(),
+      });
     } finally {
       setIsUploadingReceipt(false);
     }
@@ -203,7 +270,6 @@ export default function EditExpenseScreen() {
     );
   }
 
-  const expenseData = expense as any;
   const currency = expenseData.group?.currency || "VND";
 
   return (
@@ -320,12 +386,148 @@ export default function EditExpenseScreen() {
                 </TextField>
               )}
             />
-            {amountValue && (
+            {amountValue && participantIds.length > 0 && (
               <AppText className="text-muted text-xs mt-1 ml-1">
                 Chia đều: {formatCurrency(splitAmount, currency)} mỗi người
               </AppText>
             )}
           </View>
+
+          {/* Payer Selection */}
+          <TextField isRequired isInvalid={!!errors.paidById}>
+            <TextField.Label className="mb-3 ml-1">NGƯỜI TRẢ TIỀN</TextField.Label>
+            <Controller
+              control={control}
+              name="paidById"
+              render={({ field: { onChange, value } }) => {
+                const selectedPayer = members.find((m) => m.id === value);
+                const payerOptions = members.map((m) => ({
+                  value: m.id,
+                  label: m.id === user?.id ? "Bạn" : m.name,
+                  initial: m.name.charAt(0),
+                }));
+                const currentPayerOption = payerOptions.find(
+                  (p) => p.value === value
+                );
+                return (
+                  <Select
+                    value={currentPayerOption as any}
+                    onValueChange={(opt: any) => opt && onChange(opt.value)}
+                  >
+                    <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                      <View className="flex-row items-center gap-3">
+                        <View className="w-8 h-8 rounded-full bg-accent/10 items-center justify-center">
+                          <AppText className="font-bold text-accent text-sm">
+                            {selectedPayer?.name?.charAt(0) || "?"}
+                          </AppText>
+                        </View>
+                        <Select.Value
+                          className="text-base font-medium"
+                          placeholder="Chọn người trả"
+                        />
+                      </View>
+                      <IconSymbol
+                        name="chevron.right"
+                        size={16}
+                        color={muted}
+                        className="rotate-90"
+                      />
+                    </Select.Trigger>
+                    <Select.Portal>
+                      <Select.Overlay className="bg-black/20" />
+                      <Select.Content
+                        placement="bottom"
+                        className="rounded-2xl bg-surface border border-divider/10"
+                        width={300}
+                      >
+                        {payerOptions.map((option) => (
+                          <Select.Item
+                            key={option.value}
+                            value={option.value}
+                            label={option.label}
+                            className="p-4"
+                          >
+                            <View className="flex-row items-center gap-3">
+                              <View className="w-8 h-8 rounded-full bg-accent/10 items-center justify-center">
+                                <AppText className="font-bold text-accent text-sm">
+                                  {option.initial}
+                                </AppText>
+                              </View>
+                              <Select.ItemLabel className="text-base" />
+                            </View>
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Portal>
+                  </Select>
+                );
+              }}
+            />
+          </TextField>
+
+          {/* Participants Selection */}
+          <TextField isRequired isInvalid={!!errors.participantIds}>
+            <TextField.Label className="mb-3 ml-1">
+              NGƯỜI THAM GIA ({participantIds.length})
+            </TextField.Label>
+            <Card className="rounded-2xl border border-divider/10 bg-surface overflow-hidden">
+              {members.map((member, index) => {
+                const isSelected = participantIds.includes(member.id);
+                return (
+                  <View key={member.id}>
+                    <PressableFeedback
+                      onPress={() => toggleParticipant(member.id)}
+                      className="flex-row items-center p-4"
+                    >
+                      <Checkbox isSelected={isSelected} />
+                      <Avatar size="sm" alt={member.name} className="ml-3 mr-3">
+                        {member.avatarUrl ? (
+                          <Avatar.Image
+                            source={{ uri: member.avatarUrl }}
+                            asChild
+                          >
+                            <Image
+                              source={{ uri: member.avatarUrl }}
+                              style={{ width: "100%", height: "100%" }}
+                            />
+                          </Avatar.Image>
+                        ) : (
+                          <Avatar.Fallback className="bg-accent/10">
+                            <AppText className="font-bold text-accent">
+                              {member.name.charAt(0)}
+                            </AppText>
+                          </Avatar.Fallback>
+                        )}
+                      </Avatar>
+                      <View className="flex-1">
+                        <AppText
+                          className={`font-bold text-base ${
+                            !isSelected ? "text-muted opacity-50" : ""
+                          }`}
+                        >
+                          {member.id === user?.id ? "Bạn" : member.name}
+                        </AppText>
+                      </View>
+                      {isSelected && amountValue && (
+                        <AppText className="font-bold text-accent mr-1">
+                          {formatCurrency(splitAmount, currency)}
+                        </AppText>
+                      )}
+                    </PressableFeedback>
+                    {index < members.length - 1 && (
+                      <View className="h-[1px] bg-divider/10 mx-4" />
+                    )}
+                  </View>
+                );
+              })}
+            </Card>
+            {errors.participantIds && (
+              <TextField.ErrorMessage className="ml-1 mt-1">
+                {errors.participantIds.message}
+              </TextField.ErrorMessage>
+            )}
+          </TextField>
 
           {/* Notes */}
           <View>
@@ -361,16 +563,18 @@ export default function EditExpenseScreen() {
                     style={{ width: "100%", height: 200 }}
                     contentFit="cover"
                   />
-                  <PressableFeedback
+                  <Button
                     onPress={removeReceipt}
-                    className="absolute top-2 right-2 bg-black/50 rounded-full p-2"
+                    variant="ghost"
+                    isIconOnly
+                    className="absolute top-2 right-2 bg-black/50 rounded-full size-8"
                   >
                     <IconSymbol
-                      name="xmark.circle.fill"
-                      size={24}
+                      name="xmark"
+                      size={16}
                       color="white"
                     />
-                  </PressableFeedback>
+                  </Button>
                 </View>
                 <PressableFeedback
                   onPress={pickReceipt}
@@ -398,60 +602,7 @@ export default function EditExpenseScreen() {
             )}
           </View>
 
-          {/* Participants Info (Read-only) */}
-          {expenseData.expense_splits &&
-            expenseData.expense_splits.length > 0 && (
-              <View>
-                <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-                  NGƯỜI THAM GIA ({expenseData.expense_splits.length})
-                </AppText>
-                <Card className="rounded-2xl border border-divider/10 bg-surface overflow-hidden">
-                  {expenseData.expense_splits.map((split: any, idx: number) => {
-                    const splitUser = split.user || {};
-                    return (
-                      <View key={split.id || idx}>
-                        <View
-                          className="p-4 flex-row items-center gap-3"
-                        >
-                          {splitUser.avatar_url ? (
-                            <Avatar size="sm" alt={splitUser.name || ""}>
-                              <Avatar.Image
-                                source={{ uri: splitUser.avatar_url }}
-                              />
-                            </Avatar>
-                          ) : (
-                            <Avatar
-                              size="sm"
-                              alt={splitUser.name || ""}
-                              className="bg-accent/10"
-                            >
-                              <Avatar.Fallback>
-                                <AppText className="text-accent font-bold">
-                                  {splitUser.name?.charAt(0) || "U"}
-                                </AppText>
-                              </Avatar.Fallback>
-                            </Avatar>
-                          )}
-                          <AppText className="font-semibold flex-1">
-                            {splitUser.name || "Thành viên"}
-                          </AppText>
-                          <AppText className="text-accent font-bold">
-                            {formatCurrency(splitAmount, currency)}
-                          </AppText>
-                        </View>
-                        {idx < expenseData.expense_splits.length - 1 && (
-                            <View className="h-[1px] bg-divider/10 mx-4" />
-                        )}
-                      </View>
-                    );
-                  })}
-                </Card>
-                <AppText className="text-muted text-[10px] mt-3 ml-1">
-                  Lưu ý: Không thể thay đổi người tham gia. Tạo khoản chi mới
-                  nếu cần thay đổi.
-                </AppText>
-              </View>
-            )}
+
 
           {/* Submit Button */}
           <Button

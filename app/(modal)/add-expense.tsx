@@ -74,6 +74,8 @@ export default function AddExpenseScreen() {
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
   const { toast } = useToast();
+  const success = useThemeColor("success");
+  const danger = useThemeColor("danger");
 
   const { user } = useAuthStore();
   const { data: groups, isLoading: isLoadingGroups } = useGroups();
@@ -85,18 +87,18 @@ export default function AddExpenseScreen() {
   const hasPreselectedGroup = !!params.groupId;
 
   // Transform groups for select
-  const groupOptions: GroupOption[] = useMemo(() => {
+  const groupOptions = useMemo(() => {
     if (!groups) return [];
     return groups.map((g: any) => ({
-      id: g.id,
-      name: g.name,
+      value: g.id,
+      label: g.name,
       currency: g.currency || "VND",
     }));
   }, [groups]);
 
   // Get initial groupId
   const initialGroupId =
-    params.groupId || (groupOptions.length > 0 ? groupOptions[0].id : "");
+    params.groupId || (groupOptions.length > 0 ? groupOptions[0].value : "");
 
   const {
     control,
@@ -126,7 +128,7 @@ export default function AddExpenseScreen() {
   // Update groupId when groups load
   useEffect(() => {
     if (!params.groupId && groupOptions.length > 0 && !selectedGroupId) {
-      setValue("groupId", groupOptions[0].id);
+      setValue("groupId", groupOptions[0].value);
     }
   }, [groupOptions, params.groupId, selectedGroupId, setValue]);
 
@@ -135,7 +137,7 @@ export default function AddExpenseScreen() {
 
   const currentGroup = useMemo(() => {
     if (currentGroupDetail) return currentGroupDetail as any;
-    return groupOptions.find((g) => g.id === selectedGroupId);
+    return groupOptions.find((g) => g.value === selectedGroupId);
   }, [groupOptions, selectedGroupId, currentGroupDetail]);
 
   const currency = currentGroup?.currency || "VND";
@@ -219,7 +221,14 @@ export default function AddExpenseScreen() {
       }
 
       const amount = parseInt(values.amount.replace(/\D/g, ""));
-      const splitPerPerson = Math.floor(amount / values.participantIds.length);
+      const participantCount = values.participantIds.length;
+      const splitBase = Math.floor(amount / participantCount);
+      const remainder = amount % participantCount;
+
+      const splits = values.participantIds.map((userId, index) => ({
+        userId,
+        amount: index === 0 ? splitBase + remainder : splitBase,
+      }));
 
       await createExpense.mutateAsync({
         groupId: values.groupId,
@@ -229,21 +238,26 @@ export default function AddExpenseScreen() {
         category: values.category,
         description: values.notes || undefined,
         receiptUrl,
-        splits: values.participantIds.map((userId) => ({
-          userId,
-          amount: splitPerPerson,
-        })),
+        splits,
       });
 
       toast.show({
-        label: "Đã tạo khoản chi thành công",
+        label: "Thành công",
+        description: "Khoản chi tiêu mới đã được thêm vào nhóm",
         variant: "success",
+        icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
+        actionLabel: "OK",
+        onActionPress: ({ hide }) => hide(),
       });
       router.back();
     } catch (error: any) {
       toast.show({
-        label: "Đã có lỗi xảy ra",
+        label: "Lỗi tạo chi tiêu",
+        description: error.message || "Đã có lỗi xảy ra khi lưu khoản chi mới",
         variant: "danger",
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: "Thử lại",
+        onActionPress: ({ hide }) => hide(),
       });
     } finally {
       setIsUploadingReceipt(false);
@@ -253,9 +267,11 @@ export default function AddExpenseScreen() {
   if (isLoadingGroups) {
     return (
       <View className="flex-1 bg-background p-6">
-        <Skeleton className="w-full h-14 rounded-2xl mb-6" />
-        <Skeleton className="w-2/3 h-16 rounded-2xl mb-4 self-center" />
-        <Skeleton className="w-full h-32 rounded-2xl mb-6" />
+        <View className="animate-pulse">
+          <Skeleton className="w-full h-14 rounded-2xl mb-6" />
+          <Skeleton className="w-2/3 h-16 rounded-2xl mb-4 self-center" />
+          <Skeleton className="w-full h-32 rounded-2xl mb-6" />
+        </View>
       </View>
     );
   }
@@ -303,7 +319,7 @@ export default function AddExpenseScreen() {
               </View>
               <View className="flex-1">
                 <AppText className="font-bold text-base">
-                  {currentGroup.name}
+                  {currentGroup.label}
                 </AppText>
                 <AppText className="text-muted text-sm">
                   Thêm khoản chi mới
@@ -325,8 +341,8 @@ export default function AddExpenseScreen() {
               name="groupId"
               render={({ field: { onChange, value } }) => (
                 <Select
-                  value={groupOptions.find((g) => g.id === value) as any}
-                  onValueChange={(opt: any) => opt && onChange(opt.id || opt)}
+                  value={groupOptions.find((g) => g.value === value) as any}
+                  onValueChange={(opt: any) => opt && onChange(opt.value)}
                 >
                   <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                     <View className="flex-row items-center gap-3">
@@ -356,9 +372,9 @@ export default function AddExpenseScreen() {
                     >
                       {groupOptions.map((group) => (
                         <Select.Item
-                          key={group.id}
-                          value={group.id}
-                          label={group.name}
+                          key={group.value}
+                          value={group.value}
+                          label={group.label}
                           className="p-4"
                         >
                           <View className="flex-row items-center gap-3">
@@ -713,16 +729,18 @@ export default function AddExpenseScreen() {
                   style={{ width: "100%", height: 200 }}
                   contentFit="cover"
                 />
-                <PressableFeedback
+                <Button
                   onPress={removeReceipt}
-                  className="absolute top-2 right-2 bg-black/50 rounded-full p-2"
+                  variant="ghost"
+                  isIconOnly
+                  className="absolute top-2 right-2 bg-black/50 rounded-full size-8"
                 >
                   <IconSymbol
-                    name="xmark.circle.fill"
-                    size={24}
+                    name="xmark"
+                    size={16}
                     color="white"
                   />
-                </PressableFeedback>
+                </Button>
               </View>
               <PressableFeedback
                 onPress={pickReceipt}

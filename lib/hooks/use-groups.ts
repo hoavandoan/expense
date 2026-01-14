@@ -88,8 +88,9 @@ export const useGroup = (groupId: string | null) => {
             user:users(id, name, email, avatar_url)
           ),
           expenses(
-            id, title, description, amount, category, paid_by, expense_date, created_at,
+            id, title, description, amount, category, paid_by, created_by, expense_date, created_at,
             paid_by_user:users!expenses_paid_by_fkey(id, name, avatar_url),
+            created_by_user:users!expenses_created_by_fkey(id, name, avatar_url),
             expense_splits(id, user_id, amount, is_paid)
           )
         `

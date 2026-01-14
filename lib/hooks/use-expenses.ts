@@ -32,6 +32,7 @@ export const useRecentExpenses = (limit = 5) => {
           `
                     *,
                     paid_by_user:users!expenses_paid_by_fkey(id, name, avatar_url),
+                    created_by_user:users!expenses_created_by_fkey(id, name, avatar_url),
                     group:groups(id, name, currency)
                 `
         )
@@ -60,6 +61,7 @@ export const useExpenses = (groupId: string | null) => {
           `
           *,
           paid_by_user:users!expenses_paid_by_fkey(id, name, avatar_url),
+          created_by_user:users!expenses_created_by_fkey(id, name, avatar_url),
           expense_splits(id, user_id, amount, is_paid, user:users(id, name, avatar_url))
         `
         )
@@ -88,6 +90,7 @@ export const useExpense = (expenseId: string | null) => {
           `
           *,
           paid_by_user:users!expenses_paid_by_fkey(id, name, avatar_url),
+          created_by_user:users!expenses_created_by_fkey(id, name, avatar_url),
           expense_splits(id, user_id, amount, is_paid, user:users(id, name, avatar_url)),
           group:groups(id, name, currency)
         `
@@ -134,6 +137,7 @@ export const useCreateExpense = () => {
         .insert({
           group_id: input.groupId,
           paid_by: input.paidById || user.id,
+          created_by: user.id,
           title: input.title,
           amount: input.amount,
           category: input.category || "other",
@@ -183,7 +187,13 @@ export const useUpdateExpense = () => {
     mutationFn: async ({
       expenseId,
       groupId,
-      ...updates
+      splits,
+      title,
+      amount,
+      category,
+      description,
+      receiptUrl,
+      paidById,
     }: {
       expenseId: string;
       groupId: string;
@@ -192,20 +202,56 @@ export const useUpdateExpense = () => {
       category?: string;
       description?: string;
       receiptUrl?: string;
+      paidById?: string;
+      splits?: { userId: string; amount: number }[];
     }) => {
+      // 1. Update expense details
       const { data, error } = await supabase
         .from("expenses")
-        .update(updates)
+        .update({
+          title,
+          amount,
+          category,
+          description,
+          receipt_url: receiptUrl,
+          paid_by: paidById,
+        })
         .eq("id", expenseId)
         .select()
         .single();
 
       if (error) throw error;
+
+      // 2. Update splits if provided
+      if (splits) {
+        // Delete existing splits
+        const { error: deleteError } = await supabase
+          .from("expense_splits")
+          .delete()
+          .eq("expense_id", expenseId);
+
+        if (deleteError) throw deleteError;
+
+        // Insert new splits
+        const { error: insertError } = await supabase
+          .from("expense_splits")
+          .insert(
+            splits.map((split) => ({
+              expense_id: expenseId,
+              user_id: split.userId,
+              amount: split.amount,
+            }))
+          );
+
+        if (insertError) throw insertError;
+      }
+
       return data as Expense;
     },
     onSuccess: (_, { groupId }) => {
       queryClient.invalidateQueries({ queryKey: ["expenses", groupId] });
       queryClient.invalidateQueries({ queryKey: ["group", groupId] });
+      queryClient.invalidateQueries({ queryKey: ["recent-expenses"] });
     },
   });
 };

@@ -1,7 +1,7 @@
 import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useRouter } from 'expo-router';
-import { PressableFeedback, useThemeColor } from 'heroui-native';
+import { Button, useThemeColor } from 'heroui-native';
 import React from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -22,23 +22,37 @@ export function ModalHeader({ title, rightElement, onClose, variant = 'close' }:
 
   return (
     <View
-      className="px-6 py-4 flex-row items-center justify-between bg-background border-b border-divider/5"
+      style={{ paddingTop: insets.top }}
+      className="bg-background border-b border-divider/10"
     >
-      <PressableFeedback
-        onPress={handleClose}
-        className="w-10 h-10 rounded-full bg-surface items-center justify-center shadow-sm border border-divider/5"
-      >
-        <IconSymbol 
-          name={variant === 'close' ? 'xmark' : 'chevron.left'} 
-          size={20} 
-          color={foreground} 
-        />
-      </PressableFeedback>
-      
-      <AppText className="text-lg font-bold text-foreground">{title}</AppText>
-      
-      <View className="w-10 items-center justify-center">
-        {rightElement}
+      <View className="h-16 px-6 flex-row items-center justify-between">
+        <View className="flex-row items-center flex-1">
+          <Button
+            onPress={handleClose}
+            variant="ghost"
+            isIconOnly
+            className="size-10 mr-3 bg-surface"
+          >
+            <IconSymbol 
+              name={variant === 'close' ? 'xmark' : 'chevron.left'} 
+              size={24} 
+              color={foreground} 
+            />
+          </Button>
+          <AppText 
+            className="text-lg font-bold text-foreground flex-1"
+            numberOfLines={1}
+            style={{ fontFamily: 'Inter_700Bold' }}
+          >
+            {title}
+          </AppText>
+        </View>
+        
+        {rightElement && (
+          <View className="ml-4">
+            {rightElement}
+          </View>
+        )}
       </View>
     </View>
   );

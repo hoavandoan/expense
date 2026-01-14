@@ -4,19 +4,22 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useCompleteSettlement, usePendingSettlements, useRejectSettlement } from '@/lib/hooks';
 import type { Settlement } from '@/lib/types';
 import { Image } from 'expo-image';
-import { Avatar, Button, Card } from 'heroui-native';
+import { Avatar, Button, Card, useThemeColor, useToast } from 'heroui-native';
 import React, { useState } from 'react';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 
 interface PendingSettlementsProps {
   groupId: string;
 }
 
 export function PendingSettlements({ groupId }: PendingSettlementsProps) {
-  // const { toast } = useToast();
+  const { toast } = useToast();
   const { data: pendingSettlements, isLoading } = usePendingSettlements(groupId);
   const completeSettlement = useCompleteSettlement();
   const rejectSettlement = useRejectSettlement();
+  const success = useThemeColor('success');
+  const danger = useThemeColor('danger');
+  const warning = useThemeColor('warning');
 
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
@@ -37,9 +40,23 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
         settlementId: settlement.id,
         groupId: groupId,
       });
-      Alert.alert('Thành công', 'Đã xác nhận thanh toán');
+      toast.show({
+        label: 'Đã xác nhận',
+        description: 'Thanh toán đã được ghi nhận thành công',
+        variant: 'success',
+        icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
+        actionLabel: 'OK',
+        onActionPress: ({ hide }) => hide(),
+      });
     } catch (error: any) {
-      Alert.alert('Lỗi', error.message);
+      toast.show({
+        label: 'Lỗi xác nhận',
+        description: error.message || 'Không thể xác nhận thanh toán lúc này',
+        variant: 'danger',
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: 'Đóng',
+        onActionPress: ({ hide }) => hide(),
+      });
     }
   };
 
@@ -52,9 +69,23 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
         settlementId: settlement.id,
         groupId: groupId,
       });
-      Alert.alert('Đã từ chối', 'Yêu cầu thanh toán đã bị từ chối');
+      toast.show({
+        label: 'Đã từ chối',
+        description: 'Yêu cầu thanh toán đã được gỡ bỏ',
+        variant: 'warning',
+        icon: <IconSymbol name="exclamationmark.triangle.fill" size={20} color={warning} />,
+        actionLabel: 'OK',
+        onActionPress: ({ hide }) => hide(),
+      });
     } catch (error: any) {
-      Alert.alert('Lỗi', error.message);
+      toast.show({
+        label: 'Lỗi từ chối',
+        description: error.message || 'Không thể từ chối yêu cầu lúc này',
+        variant: 'danger',
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: 'Đóng',
+        onActionPress: ({ hide }) => hide(),
+      });
     }
   };
 

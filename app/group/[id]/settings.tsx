@@ -5,29 +5,31 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ModalHeader } from "@/components/ui/modal-header";
-import { SettingsItem } from "@/components/ui/settings-item";
 import { useGroup, useLeaveGroup, useUpdateGroup } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    Avatar,
-    Button,
-    Card,
-    Divider,
-    PressableFeedback,
-    Skeleton,
-    Spinner,
-    TextField,
-    useThemeColor,
+  Avatar,
+  Button,
+  Card,
+  Divider,
+  PressableFeedback,
+  Skeleton,
+  Spinner,
+  TextField,
+  useThemeColor,
+  useToast,
 } from "heroui-native";
 import React, { useState } from "react";
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 
 export default function GroupSettingsScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const accent = useThemeColor("accent");
   const danger = useThemeColor("danger");
+  const success = useThemeColor("success");
+  const warning = useThemeColor("warning");
   const { user } = useAuthStore();
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -36,6 +38,7 @@ export default function GroupSettingsScreen() {
   const { data: group, isLoading, error, refetch } = useGroup(id as string);
   const updateGroup = useUpdateGroup();
   const leaveGroup = useLeaveGroup();
+  const { toast } = useToast();
 
   const groupData = group as any;
   const currentUserMember = groupData?.group_members?.find(
@@ -50,10 +53,24 @@ export default function GroupSettingsScreen() {
 
     try {
       await leaveGroup.mutateAsync(group.id);
-      Alert.alert("Thành công", "Đã rời nhóm");
+      toast.show({
+        label: "Đã rời nhóm",
+        description: "Bạn không còn là thành viên của nhóm này nữa",
+        variant: "success",
+        icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
+        actionLabel: "OK",
+        onActionPress: ({ hide }) => hide(),
+      });
       router.replace("/(tabs)");
     } catch (error: any) {
-      Alert.alert("Lỗi", error.message || "Không thể rời nhóm");
+      toast.show({
+        label: "Lỗi rời nhóm",
+        description: error.message || "Đã có lỗi xảy ra khi thực hiện yêu cầu",
+        variant: "danger",
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: "Thử lại",
+        onActionPress: ({ hide }) => hide(),
+      });
     }
   };
 
@@ -66,9 +83,23 @@ export default function GroupSettingsScreen() {
         name: editedName.trim(),
       });
       setIsEditingName(false);
-      Alert.alert("Thành công", "Đã cập nhật tên nhóm");
+      toast.show({
+        label: "Thành công",
+        description: "Tên nhóm đã được cập nhật mới",
+        variant: "success",
+        icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
+        actionLabel: "OK",
+        onActionPress: ({ hide }) => hide(),
+      });
     } catch (error: any) {
-      Alert.alert("Lỗi", error.message || "Không thể cập nhật");
+      toast.show({
+        label: "Lỗi cập nhật",
+        description: error.message || "Không thể đổi tên nhóm lúc này",
+        variant: "danger",
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: "Thử lại",
+        onActionPress: ({ hide }) => hide(),
+      });
     }
   };
 
@@ -162,15 +193,17 @@ export default function GroupSettingsScreen() {
                       </AppText>
                     </View>
                     {canEdit && (
-                      <PressableFeedback
+                      <Button
                         onPress={() => {
                           setEditedName(group.name);
                           setIsEditingName(true);
                         }}
-                        className="p-2"
+                        variant="ghost"
+                        isIconOnly
+                        className="size-9"
                       >
-                        <IconSymbol name="pencil" size={20} color={accent} />
-                      </PressableFeedback>
+                        <IconSymbol name="pencil" size={18} color={accent} />
+                      </Button>
                     )}
                   </View>
                 )}
@@ -182,15 +215,24 @@ export default function GroupSettingsScreen() {
                   <AppText className="text-base font-semibold font-mono">
                     {groupData.invite_code || "N/A"}
                   </AppText>
-                  <PressableFeedback
+                  <Button
                     onPress={() => {
                       // TODO: Copy invite code to clipboard
-                      Alert.alert("Đã sao chép", "Mã mời đã được sao chép");
+                      toast.show({
+                        label: "Đã sao chép",
+                        description: "Mã mời đã được lưu vào bộ nhớ tạm",
+                        variant: "success",
+                        icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
+                        actionLabel: "Đóng",
+                        onActionPress: ({ hide }) => hide(),
+                      });
                     }}
-                    className="p-2"
+                    variant="ghost"
+                    isIconOnly
+                    className="size-9"
                   >
                     <IconSymbol name="doc.on.doc" size={18} color={accent} />
-                  </PressableFeedback>
+                  </Button>
                 </View>
               </View>
             </Card>
@@ -206,10 +248,11 @@ export default function GroupSettingsScreen() {
                 <PressableFeedback
                   onPress={() => {
                     // TODO: Navigate to add member screen
-                    Alert.alert(
-                      "Tính năng",
-                      "Thêm thành viên sẽ được triển khai sau"
-                    );
+                    toast.show({
+                      label: "Thêm thành viên sẽ được triển khai sau",
+                      variant: "warning",
+                      icon: <IconSymbol name="exclamationmark.triangle.fill" size={20} color={warning} />,
+                    });
                   }}
                 >
                   <AppText className="text-accent font-semibold text-sm">
@@ -284,18 +327,21 @@ export default function GroupSettingsScreen() {
                             )}
                         </View>
                         {canRemove && (
-                          <PressableFeedback
+                          <Button
                             onPress={() => {
                               // TODO: Implement remove member
-                              Alert.alert(
-                                "Tính năng",
-                                "Xóa thành viên sẽ được triển khai sau"
-                              );
+                              toast.show({
+                                label: "Xác nhận xóa thành viên chưa được cấu hình",
+                                variant: "warning",
+                                icon: <IconSymbol name="exclamationmark.triangle.fill" size={20} color={warning} />,
+                              });
                             }}
-                            className="p-2"
+                            variant="ghost"
+                            isIconOnly
+                            className="size-9"
                           >
                             <IconSymbol name="trash" size={18} color={danger} />
-                          </PressableFeedback>
+                          </Button>
                         )}
                       </View>
                       {idx < members.length - 1 && (
@@ -310,18 +356,10 @@ export default function GroupSettingsScreen() {
 
           {/* Danger Zone */}
           <View>
-            <AppText className="text-[12px] font-bold text-danger uppercase tracking-widest mb-4 ml-1">
-              VÙNG NGUY HIỂM
-            </AppText>
-            <Card className="rounded-2xl border border-danger/20 overflow-hidden bg-danger/5">
-              <SettingsItem
-                icon="arrow.right.square"
-                iconBgColor={danger}
-                label="Rời nhóm"
-                description="Bạn sẽ không thể xem hoặc chỉnh sửa các khoản chi trong nhóm này"
-                onPress={() => setShowLeaveDialog(true)}
-              />
-            </Card>
+            <Button variant="danger-soft" onPress={() => setShowLeaveDialog(true)}>
+              <IconSymbol name="arrow.right.square" size={20} color={useThemeColor("foreground")} />
+              <Button.Label className="text-foreground">Rời nhóm</Button.Label>
+            </Button>
           </View>
         </View>
       </ScreenScrollView>

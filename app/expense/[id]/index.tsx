@@ -11,15 +11,16 @@ import { formatCurrency } from "@/lib/utils";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  Avatar,
-  Button,
-  Card,
-  Divider,
-  Spinner,
-  useThemeColor,
+    Avatar,
+    Button,
+    Card,
+    Divider,
+    Spinner,
+    useThemeColor,
+    useToast,
 } from "heroui-native";
 import React, { useState } from "react";
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
@@ -46,11 +47,13 @@ export default function ExpenseDetailScreen() {
   const router = useRouter();
   const accent = useThemeColor("accent");
   const danger = useThemeColor("danger");
+  const success = useThemeColor("success");
   const { user } = useAuthStore();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const { data: expense, isLoading, error, refetch } = useExpense(id as string);
   const deleteExpense = useDeleteExpense();
+  const { toast } = useToast();
 
   const handleDelete = async () => {
     if (!expense) return;
@@ -58,12 +61,26 @@ export default function ExpenseDetailScreen() {
     try {
       await deleteExpense.mutateAsync({
         expenseId: expense.id,
-        groupId: expense.group_id,
+        groupId: expense.groupId,
       });
-      Alert.alert("Thành công", "Đã xóa khoản chi");
+      toast.show({
+        label: "Đã xóa",
+        description: "Khoản chi tiêu đã được gỡ bỏ khỏi nhóm",
+        variant: "success",
+        icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
+        actionLabel: "OK",
+        onActionPress: ({ hide }) => hide(),
+      });
       router.back();
     } catch (error: any) {
-      Alert.alert("Lỗi", error.message || "Không thể xóa khoản chi");
+      toast.show({
+        label: "Lỗi xóa",
+        description: error.message || "Không thể xóa khoản chi lúc này",
+        variant: "danger",
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: "Thử lại",
+        onActionPress: ({ hide }) => hide(),
+      });
     }
   };
 
@@ -101,7 +118,7 @@ export default function ExpenseDetailScreen() {
   const paidByUser = expenseData.paid_by_user;
   const splits = expenseData.expense_splits || [];
   const groupCurrency = expenseData.group?.currency || "VND";
-  const canEdit = expense.paid_by === user?.id; // Only payer can edit
+  const canEdit = expenseData.created_by === user?.id; // Only creator can edit
 
   return (
     <View className="flex-1 bg-background">
@@ -113,7 +130,7 @@ export default function ExpenseDetailScreen() {
             className={`w-16 h-16 rounded-2xl items-center justify-center mb-4 ${categoryConfig.bg}`}
           >
             <IconSymbol
-              name={categoryConfig.icon}
+              name={categoryConfig.icon as any}
               size={32}
               color={categoryConfig.color}
             />
@@ -154,7 +171,7 @@ export default function ExpenseDetailScreen() {
               <AppText className="font-bold">
                 {paidByUser?.name || "Người dùng"}
               </AppText>{" "}
-              • {formatDate(expense.created_at)}
+              • {formatDate(expense.createdAt)}
             </AppText>
           </View>
         </View>
@@ -232,14 +249,14 @@ export default function ExpenseDetailScreen() {
             </View>
           )}
 
-          {expense.receipt_url && (
+          {expense.receiptUrl && (
             <View className="mb-10">
               <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
                 ẢNH HÓA ĐƠN
               </AppText>
               <Card className="h-60 rounded-2xl overflow-hidden bg-surface border border-divider/10 shadow-sm">
                 <Image
-                  source={{ uri: expense.receipt_url }}
+                  source={{ uri: expense.receiptUrl }}
                   style={{ width: "100%", height: "100%" }}
                   contentFit="cover"
                 />

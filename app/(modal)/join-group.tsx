@@ -4,14 +4,17 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useJoinGroup } from '@/lib/hooks';
 import * as Clipboard from 'expo-clipboard';
 import { useRouter } from 'expo-router';
-import { Button, Divider, PressableFeedback, TextField } from 'heroui-native';
+import { Button, Divider, PressableFeedback, TextField, useThemeColor, useToast } from 'heroui-native';
 import React, { useState } from 'react';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 
 export default function JoinGroupScreen() {
   const router = useRouter();
   const [inviteCode, setInviteCode] = useState('');
   const joinGroup = useJoinGroup();
+  const { toast } = useToast();
+  const success = useThemeColor('success');
+  const danger = useThemeColor('danger');
 
   const handlePaste = async () => {
     const text = await Clipboard.getStringAsync();
@@ -24,22 +27,37 @@ export default function JoinGroupScreen() {
 
   const handleJoinGroup = async () => {
     if (!inviteCode.trim()) {
-      Alert.alert('Lỗi', 'Vui lòng nhập mã mời hoặc liên kết');
+      toast.show({
+        label: 'Mục nhập trống',
+        description: 'Vui lòng nhập mã mời hoặc dán liên kết mời để tiếp tục',
+        variant: 'danger',
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: 'Đóng',
+        onActionPress: ({ hide }) => hide(),
+      });
       return;
     }
 
     try {
       const groupId = await joinGroup.mutateAsync(inviteCode.trim());
-      Alert.alert('Thành công', 'Đã tham gia nhóm', [
-        {
-          text: 'OK',
-          onPress: () => {
-            router.replace(`/group/${groupId}` as any);
-          },
-        },
-      ]);
+      toast.show({
+        label: 'Tham gia thành công',
+        description: 'Bạn đã trở thành thành viên của nhóm mới',
+        variant: 'success',
+        icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
+        actionLabel: 'OK',
+        onActionPress: ({ hide }) => hide(),
+      });
+      router.replace(`/group/${groupId}` as any);
     } catch (error: any) {
-      Alert.alert('Lỗi', error.message || 'Mã mời không hợp lệ');
+      toast.show({
+        label: 'Không thể tham gia',
+        description: error.message || 'Mã mời không chính xác hoặc đã hết hạn',
+        variant: 'danger',
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: 'Thử lại',
+        onActionPress: ({ hide }) => hide(),
+      });
     }
   };
 

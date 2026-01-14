@@ -152,7 +152,7 @@ export default function GroupDetailScreen() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || !id) {
     return (
       <View className="flex-1 bg-background p-6">
         <Skeleton className="w-full h-64 rounded-2xl mb-6" />
@@ -163,7 +163,7 @@ export default function GroupDetailScreen() {
     );
   }
 
-  if (!group && !isLoading) {
+  if (!group) {
     return (
       <View className="flex-1 bg-background">
         <ErrorState

@@ -5,9 +5,9 @@ import { signInWithApple, signInWithGoogle } from '@/lib/auth/oauth';
 import { useAuth } from '@/lib/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Button, PressableFeedback, TextField, useThemeColor } from 'heroui-native';
+import { Button, PressableFeedback, TextField, useThemeColor, useToast } from 'heroui-native';
 import React, { useState } from 'react';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 
 export default function LoginScreen() {
   const { signInWithEmail, signUpWithEmail } = useAuth();
@@ -15,6 +15,9 @@ export default function LoginScreen() {
   const foreground = useThemeColor('foreground');
   const accent = useThemeColor('accent');
   const background = useThemeColor('background');
+  const { toast } = useToast();
+  const success = useThemeColor('success');
+  const danger = useThemeColor('danger');
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -25,12 +28,26 @@ export default function LoginScreen() {
 
   const handleEmailAuth = async () => {
     if (!email || !password) {
-      Alert.alert('Lỗi', 'Vui lòng nhập email và mật khẩu');
+      toast.show({
+        label: 'Thông tin trống',
+        description: 'Vui lòng nhập cả email và mật khẩu để tiếp tục',
+        variant: 'danger',
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: 'Đóng',
+        onActionPress: ({ hide }) => hide(),
+      });
       return;
     }
 
     if (isSignUp && !name) {
-      Alert.alert('Lỗi', 'Vui lòng nhập tên của bạn');
+      toast.show({
+        label: 'Thiếu thông tin',
+        description: 'Vui lòng cung cấp tên của bạn cho tài khoản mới',
+        variant: 'danger',
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: 'Đóng',
+        onActionPress: ({ hide }) => hide(),
+      });
       return;
     }
 
@@ -38,13 +55,27 @@ export default function LoginScreen() {
     try {
       if (isSignUp) {
         await signUpWithEmail(email, password, name);
-        Alert.alert('Thành công', 'Vui lòng kiểm tra email để xác nhận tài khoản');
+        toast.show({
+          label: 'Đăng ký thành công',
+          description: 'Vui lòng kiểm tra email của bạn để xác nhận tài khoản trước khi đăng nhập',
+          variant: 'success',
+          icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
+          actionLabel: 'OK',
+          onActionPress: ({ hide }) => hide(),
+        });
       } else {
         await signInWithEmail(email, password);
         router.replace('/(tabs)');
       }
     } catch (error: any) {
-      Alert.alert('Lỗi', error.message || 'Đã có lỗi xảy ra');
+      toast.show({
+        label: 'Lỗi xác thực',
+        description: error.message || 'Đã có lỗi xảy ra trong quá trình đăng nhập',
+        variant: 'danger',
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: 'Thử lại',
+        onActionPress: ({ hide }) => hide(),
+      });
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +88,11 @@ export default function LoginScreen() {
       router.replace('/(tabs)');
     } catch (error: any) {
       if (!error.message?.includes('hủy')) {
-        Alert.alert('Lỗi', error.message || 'Đăng nhập thất bại');
+        toast.show({
+          label: error.message || 'Đăng nhập Apple thất bại',
+          variant: 'danger',
+          icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        });
       }
     } finally {
       setIsSocialLoading(false);
@@ -71,7 +106,11 @@ export default function LoginScreen() {
       router.replace('/(tabs)');
     } catch (error: any) {
       if (!error.message?.includes('hủy')) {
-        Alert.alert('Lỗi', error.message || 'Đăng nhập thất bại');
+        toast.show({
+          label: error.message || 'Đăng nhập Google thất bại',
+          variant: 'danger',
+          icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        });
       }
     } finally {
       setIsSocialLoading(false);

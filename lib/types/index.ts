@@ -49,6 +49,7 @@ export interface Expense {
     id: string;
     groupId: string;
     paidBy: string;
+    createdBy: string;
     title: string;
     description: string | null;
     amount: number;
@@ -57,6 +58,7 @@ export interface Expense {
     expenseDate: string;
     createdAt: string;
     paidByUser?: User;
+    createdByUser?: User;
 }
 
 // Expense split for each participant

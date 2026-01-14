@@ -6,9 +6,9 @@ import { useAuthStore } from '@/lib/stores/auth-store';
 import { assignDebtsOptimized, assignDebtsWithAssignee } from '@/lib/utils/debt-calculator';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Avatar, Button, Card, cn, PressableFeedback, Spinner, useThemeColor } from 'heroui-native';
+import { Avatar, Button, Card, cn, PressableFeedback, Spinner, useThemeColor, useToast } from 'heroui-native';
 import React, { useMemo, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 
 interface DebtItem {
   id: string;
@@ -30,7 +30,9 @@ export default function SettleUpScreen() {
   const { data: group, isLoading } = useGroup(params.groupId || null);
   const { data: activeAssignment } = useDebtAssignment(params.groupId || null);
   const createSettlement = useCreateSettlement();
-  // const { toast } = useToast();
+  const { toast } = useToast();
+  const danger = useThemeColor('danger');
+  const success = useThemeColor('success');
 
   // Calculate debts from group data
   const debts = useMemo((): DebtItem[] => {
@@ -113,8 +115,16 @@ export default function SettleUpScreen() {
   const totalGain = debts.filter(d => d.type === 'owe_you').reduce((acc, d) => acc + d.amount, 0);
 
   const handleConfirmPayment = async () => {
+
     if (!selectedDebt || !params.groupId) {
-      Alert.alert('Lỗi', 'Vui lòng chọn khoản thanh toán');
+      toast.show({
+        label: 'Không thể thanh toán',
+        description: 'Vui lòng chọn một khoản nợ để tiếp tục',
+        variant: 'danger',
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: 'Đóng',
+        onActionPress: ({ hide }) => hide(),
+      });
       return;
     }
 
@@ -126,13 +136,24 @@ export default function SettleUpScreen() {
         note: `Thanh toán qua ${selectedMethod}`,
       });
 
-      Alert.alert(
-        'Đã gửi yêu cầu',
-        `Yêu cầu thanh toán ${selectedDebt.amount.toLocaleString()}đ cho ${selectedDebt.name} đang chờ xác nhận.`,
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
+      toast.show({
+        label: 'Gửi yêu cầu thành công',
+        description: `Yêu cầu thanh toán cho ${selectedDebt.name} đang chờ xác nhận`,
+        variant: 'success',
+        icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
+        actionLabel: 'OK',
+        onActionPress: ({ hide }) => hide(),
+      });
+      router.back();
     } catch (error: any) {
-      Alert.alert('Lỗi', error.message || 'Đã có lỗi xảy ra');
+      toast.show({
+        label: 'Lỗi thanh toán',
+        description: error.message || 'Đã có lỗi xảy ra khi gửi yêu cầu',
+        variant: 'danger',
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: 'Thử lại',
+        onActionPress: ({ hide }) => hide(),
+      });
     }
   };
 
