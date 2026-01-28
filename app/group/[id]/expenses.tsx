@@ -1,30 +1,37 @@
 import { AppText } from "@/components/app-text";
-import { ScreenScrollView } from "@/components/screen-scroll-view";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { ExpenseCard } from "@/components/ui/expense-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
-import { CATEGORY_CONFIG, EXPENSE_CATEGORIES } from "@/constants";
+import { EXPENSE_CATEGORIES } from "@/constants";
 import { useExpenses, useGroup } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatDate } from "@/lib/utils";
+import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    PressableFeedback,
-    Select,
-    Spinner,
-    Tabs,
-    TextField,
-    cn,
-    useThemeColor
+  PressableFeedback,
+  Select,
+  Spinner,
+  Tabs,
+  TextField,
+  cn,
+  useThemeColor
 } from "heroui-native";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
+import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+type ExpenseListItem = 
+  | { type: "header"; title: string; id: string }
+  | { type: "expense"; data: any; id: string };
 
 export default function GroupExpensesScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
   const { user } = useAuthStore();
@@ -44,7 +51,7 @@ export default function GroupExpensesScreen() {
   const groupData = group as any;
   const members = groupData?.group_members || [];
 
-  const filteredExpenses = useMemo(() => {
+  const flattenedExpenses = useMemo(() => {
     if (!expenses) return [];
 
     let filtered = expenses;
@@ -88,12 +95,9 @@ export default function GroupExpensesScreen() {
       );
     });
 
-    return filtered;
-  }, [expenses, searchQuery, selectedCategory, selectedMember, sortBy]);
-
-  const groupedExpenses = useMemo(() => {
+    // Group and flatten
     const groups: Record<string, any[]> = {};
-    filteredExpenses.forEach((expense: any) => {
+    filtered.forEach((expense: any) => {
       const date = new Date(expense.expense_date || expense.created_at);
       const dateKey = formatDate(date.toISOString());
       if (!groups[dateKey]) {
@@ -101,8 +105,17 @@ export default function GroupExpensesScreen() {
       }
       groups[dateKey].push(expense);
     });
-    return groups;
-  }, [filteredExpenses]);
+
+    const flattened: ExpenseListItem[] = [];
+    Object.keys(groups).forEach((dateKey) => {
+      flattened.push({ type: "header", title: dateKey, id: `header-${dateKey}` });
+      groups[dateKey].forEach((expense) => {
+        flattened.push({ type: "expense", data: expense, id: expense.id });
+      });
+    });
+
+    return flattened;
+  }, [expenses, searchQuery, selectedCategory, selectedMember, sortBy]);
 
   const memberMap = useMemo(() => {
     const map = new Map();
@@ -115,6 +128,39 @@ export default function GroupExpensesScreen() {
     });
     return map;
   }, [groupData]);
+
+  const renderItem = useCallback(({ item, index }: { item: ExpenseListItem; index: number }) => {
+    if (item.type === "header") {
+      return (
+        <Animated.View 
+          entering={FadeInUp.delay(index * 30).duration(250)}
+          exiting={FadeOut.duration(200)}
+        >
+          <AppText className="text-lg font-bold text-foreground mb-4 px-6 mt-6">
+            {item.title}
+          </AppText>
+        </Animated.View>
+      );
+    }
+
+    const { data: expense } = item;
+    return (
+      <Animated.View 
+        className="px-6 mb-3"
+        entering={FadeInUp.delay(index * 40).duration(300).springify().damping(15)}
+        exiting={FadeOut.duration(200)}
+      >
+        <ExpenseCard
+          expense={expense}
+          currency={groupData?.currency || "VND"}
+          memberMap={memberMap}
+          currentUserId={user?.id}
+          onPress={() => router.push(`/expense/${expense.id}` as any)}
+          className="mb-1"
+        />
+      </Animated.View>
+    );
+  }, [groupData?.currency, memberMap, user?.id, router]);
 
   if (isLoadingGroup || isLoadingExpenses) {
     return (
@@ -270,54 +316,31 @@ export default function GroupExpensesScreen() {
       </View>
 
       {/* Expenses List */}
-      {filteredExpenses.length === 0 ? (
-        <EmptyState
-          icon="doc.text.fill"
-          title={
-            searchQuery || selectedCategory || selectedMember
-              ? "Không tìm thấy kết quả"
-              : "Chưa có khoản chi nào"
-          }
-          description={
-            searchQuery || selectedCategory || selectedMember
-              ? "Thử thay đổi bộ lọc"
-              : "Thêm khoản chi mới để bắt đầu"
-          }
-        />
-      ) : (
-        <ScreenScrollView withKeyboardAvoidingView>
-          <View className="pb-20 pt-4">
-            {Object.keys(groupedExpenses).map((dateKey) => (
-              <View key={dateKey} className="mb-8">
-                <AppText className="text-lg font-bold text-foreground mb-4">
-                  {dateKey}
-                </AppText>
-                <View className="gap-3">
-                  {groupedExpenses[dateKey].map((expense: any) => {
-                    const categoryConfig =
-                      CATEGORY_CONFIG[expense.category] ||
-                      CATEGORY_CONFIG.other;
-                    const isMe = expense.paid_by === user?.id;
-                    const paidByUser = expense.paid_by_user;
-
-                    return (
-                      <ExpenseCard
-                        key={expense.id}
-                        expense={expense}
-                        currency={groupData?.currency || "VND"}
-                        memberMap={memberMap}
-                        currentUserId={user?.id}
-                        onPress={() => router.push(`/expense/${expense.id}` as any)}
-                        className="mb-1"
-                      />
-                    );
-                  })}
-                </View>
-              </View>
-            ))}
-          </View>
-        </ScreenScrollView>
-      )}
+      <FlashList
+        data={flattenedExpenses}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        estimatedItemSize={100}
+        getItemType={(item) => item.type}
+        onRefresh={refetch}
+        refreshing={false}
+        ListEmptyComponent={
+          <EmptyState
+            icon="doc.text.fill"
+            title={
+              searchQuery || selectedCategory || selectedMember
+                ? "Không tìm thấy kết quả"
+                : "Chưa có khoản chi nào"
+            }
+            description={
+              searchQuery || selectedCategory || selectedMember
+                ? "Thử thay đổi bộ lọc"
+                : "Thêm khoản chi mới để bắt đầu"
+            }
+          />
+        }
+        contentContainerStyle={{ paddingBottom: insets.bottom + 100, paddingTop: 10 }}
+      />
     </View>
   );
 }

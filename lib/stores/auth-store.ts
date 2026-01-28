@@ -48,6 +48,8 @@ export const useAuthStore = create<AuthState>()(
                     isAuthenticated: false,
                     isLoading: false,
                     isLoginSheetOpen: false,
+                    hasCompletedOnboarding: false,
+
                     // Keep hasCompletedOnboarding true after logout
                 }),
         }),

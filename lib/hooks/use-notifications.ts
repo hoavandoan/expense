@@ -1,71 +1,34 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '../supabase';
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '../api-client';
 import type { Notification } from '../types';
 
 const NOTIFICATIONS_KEY = ['notifications'];
+
+export const notificationsQueryOptions = (options?: { limit?: number; unreadOnly?: boolean }) => queryOptions({
+  queryKey: [...NOTIFICATIONS_KEY, options],
+  queryFn: () => apiClient<Notification[]>('/notifications', { params: options as any }),
+});
+
+export const unreadCountQueryOptions = () => queryOptions({
+  queryKey: [...NOTIFICATIONS_KEY, 'unread-count'],
+  queryFn: async () => {
+    const notifications = await apiClient<Notification[]>('/notifications', { params: { unreadOnly: 'true' } });
+    return notifications.length;
+  },
+});
 
 /**
  * Fetch all notifications for the current user
  */
 export const useNotifications = (options?: { limit?: number; unreadOnly?: boolean }) => {
-  return useQuery({
-    queryKey: [...NOTIFICATIONS_KEY, options],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      let query = supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (options?.unreadOnly) {
-        query = query.eq('is_read', false);
-      }
-
-      if (options?.limit) {
-        query = query.limit(options.limit);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      return (data || []).map((n: any) => ({
-        id: n.id,
-        userId: n.user_id,
-        type: n.type,
-        title: n.title,
-        body: n.body,
-        metadata: n.metadata || {},
-        isRead: n.is_read,
-        readAt: n.read_at,
-        createdAt: n.created_at,
-      })) as Notification[];
-    },
-  });
+  return useQuery(notificationsQueryOptions(options));
 };
 
 /**
  * Fetch unread notifications count
  */
 export const useUnreadNotificationsCount = () => {
-  return useQuery({
-    queryKey: [...NOTIFICATIONS_KEY, 'unread-count'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return 0;
-
-      const { count, error } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false);
-
-      if (error) throw error;
-      return count || 0;
-    },
-  });
+  return useQuery(unreadCountQueryOptions());
 };
 
 /**
@@ -75,20 +38,10 @@ export const useMarkNotificationAsRead = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (notificationId: string) => {
-      const { data, error } = await supabase
-        .from('notifications')
-        .update({
-          is_read: true,
-          read_at: new Date().toISOString(),
-        })
-        .eq('id', notificationId)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (notificationId: string) => apiClient(`/notifications`, {
+      method: 'PATCH',
+      body: JSON.stringify({ notificationId }),
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_KEY });
     },
@@ -102,21 +55,10 @@ export const useMarkAllNotificationsAsRead = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { error } = await supabase
-        .from('notifications')
-        .update({
-          is_read: true,
-          read_at: new Date().toISOString(),
-        })
-        .eq('user_id', user.id)
-        .eq('is_read', false);
-
-      if (error) throw error;
-    },
+    mutationFn: () => apiClient('/notifications', {
+      method: 'PATCH',
+      body: JSON.stringify({ allAsRead: true }),
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_KEY });
     },
@@ -130,16 +72,12 @@ export const useDeleteNotification = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (notificationId: string) => {
-      const { error } = await supabase
-        .from('notifications')
-        .delete()
-        .eq('id', notificationId);
-
-      if (error) throw error;
-    },
+    mutationFn: (notificationId: string) => apiClient(`/notifications/${notificationId}`, {
+      method: 'DELETE',
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_KEY });
     },
   });
 };
+

@@ -3,9 +3,14 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { formatCurrency } from "@/lib/utils";
 import { getCategoryIcon } from "@/lib/utils/expense";
 import { Image } from "expo-image";
-import { Avatar, Card, cn, Divider, PressableFeedback } from "heroui-native";
+import { Avatar, Card, cn, Divider } from "heroui-native";
 import React, { FC } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+} from "react-native-reanimated";
 
 interface ExpenseCardProps {
   expense: any;
@@ -16,6 +21,8 @@ interface ExpenseCardProps {
   className?: string;
 }
 
+const AnimatedCard = Animated.createAnimatedComponent(Card);
+
 export const ExpenseCard: FC<ExpenseCardProps> = ({
   expense,
   currency,
@@ -24,6 +31,20 @@ export const ExpenseCard: FC<ExpenseCardProps> = ({
   onPress,
   className,
 }) => {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+  };
+
   const payer = memberMap.get(expense.paid_by);
   const participants =
     expense.expense_splits
@@ -31,11 +52,16 @@ export const ExpenseCard: FC<ExpenseCardProps> = ({
       .filter(Boolean) || [];
 
   return (
-    <Card
+    <AnimatedCard
       variant="default"
       className={cn("p-4 rounded-2xl bg-surface border border-divider/10", className)}
+      style={animatedStyle}
     >
-      <PressableFeedback onPress={onPress}>
+      <Pressable
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      >
         <View className="flex-row items-center justify-between mb-1.5">
           <View className="flex-row items-center flex-1">
             <View className="w-10 h-10 rounded-xl bg-accent/10 items-center justify-center mr-3">
@@ -132,7 +158,8 @@ export const ExpenseCard: FC<ExpenseCardProps> = ({
             )}
           </View>
         </View>
-      </PressableFeedback>
-    </Card>
+      </Pressable>
+    </AnimatedCard>
   );
 };
+

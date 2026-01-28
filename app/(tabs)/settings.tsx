@@ -37,7 +37,7 @@ export default function SettingsScreen() {
   const SETTINGS_HEADER_HEIGHT = 360;
 
   const renderTopNavBarComponent = () => (
-    <HeaderNavBar useBlur={true} className="border-b border-divider/10">
+    <HeaderNavBar useBlur={true} tint="light" intensity={80} className="border-b border-divider/10">
       <View className="flex-row items-center h-full w-full">
         <View className="flex-1 items-start">
           <Button

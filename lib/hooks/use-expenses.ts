@@ -1,111 +1,47 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "../supabase";
+import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "../api-client";
 import type { Expense, ExpenseSplit } from "../types";
+import { groupQueryOptions, groupsQueryOptions } from "./use-groups";
+
+export const recentExpensesQueryOptions = (limit = 5) => queryOptions({
+  queryKey: ["recent-expenses", limit],
+  queryFn: () => apiClient<Expense[]>(`/expenses?limit=${limit}`),
+});
+
+export const expensesQueryOptions = (groupId: string | null) => queryOptions({
+  queryKey: ["expenses", groupId],
+  queryFn: () => apiClient<(Expense & { expense_splits: ExpenseSplit[] })[]>(`/expenses?groupId=${groupId}`),
+  enabled: !!groupId,
+});
+
+export const expenseQueryOptions = (expenseId: string | null) => queryOptions({
+  queryKey: ["expense", expenseId],
+  queryFn: () => apiClient<Expense & {
+    expense_splits: ExpenseSplit[];
+    group?: { id: string; name: string; currency: string };
+  }>(`/expenses/${expenseId}`),
+  enabled: !!expenseId,
+});
 
 /**
  * Fetch recent expenses across all user's groups
  */
 export const useRecentExpenses = (limit = 5) => {
-  return useQuery({
-    queryKey: ["recent-expenses", limit],
-    queryFn: async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      // Get all group IDs the user is a member of
-      const { data: memberships, error: membershipError } = await supabase
-        .from("group_members")
-        .select("group_id")
-        .eq("user_id", user.id);
-
-      if (membershipError) throw membershipError;
-      if (!memberships || memberships.length === 0) return [];
-
-      const groupIds = memberships.map((m) => m.group_id);
-
-      // Fetch recent expenses from those groups
-      const { data, error } = await supabase
-        .from("expenses")
-        .select(
-          `
-                    *,
-                    paid_by_user:users!expenses_paid_by_fkey(id, name, avatar_url),
-                    created_by_user:users!expenses_created_by_fkey(id, name, avatar_url),
-                    group:groups(id, name, currency)
-                `
-        )
-        .in("group_id", groupIds)
-        .order("created_at", { ascending: false })
-        .limit(limit);
-
-      if (error) throw error;
-      return data;
-    },
-  });
+  return useQuery(recentExpensesQueryOptions(limit));
 };
 
 /**
  * Fetch expenses for a group
  */
 export const useExpenses = (groupId: string | null) => {
-  return useQuery({
-    queryKey: ["expenses", groupId],
-    queryFn: async () => {
-      if (!groupId) return [];
-
-      const { data, error } = await supabase
-        .from("expenses")
-        .select(
-          `
-          *,
-          paid_by_user:users!expenses_paid_by_fkey(id, name, avatar_url),
-          created_by_user:users!expenses_created_by_fkey(id, name, avatar_url),
-          expense_splits(id, user_id, amount, is_paid, user:users(id, name, avatar_url))
-        `
-        )
-        .eq("group_id", groupId)
-        .order("expense_date", { ascending: false });
-
-      if (error) throw error;
-      return data as (Expense & { expense_splits: ExpenseSplit[] })[];
-    },
-    enabled: !!groupId,
-  });
+  return useQuery(expensesQueryOptions(groupId));
 };
 
 /**
  * Fetch a single expense by ID
  */
 export const useExpense = (expenseId: string | null) => {
-  return useQuery({
-    queryKey: ["expense", expenseId],
-    queryFn: async () => {
-      if (!expenseId) return null;
-
-      const { data, error } = await supabase
-        .from("expenses")
-        .select(
-          `
-          *,
-          paid_by_user:users!expenses_paid_by_fkey(id, name, avatar_url),
-          created_by_user:users!expenses_created_by_fkey(id, name, avatar_url),
-          expense_splits(id, user_id, amount, is_paid, user:users(id, name, avatar_url)),
-          group:groups(id, name, currency)
-        `
-        )
-        .eq("id", expenseId)
-        .single();
-
-      if (error) throw error;
-      return data as Expense & {
-        expense_splits: ExpenseSplit[];
-        group?: { id: string; name: string; currency: string };
-      };
-    },
-    enabled: !!expenseId,
-  });
+  return useQuery(expenseQueryOptions(expenseId));
 };
 
 /**
@@ -126,53 +62,16 @@ export const useCreateExpense = () => {
       receiptUrl?: string;
       splits: { userId: string; amount: number }[];
     }) => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      // Create expense
-      const { data: expense, error: expenseError } = await supabase
-        .from("expenses")
-        .insert({
-          group_id: input.groupId,
-          paid_by: input.paidById || user.id,
-          created_by: user.id,
-          title: input.title,
-          amount: input.amount,
-          category: input.category || "other",
-          description: input.description || null,
-          receipt_url: input.receiptUrl || null,
-          expense_date:
-            input.expenseDate || new Date().toISOString().split("T")[0],
-        })
-        .select()
-        .single();
-
-      if (expenseError) throw expenseError;
-
-      // Create splits
-      if (input.splits.length > 0) {
-        const { error: splitsError } = await supabase
-          .from("expense_splits")
-          .insert(
-            input.splits.map((split) => ({
-              expense_id: expense.id,
-              user_id: split.userId,
-              amount: split.amount,
-            }))
-          );
-
-        if (splitsError) throw splitsError;
-      }
-
-      return expense as Expense;
+      return apiClient<Expense>("/expenses", {
+        method: "POST",
+        body: JSON.stringify(input),
+      });
     },
     onSuccess: (_, { groupId }) => {
-      queryClient.invalidateQueries({ queryKey: ["expenses", groupId] });
-      queryClient.invalidateQueries({ queryKey: ["group", groupId] });
-      queryClient.invalidateQueries({ queryKey: ["groups"] });
-      queryClient.invalidateQueries({ queryKey: ["recent-expenses"] });
+      queryClient.invalidateQueries({ queryKey: expensesQueryOptions(groupId).queryKey });
+      queryClient.invalidateQueries({ queryKey: groupQueryOptions(groupId).queryKey });
+      queryClient.invalidateQueries({ queryKey: groupsQueryOptions.queryKey });
+      queryClient.invalidateQueries({ queryKey: recentExpensesQueryOptions().queryKey });
     },
   });
 };
@@ -187,13 +86,7 @@ export const useUpdateExpense = () => {
     mutationFn: async ({
       expenseId,
       groupId,
-      splits,
-      title,
-      amount,
-      category,
-      description,
-      receiptUrl,
-      paidById,
+      ...updates
     }: {
       expenseId: string;
       groupId: string;
@@ -205,53 +98,15 @@ export const useUpdateExpense = () => {
       paidById?: string;
       splits?: { userId: string; amount: number }[];
     }) => {
-      // 1. Update expense details
-      const { data, error } = await supabase
-        .from("expenses")
-        .update({
-          title,
-          amount,
-          category,
-          description,
-          receipt_url: receiptUrl,
-          paid_by: paidById,
-        })
-        .eq("id", expenseId)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // 2. Update splits if provided
-      if (splits) {
-        // Delete existing splits
-        const { error: deleteError } = await supabase
-          .from("expense_splits")
-          .delete()
-          .eq("expense_id", expenseId);
-
-        if (deleteError) throw deleteError;
-
-        // Insert new splits
-        const { error: insertError } = await supabase
-          .from("expense_splits")
-          .insert(
-            splits.map((split) => ({
-              expense_id: expenseId,
-              user_id: split.userId,
-              amount: split.amount,
-            }))
-          );
-
-        if (insertError) throw insertError;
-      }
-
-      return data as Expense;
+      return apiClient<Expense>(`/expenses/${expenseId}`, {
+        method: "PATCH",
+        body: JSON.stringify(updates),
+      });
     },
     onSuccess: (_, { groupId }) => {
-      queryClient.invalidateQueries({ queryKey: ["expenses", groupId] });
-      queryClient.invalidateQueries({ queryKey: ["group", groupId] });
-      queryClient.invalidateQueries({ queryKey: ["recent-expenses"] });
+      queryClient.invalidateQueries({ queryKey: expensesQueryOptions(groupId).queryKey });
+      queryClient.invalidateQueries({ queryKey: groupQueryOptions(groupId).queryKey });
+      queryClient.invalidateQueries({ queryKey: recentExpensesQueryOptions().queryKey });
     },
   });
 };
@@ -270,18 +125,16 @@ export const useDeleteExpense = () => {
       expenseId: string;
       groupId: string;
     }) => {
-      const { error } = await supabase
-        .from("expenses")
-        .delete()
-        .eq("id", expenseId);
-
-      if (error) throw error;
+      return apiClient(`/expenses/${expenseId}`, {
+        method: "DELETE",
+      });
     },
     onSuccess: (_, { groupId }) => {
-      queryClient.invalidateQueries({ queryKey: ["expenses", groupId] });
-      queryClient.invalidateQueries({ queryKey: ["group", groupId] });
-      queryClient.invalidateQueries({ queryKey: ["groups"] });
-      queryClient.invalidateQueries({ queryKey: ["recent-expenses"] });
+      queryClient.invalidateQueries({ queryKey: expensesQueryOptions(groupId).queryKey });
+      queryClient.invalidateQueries({ queryKey: groupQueryOptions(groupId).queryKey });
+      queryClient.invalidateQueries({ queryKey: groupsQueryOptions.queryKey });
+      queryClient.invalidateQueries({ queryKey: recentExpensesQueryOptions().queryKey });
     },
   });
 };
+

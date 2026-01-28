@@ -1,5 +1,6 @@
 import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { SkiaOnboardingBackground } from '@/components/ui/skia-onboarding-background';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -7,8 +8,9 @@ import { Avatar, Button, PressableFeedback, useThemeColor } from 'heroui-native'
 import React, { useRef, useState } from 'react';
 import { Dimensions, View } from 'react-native';
 import PagerView from 'react-native-pager-view';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeInUp, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CrossPagerView, type CrossPagerViewRef } from '@/components/ui/cross-pager-view';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -34,7 +36,7 @@ const SLIDES: Slide[] = [
           <IconSymbol name="house.fill" size={20} color="white" />
         </View>
         <View className="flex-1">
-          <AppText className="font-bold text-sm">Nhà trọ Happy</AppText>
+          <AppText weight="bold" className="text-sm">Nhà trọ Happy</AppText>
           <AppText className="text-xs text-muted">5 thành viên</AppText>
         </View>
         <View className="flex-row -space-x-3">
@@ -45,7 +47,7 @@ const SLIDES: Slide[] = [
             <Avatar.Image source={{ uri: "https://i.pravatar.cc/100?u=b" }} />
           </Avatar>
           <View className="w-6 h-6 rounded-full bg-accent items-center justify-center border border-surface">
-            <AppText className="text-[8px] font-bold text-white">+2</AppText>
+            <AppText weight="bold" className="text-[8px] text-white">+2</AppText>
           </View>
         </View>
       </View>
@@ -61,8 +63,8 @@ const SLIDES: Slide[] = [
       <View className="absolute inset-x-8 top-1/4 bg-surface p-4 rounded-2xl shadow-2xl border border-divider/10">
         <View className="flex-row items-center justify-between mb-4">
           <View>
-            <AppText className="text-[10px] text-muted uppercase font-bold">Chi tiêu nhóm</AppText>
-            <AppText className="font-bold text-base">Đà Lạt 2024 🍓</AppText>
+            <AppText weight="bold" className="text-[10px] text-muted uppercase">Chi tiêu nhóm</AppText>
+            <AppText weight="bold" className="text-base">Đà Lạt 2024 🍓</AppText>
           </View>
           <View className="flex-row items-center gap-1 bg-surface-secondary p-1 rounded-full px-2">
             <Avatar size="sm" alt="User L">
@@ -84,8 +86,8 @@ const SLIDES: Slide[] = [
               <View className="w-8 h-8 rounded-xl bg-accent-soft items-center justify-center">
                 <IconSymbol name={item.icon as any} size={14} color={accent} />
               </View>
-              <AppText className="flex-1 font-medium text-sm">{item.label}</AppText>
-              <AppText className={`font-bold ${item.color}`}>{item.amount}</AppText>
+              <AppText weight="medium" className="flex-1 text-sm">{item.label}</AppText>
+              <AppText weight="bold" className={item.color}>{item.amount}</AppText>
             </View>
           ))}
         </View>
@@ -111,9 +113,9 @@ const SLIDES: Slide[] = [
               <View className="w-8 h-8 rounded-xl bg-accent-soft items-center justify-center">
                 <IconSymbol name="creditcard.fill" size={14} color={accent} />
               </View>
-              <AppText className="text-xs font-bold text-muted uppercase">Đã thu nợ</AppText>
+              <AppText weight="bold" className="text-xs text-muted uppercase">Đã thu nợ</AppText>
             </View>
-            <AppText className="text-xs font-bold">85%</AppText>
+            <AppText weight="bold" className="text-xs">85%</AppText>
           </View>
           <View className="h-2 bg-divider rounded-full overflow-hidden">
             <View className="h-full bg-accent w-[85%]" />
@@ -125,12 +127,12 @@ const SLIDES: Slide[] = [
             <IconSymbol name="chart.bar.fill" size={24} color="white" />
           </View>
           <View className="flex-1">
-            <AppText className="text-[10px] text-muted uppercase font-bold">Chi tiêu tháng</AppText>
-            <AppText className="text-xl font-bold">4.250.000đ</AppText>
+            <AppText weight="bold" className="text-[10px] text-muted uppercase">Chi tiêu tháng</AppText>
+            <AppText weight="bold" className="text-xl">4.250.000đ</AppText>
           </View>
           <View className="bg-accent-soft px-2 py-1 rounded-full flex-row items-center gap-1">
             <IconSymbol name="arrow.down" size={10} color={accent} />
-            <AppText className="text-accent font-bold text-[10px]">5%</AppText>
+            <AppText weight="bold" className="text-accent text-[10px]">5%</AppText>
           </View>
         </View>
       </View>
@@ -152,18 +154,18 @@ const SLIDES: Slide[] = [
         </View>
         <View className="bg-surface px-6 py-3 rounded-2xl border border-divider/10 shadow-lg flex-row gap-4 items-center">
           <View className="items-center">
-            <AppText className="text-[10px] text-muted font-bold">ĂN UỐNG</AppText>
-            <AppText className="font-bold">45%</AppText>
+            <AppText weight="bold" className="text-[10px] text-muted">ĂN UỐNG</AppText>
+            <AppText weight="bold">45%</AppText>
           </View>
           <View className="w-px h-6 bg-divider/20" />
           <View className="items-center">
-            <AppText className="text-[10px] text-muted font-bold">DU LỊCH</AppText>
-            <AppText className="font-bold">30%</AppText>
+            <AppText weight="bold" className="text-[10px] text-muted">DU LỊCH</AppText>
+            <AppText weight="bold">30%</AppText>
           </View>
           <View className="w-px h-6 bg-divider/20" />
           <View className="items-center">
-            <AppText className="text-[10px] text-muted font-bold">KHÁC</AppText>
-            <AppText className="font-bold">25%</AppText>
+            <AppText weight="bold" className="text-[10px] text-muted">KHÁC</AppText>
+            <AppText weight="bold">25%</AppText>
           </View>
         </View>
       </View>
@@ -177,17 +179,17 @@ const SLIDES: Slide[] = [
     image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=600',
     renderOverlay: (accent) => (
       <View className="absolute inset-0 items-center justify-center p-8">
-        <View className="bg-surface/90 p-8 rounded-[40px] items-center border border-white/20 shadow-2xl">
+        <View className="bg-surface/90 p-8 rounded-[40px] items-center border border-white/20 shadow-2xl backdrop-blur-3xl">
           <View className="w-24 h-24 bg-accent/10 rounded-full items-center justify-center mb-6">
             <IconSymbol name="shield" size={48} color={accent} />
           </View>
-          <AppText className="text-xl font-bold mb-2">Đã được mã hóa</AppText>
+          <AppText weight="bold" className="text-xl mb-2">Đã được mã hóa</AppText>
           <AppText className="text-sm text-muted text-center leading-5">
             Tất cả các giao dịch và dữ liệu cá nhân của bạn được bảo mật 256-bit.
           </AppText>
           <View className="mt-8 flex-row items-center gap-2 bg-success-soft px-4 py-2 rounded-full">
             <IconSymbol name="checkmark.circle.fill" size={16} color="#10b981" />
-            <AppText className="text-[#10b981] font-bold text-xs">Verify by SplitGroup</AppText>
+            <AppText weight="bold" className="text-[#10b981] text-xs">Verify by SplitSmart</AppText>
           </View>
         </View>
       </View>
@@ -200,7 +202,7 @@ export default function TutorialScreen() {
   const insets = useSafeAreaInsets();
   const [currentSlide, setCurrentSlide] = useState(0);
   const accent = useThemeColor('accent');
-  const pagerRef = useRef<PagerView>(null);
+  const pagerRef = useRef<CrossPagerViewRef>(null);
   const setOnboardingComplete = useAuthStore((state) => state.setOnboardingComplete);
 
   const handleComplete = () => {
@@ -223,73 +225,77 @@ export default function TutorialScreen() {
   const slide = SLIDES[currentSlide];
 
   return (
-    <View className="flex-1 bg-background justify-between py-12 px-6">
-      <View style={{ paddingTop: insets.top }} className="flex-row justify-end">
-        <PressableFeedback onPress={handleSkip}>
-          <AppText className="text-muted font-bold">Bỏ qua</AppText>
-        </PressableFeedback>
-      </View>
+    <View className="flex-1 bg-background">
+      <SkiaOnboardingBackground />
 
-      <View className="flex-1 items-center justify-center my-8">
-        <PagerView
-          ref={pagerRef}
-          style={{ width: SCREEN_WIDTH - 48, height: 380 }}
-          initialPage={0}
-          onPageSelected={(e) => setCurrentSlide(e.nativeEvent.position)}
-        >
-          {SLIDES.map((slideItem, index) => (
-            <View key={slideItem.id} className="flex-1">
-              <View className="w-full h-full bg-surface-tertiary rounded-2xl overflow-hidden shadow-2xl relative border border-divider/10">
-                <Image
-                  source={{ uri: slideItem.image }}
-                  style={{ width: '100%', height: '100%', opacity: 0.4 }}
-                  contentFit="cover"
-                />
-                {slideItem.renderOverlay(accent)}
+      <View className="flex-1 justify-between py-12 px-6">
+        <View style={{ paddingTop: insets.top }} className="flex-row justify-end">
+          <PressableFeedback onPress={handleSkip}>
+            <AppText weight="bold" className="text-muted">Bỏ qua</AppText>
+          </PressableFeedback>
+        </View>
+
+        <View className="flex-1 items-center justify-center my-8">
+          <CrossPagerView
+            ref={pagerRef}
+            style={{ width: SCREEN_WIDTH - 48, height: 380 }}
+            initialPage={0}
+            onPageSelected={(e) => setCurrentSlide(e.nativeEvent.position)}
+          >
+            {SLIDES.map((slideItem) => (
+              <View key={slideItem.id} className="flex-1">
+                <View className="w-full h-full bg-surface/30 rounded-[40px] overflow-hidden shadow-2xl relative border border-white/20">
+                  <Image
+                    source={{ uri: slideItem.image }}
+                    style={{ width: '100%', height: '100%', opacity: 0.1 }}
+                    contentFit="cover"
+                  />
+                  {slideItem.renderOverlay(accent)}
+                </View>
               </View>
-            </View>
-          ))}
-        </PagerView>
+            ))}
+          </CrossPagerView>
 
-        <View className="mt-12 items-center px-4">
-          <Animated.View key={currentSlide} entering={FadeIn} exiting={FadeOut}>
-            <AppText className="text-3xl font-bold text-center leading-tight mb-4">
-              {slide.title}
-              <AppText className="text-accent">{slide.accent}</AppText>
-            </AppText>
-            <AppText className="text-muted text-center leading-relaxed">
-              {slide.description}
-            </AppText>
-          </Animated.View>
-        </View>
-      </View>
-
-      <View className="w-full gap-8" style={{ marginBottom: insets.bottom }}>
-        <View className="flex-row justify-center gap-2">
-          {SLIDES.map((_, idx) => (
-            <View
-              key={idx}
-              className={`h-2 rounded-full ${currentSlide === idx ? 'w-8 bg-accent' : 'w-2 bg-divider'}`}
-            />
-          ))}
-        </View>
-
-        <Button
-          size="lg"
-          className="h-16 rounded-2xl bg-accent shadow-lg"
-          onPress={nextSlide}
-        >
-          <View className="flex-row items-center gap-2">
-            <AppText className="font-bold text-lg text-white">
-              {currentSlide === SLIDES.length - 1 ? 'Bắt đầu ngay' : 'Tiếp tục'}
-            </AppText>
-            {currentSlide === SLIDES.length - 1 ? (
-              <IconSymbol name="rocket.fill" size={20} color="white" />
-            ) : (
-              <IconSymbol name="arrow.right" size={20} color="white" />
-            )}
+          <View className="mt-12 items-center px-4 w-full h-32">
+            <Animated.View key={currentSlide} entering={FadeInUp.duration(600)} exiting={FadeOut}>
+              <AppText variant="heading" weight="bold" className="text-3xl text-center leading-tight mb-4">
+                {slide.title}
+                <AppText variant="heading" weight="bold" className="text-accent">{slide.accent}</AppText>
+              </AppText>
+              <AppText className="text-muted text-center leading-relaxed">
+                {slide.description}
+              </AppText>
+            </Animated.View>
           </View>
-        </Button>
+        </View>
+
+        <View className="w-full gap-8" style={{ marginBottom: insets.bottom }}>
+          <View className="flex-row justify-center gap-2">
+            {SLIDES.map((_, idx) => (
+              <View
+                key={idx}
+                className={`h-2 rounded-full transition-all duration-300 ${currentSlide === idx ? 'w-8 bg-accent' : 'w-2 bg-divider'}`}
+              />
+            ))}
+          </View>
+
+          <Button
+            size="lg"
+            className="h-16 rounded-2xl bg-accent shadow-xl shadow-accent/20"
+            onPress={nextSlide}
+          >
+            <View className="flex-row items-center gap-2">
+              <AppText weight="bold" className="text-lg text-white">
+                {currentSlide === SLIDES.length - 1 ? 'Bắt đầu ngay' : 'Tiếp tục'}
+              </AppText>
+              {currentSlide === SLIDES.length - 1 ? (
+                <IconSymbol name="rocket.fill" size={20} color="white" />
+              ) : (
+                <IconSymbol name="arrow.right" size={20} color="white" />
+              )}
+            </View>
+          </Button>
+        </View>
       </View>
     </View>
   );

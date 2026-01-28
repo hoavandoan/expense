@@ -1,20 +1,94 @@
-import { AppText } from '@/components/app-text';
-import { ScreenScrollView } from '@/components/screen-scroll-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useJoinGroup } from '@/lib/hooks';
-import * as Clipboard from 'expo-clipboard';
-import { useRouter } from 'expo-router';
-import { Button, Divider, PressableFeedback, TextField, useThemeColor, useToast } from 'heroui-native';
-import React, { useState } from 'react';
-import { View } from 'react-native';
+import { AppText } from "@/components/app-text";
+import { ScreenScrollView } from "@/components/screen-scroll-view";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useJoinGroup } from "@/lib/hooks";
+import { CameraView, scanFromURLAsync, useCameraPermissions } from "expo-camera";
+import * as Clipboard from "expo-clipboard";
+import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
+import {
+  Button,
+  Divider,
+  PressableFeedback,
+  Spinner,
+  TextField,
+  useThemeColor,
+  useToast,
+} from "heroui-native";
+import React, { useState } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function JoinGroupScreen() {
   const router = useRouter();
-  const [inviteCode, setInviteCode] = useState('');
+  const [inviteCode, setInviteCode] = useState("");
+  const [permission, requestPermission] = useCameraPermissions();
+  const [isScanning, setIsScanning] = useState(true);
+  const [torch, setTorch] = useState(false);
   const joinGroup = useJoinGroup();
   const { toast } = useToast();
-  const success = useThemeColor('success');
-  const danger = useThemeColor('danger');
+  const accent = useThemeColor("accent");
+  const success = useThemeColor("success");
+  const danger = useThemeColor("danger");
+
+  const parseCode = (data: string) => {
+    // Support deep link expense://join-group/{code} or raw code
+    const codeMatch = data.match(/join-group\/([A-Z0-9]+)/i);
+    return codeMatch ? codeMatch[1].toUpperCase() : data.toUpperCase();
+  };
+
+  const onBarCodeScanned = ({ data }: { data: string }) => {
+    if (!isScanning) return;
+    setIsScanning(false);
+
+    const code = parseCode(data);
+    setInviteCode(code);
+
+    toast.show({
+      label: "Đã quét được mã",
+      description: `Mã: ${code}`,
+      variant: "success",
+    });
+
+    // Option to auto-join or just fill the field
+    // For better UX, let's just fill the field and stay interactive
+    setTimeout(() => setIsScanning(true), 3000);
+  };
+
+  const handlePickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: false,
+        quality: 1,
+      });
+
+      if (result.canceled || !result.assets[0].uri) return;
+
+      const scannedResults = await scanFromURLAsync(result.assets[0].uri, ["qr"]);
+
+      if (scannedResults.length > 0) {
+        const code = parseCode(scannedResults[0].data);
+        setInviteCode(code);
+        toast.show({
+          label: "Đã nhận diện QR",
+          description: `Mã: ${code}`,
+          variant: "success",
+        });
+      } else {
+        toast.show({
+          label: "Không tìm thấy mã",
+          description: "Vui lòng chọn ảnh chứa mã QR nhóm hợp lệ",
+          variant: "warning",
+        });
+      }
+    } catch (error) {
+      toast.show({
+        label: "Lỗi",
+        description: "Không thể quét mã từ ảnh này",
+        variant: "danger",
+      });
+    }
+  };
 
   const handlePaste = async () => {
     const text = await Clipboard.getStringAsync();
@@ -31,7 +105,7 @@ export default function JoinGroupScreen() {
         label: 'Mục nhập trống',
         description: 'Vui lòng nhập mã mời hoặc dán liên kết mời để tiếp tục',
         variant: 'danger',
-        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        icon: <IconSymbol name="exclamationmark.triangle.fill" size={20} color={danger} />,
         actionLabel: 'Đóng',
         onActionPress: ({ hide }) => hide(),
       });
@@ -51,15 +125,58 @@ export default function JoinGroupScreen() {
       router.replace(`/group/${groupId}` as any);
     } catch (error: any) {
       toast.show({
-        label: 'Không thể tham gia',
-        description: error.message || 'Mã mời không chính xác hoặc đã hết hạn',
-        variant: 'danger',
-        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: 'Thử lại',
-        onActionPress: ({ hide }) => hide(),
+        label: "Không thể tham gia",
+        description: error.message || "Mã mời không chính xác hoặc đã hết hạn",
+        variant: "danger",
+        icon: (
+          <IconSymbol
+            name="exclamationmark.triangle.fill"
+            size={20}
+            color={danger}
+          />
+        ),
+        actionLabel: "Thử lại",
+        onActionPress: ({ hide }) => {
+          hide();
+          setIsScanning(true);
+        },
       });
     }
   };
+
+  if (!permission) {
+    return (
+      <View className="flex-1 bg-background items-center justify-center p-6">
+        <Spinner size="lg" color={accent} />
+      </View>
+    );
+  }
+
+  if (!permission.granted) {
+    return (
+      <View className="flex-1 bg-background items-center justify-center p-6">
+        <View className="bg-surface p-8 rounded-3xl border border-divider/10 items-center w-full">
+          <View className="w-20 h-20 bg-accent/10 rounded-full items-center justify-center mb-6">
+            <IconSymbol name="camera.fill" size={40} color={accent} />
+          </View>
+          <AppText className="text-2xl font-bold mb-3 text-center">
+            Quyền Truy Cập Camera
+          </AppText>
+          <AppText className="text-muted text-center mb-8 leading-relaxed">
+            Chúng tôi cần quyền truy cập camera để bạn có thể quét mã QR tham gia
+            nhóm nhanh chóng.
+          </AppText>
+          <Button
+            size="lg"
+            className="w-full h-14 rounded-2xl bg-accent"
+            onPress={requestPermission}
+          >
+            <Button.Label className="font-bold">Cấp quyền camera</Button.Label>
+          </Button>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-background">
@@ -71,11 +188,27 @@ export default function JoinGroupScreen() {
           </AppText>
         </View>
 
-        {/* QR Scanner Mock */}
-        <View className="aspect-square w-full rounded-2xl overflow-hidden bg-black/95 relative shadow-2xl mb-12">
-          <View className="absolute inset-0 items-center justify-center">
-            <View className="w-64 h-64 border-2 border-accent rounded-3xl" style={{ borderStyle: 'dashed' }} />
-            <View className="absolute w-full h-1 bg-accent/50" style={{ top: '50%' }} />
+        {/* QR Scanner */}
+        <View className="aspect-square w-full rounded-3xl overflow-hidden bg-black relative shadow-2xl mb-12">
+          <CameraView
+            style={StyleSheet.absoluteFill}
+            facing="back"
+            onBarcodeScanned={onBarCodeScanned}
+            barcodeScannerSettings={{
+              barcodeTypes: ["qr"],
+            }}
+            enableTorch={torch}
+          />
+
+          <View className="absolute inset-0 items-center justify-center pointer-events-none">
+            <View
+              className="w-64 h-64 border-2 border-accent/50 rounded-3xl"
+              style={{ borderStyle: "dashed" }}
+            />
+            <View
+              className="absolute w-full h-0.5 bg-accent/30"
+              style={{ top: "50%" }}
+            />
           </View>
 
           {/* Corner Markers */}
@@ -86,20 +219,31 @@ export default function JoinGroupScreen() {
 
           <View className="absolute bottom-12 w-full flex-row justify-center gap-8">
             <View className="items-center">
-              <PressableFeedback>
-                <View className="w-14 h-14 rounded-full bg-white/10 items-center justify-center border border-white/20">
-                  <IconSymbol name="photo.on.rectangle" size={24} color="white" />
-                </View>
-              </PressableFeedback>
-              <AppText className="text-white text-[10px] text-center mt-2 font-bold uppercase">Thư viện</AppText>
+              <TouchableOpacity
+                onPress={handlePickImage}
+                className="w-14 h-14 rounded-full bg-black/40 items-center justify-center border border-white/20"
+              >
+                <IconSymbol name="photo.on.rectangle" size={24} color="white" />
+              </TouchableOpacity>
+              <AppText className="text-white text-[10px] text-center mt-2 font-bold uppercase">
+                Thư viện
+              </AppText>
             </View>
             <View className="items-center">
-              <PressableFeedback>
-                <View className="w-14 h-14 rounded-full bg-white/10 items-center justify-center border border-white/20">
-                  <IconSymbol name="flashlight.on.fill" size={24} color="white" />
-                </View>
-              </PressableFeedback>
-              <AppText className="text-white text-[10px] text-center mt-2 font-bold uppercase">Đèn flash</AppText>
+              <TouchableOpacity
+                onPress={() => setTorch(!torch)}
+                className={`w-14 h-14 rounded-full ${torch ? "bg-accent" : "bg-black/40"
+                } items-center justify-center border border-white/20`}
+              >
+                <IconSymbol
+                  name="flashlight.on.fill"
+                  size={24}
+                  color="white"
+                />
+              </TouchableOpacity>
+              <AppText className="text-white text-[10px] text-center mt-2 font-bold uppercase">
+                Đèn flash
+              </AppText>
             </View>
           </View>
         </View>

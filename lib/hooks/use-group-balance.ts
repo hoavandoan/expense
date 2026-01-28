@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { GroupWithDetails } from '../types';
+import type { Group, GroupWithDetails } from '../types';
 
 interface BalanceStats {
   totalPaid: number;
@@ -97,7 +97,7 @@ export const useMembersBalance = (
  * Calculate total balance across all groups for a user
  */
 export const useTotalBalanceAcrossGroups = (
-  groups: GroupWithDetails[] | null | undefined,
+  groups: Group[] | null | undefined,
   userId: string | null | undefined
 ): BalanceStats => {
   return useMemo(() => {

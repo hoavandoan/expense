@@ -8,27 +8,35 @@
 
 @layer theme {
   @variant light {
-    /* --accent: oklch(0.65 0.25 150); */
+    --accent: oklch(0.65 0.25 150);
     --accent-gradient: linear-gradient(135deg, #17C964 0%, #17AD56 100%);
     --divider: oklch(0.922 0 0);
+    --background: oklch(0.98 0.005 240);
+    --surface: oklch(1 0 0);
+    --muted: oklch(0.55 0.01 240);
+    --foreground: oklch(0.15 0.01 240);
 
     /* Semantic Colors */
-    --success: oklch(0.7 0.2 145);
-    --warning: oklch(0.8 0.15 70);
-    --danger: oklch(0.6 0.2 25);
-    --info: oklch(0.6 0.2 250);
+    --success: oklch(0.7 0.18 145);
+    --warning: oklch(0.8 0.12 70);
+    --danger: oklch(0.6 0.18 25);
+    --info: oklch(0.6 0.18 250);
   }
 
   @variant dark {
-    /* --accent: oklch(0.65 0.25 150); */
+    --accent: oklch(0.65 0.25 150);
     --accent-gradient: linear-gradient(135deg, #17C964 0%, #17AD56 100%);
     --divider: oklch(1 0 0 / 10%);
+    --background: oklch(0.12 0.01 240);
+    --surface: oklch(0.18 0.01 240);
+    --muted: oklch(0.6 0.01 240);
+    --foreground: oklch(0.95 0.01 240);
 
     /* Semantic Colors */
-    --success: oklch(0.65 0.2 145);
-    --warning: oklch(0.75 0.15 70);
-    --danger: oklch(0.55 0.2 25);
-    --info: oklch(0.55 0.2 250);
+    --success: oklch(0.65 0.18 145);
+    --warning: oklch(0.75 0.12 70);
+    --danger: oklch(0.55 0.18 25);
+    --info: oklch(0.55 0.18 250);
   }
 }
 
@@ -51,6 +59,12 @@
   --font-medium: 'Inter_500Medium';
   --font-semibold: 'Inter_600SemiBold';
   --font-bold: 'Inter_700Bold';
+
+  /* Heading fonts */
+  --font-heading-normal: 'IBMPlexSans_400Regular';
+  --font-heading-medium: 'IBMPlexSans_500Medium';
+  --font-heading-semibold: 'IBMPlexSans_600SemiBold';
+  --font-heading-bold: 'IBMPlexSans_700Bold';
 
   /* Typography Hierarchy */
   --text-xs: 12px;

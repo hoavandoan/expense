@@ -19,18 +19,18 @@ export interface ActivityItemProps {
 }
 
 export const ActivityItem = ({
-  user,
-  action,
-  subject,
-  group,
-  groupIcon,
-  amount,
-  status,
-  typeIcon,
-  typeColor,
-  iconColor,
-  isMe,
-}: ActivityItemProps) => {
+                               user,
+                               action,
+                               subject,
+                               group,
+                               groupIcon,
+                               amount,
+                               status,
+                               typeIcon,
+                               typeColor,
+                               iconColor,
+                               isMe,
+                             }: ActivityItemProps) => {
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
 
@@ -45,8 +45,12 @@ export const ActivityItem = ({
                   Bạn
                 </AppText>
               </View>
-            ) : (
+            ) : user.avatar ? (
               <Avatar.Image source={{ uri: user.avatar }} />
+            ) : (
+              <Avatar.Fallback className="bg-surface-secondary">
+                {user.name.charAt(0)}
+              </Avatar.Fallback>
             )}
           </Avatar>
           <View
@@ -86,8 +90,8 @@ export const ActivityItem = ({
                 amount.startsWith("+")
                   ? "text-success"
                   : status
-                  ? "text-accent"
-                  : "text-foreground"
+                    ? "text-accent"
+                    : "text-foreground"
               )}
             >
               {amount}

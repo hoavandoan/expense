@@ -1,6 +1,5 @@
 import { ActivityItem } from "@/components/activity-item";
 import { AppText } from "@/components/app-text";
-import { ScreenScrollView } from "@/components/screen-scroll-view";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -8,9 +7,11 @@ import { CATEGORY_CONFIG } from "@/constants";
 import { useRecentActivity } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatCurrency } from "@/lib/utils";
+import { FlashList } from "@shopify/flash-list";
 import { cn, Spinner, Tabs, TextField, useThemeColor } from "heroui-native";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
+import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const FILTERS = [
@@ -166,39 +167,13 @@ const formatTimeAgo = (dateString: string): string => {
   return date.toLocaleDateString("vi-VN");
 };
 
-const groupActivitiesByDate = (activities: any[]) => {
-  const groups: Record<string, any[]> = {};
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  activities.forEach((activity) => {
-    const activityDate = new Date(activity.createdAt);
-    activityDate.setHours(0, 0, 0, 0);
-
-    let groupKey: string;
-    if (activityDate.getTime() === today.getTime()) {
-      groupKey = "Hôm nay";
-    } else if (activityDate.getTime() === yesterday.getTime()) {
-      groupKey = "Hôm qua";
-    } else {
-      groupKey = activityDate.toLocaleDateString("vi-VN");
-    }
-
-    if (!groups[groupKey]) {
-      groups[groupKey] = [];
-    }
-    groups[groupKey].push(activity);
-  });
-
-  return groups;
-};
+type ActivityListItem = 
+  | { type: "header"; title: string; id: string }
+  | { type: "activity"; data: any; id: string };
 
 export default function ActivityScreen() {
   const insets = useSafeAreaInsets();
   const accent = useThemeColor("accent");
-  const foreground = useThemeColor("foreground");
   const muted = useThemeColor("muted");
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -206,7 +181,7 @@ export default function ActivityScreen() {
 
   const { data: activities, isLoading, error, refetch } = useRecentActivity(50);
 
-  const filteredActivities = useMemo(() => {
+  const flattenedActivities = useMemo(() => {
     if (!activities) return [];
 
     let filtered = activities;
@@ -237,24 +212,111 @@ export default function ActivityScreen() {
       });
     }
 
-    return filtered;
+    // Group and flatten
+    const groups: Record<string, any[]> = {};
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    filtered.forEach((activity) => {
+      const activityDate = new Date(activity.createdAt);
+      activityDate.setHours(0, 0, 0, 0);
+
+      let groupKey: string;
+      if (activityDate.getTime() === today.getTime()) {
+        groupKey = "Hôm nay";
+      } else if (activityDate.getTime() === yesterday.getTime()) {
+        groupKey = "Hôm qua";
+      } else {
+        groupKey = activityDate.toLocaleDateString("vi-VN");
+      }
+
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(activity);
+    });
+
+    const groupKeys = Object.keys(groups).sort((a, b) => {
+      if (a === "Hôm nay") return -1;
+      if (b === "Hôm nay") return 1;
+      if (a === "Hôm qua") return -1;
+      if (b === "Hôm qua") return 1;
+      return b.localeCompare(a);
+    });
+
+    const flattened: ActivityListItem[] = [];
+    groupKeys.forEach((key) => {
+      flattened.push({ type: "header", title: key, id: `header-${key}` });
+      groups[key].forEach((activity) => {
+        flattened.push({ type: "activity", data: activity, id: activity.id });
+      });
+    });
+
+    return flattened;
   }, [activities, activeFilter, searchQuery]);
 
-  const groupedActivities = useMemo(() => {
-    return groupActivitiesByDate(filteredActivities);
-  }, [filteredActivities]);
-
-  const onRefresh = React.useCallback(async () => {
+  const onRefresh = useCallback(async () => {
     await refetch();
   }, [refetch]);
 
-  const groupKeys = Object.keys(groupedActivities).sort((a, b) => {
-    if (a === "Hôm nay") return -1;
-    if (b === "Hôm nay") return 1;
-    if (a === "Hôm qua") return -1;
-    if (b === "Hôm qua") return 1;
-    return b.localeCompare(a);
-  });
+  const renderItem = useCallback(({ item, index }: { item: ActivityListItem; index: number }) => {
+    if (item.type === "header") {
+      return (
+        <Animated.View entering={FadeInUp.delay(index * 30).duration(300)} exiting={FadeOut.duration(200)}>
+          <AppText className="text-xl font-bold text-foreground mb-5 px-6 mt-8">
+            {item.title}
+          </AppText>
+        </Animated.View>
+      );
+    }
+
+    const { data: activity } = item;
+    const isMe = activity.userId === user?.id;
+    const activityIcon = getActivityIcon(activity.actionType);
+    const { action, subject } = formatActivityAction(
+      activity.actionType,
+      activity.metadata
+    );
+    const categoryConfig = activity.metadata.category
+      ? CATEGORY_CONFIG[activity.metadata.category as string] ||
+        CATEGORY_CONFIG.other
+      : activityIcon;
+
+    let amount: string | undefined;
+    if (activity.metadata.amount) {
+      const amountNum = activity.metadata.amount as number;
+      amount = formatCurrency(
+        amountNum,
+        activity.group?.currency || "VND"
+      );
+    }
+
+    return (
+      <Animated.View 
+        className="mb-4" 
+        entering={FadeInUp.delay(index * 40).duration(300).springify().damping(15)}
+        exiting={FadeOut.duration(200)}
+      >
+        <ActivityItem
+          user={{
+            name: isMe ? "Bạn" : activity.user?.name || "Ai đó",
+            avatar: activity.user?.avatarUrl || "",
+          }}
+          action={action}
+          subject={subject}
+          group={activity.group?.name || "Nhóm"}
+          groupIcon="person.3.fill"
+          amount={amount}
+          typeIcon={categoryConfig.icon}
+          typeColor={categoryConfig.bg}
+          iconColor={categoryConfig.color}
+          isMe={isMe}
+        />
+      </Animated.View>
+    );
+  }, [user?.id]);
 
   if (error) {
     return (
@@ -334,75 +396,29 @@ export default function ActivityScreen() {
         <View className="flex-1 items-center justify-center">
           <Spinner size="lg" color={accent} />
         </View>
-      ) : filteredActivities.length > 0 ? (
-        <ScreenScrollView
-          refreshing={false}
-          onRefresh={onRefresh}
-          className="pt-6"
-          withTabBarOffset
-          withKeyboardAvoidingView
-        >
-          {groupKeys.map((groupTitle) => (
-            <View key={groupTitle} className="mb-8">
-              <AppText className="text-xl font-bold text-foreground mb-5 px-6">
-                {groupTitle}
-              </AppText>
-              <View className="gap-4">
-                {groupedActivities[groupTitle].map((activity) => {
-                  const isMe = activity.userId === user?.id;
-                  const activityIcon = getActivityIcon(activity.actionType);
-                  const { action, subject } = formatActivityAction(
-                    activity.actionType,
-                    activity.metadata
-                  );
-                  const categoryConfig = activity.metadata.category
-                    ? CATEGORY_CONFIG[activity.metadata.category as string] ||
-                      CATEGORY_CONFIG.other
-                    : activityIcon;
-
-                  let amount: string | undefined;
-                  if (activity.metadata.amount) {
-                    const amountNum = activity.metadata.amount as number;
-                    amount = formatCurrency(
-                      amountNum,
-                      activity.group?.currency || "VND"
-                    );
-                  }
-
-                  return (
-                    <ActivityItem
-                      key={activity.id}
-                      user={{
-                        name: isMe ? "Bạn" : activity.user?.name || "Ai đó",
-                        avatar: activity.user?.avatarUrl || "",
-                      }}
-                      action={action}
-                      subject={subject}
-                      group={activity.group?.name || "Nhóm"}
-                      groupIcon="person.3.fill"
-                      amount={amount}
-                      typeIcon={categoryConfig.icon}
-                      typeColor={categoryConfig.bg}
-                      iconColor={categoryConfig.color}
-                      isMe={isMe}
-                    />
-                  );
-                })}
-              </View>
-            </View>
-          ))}
-        </ScreenScrollView>
       ) : (
-        <EmptyState
-          icon="clock.fill"
-          title={
-            searchQuery ? "Không tìm thấy kết quả" : "Chưa có hoạt động nào"
+        <FlashList
+          data={flattenedActivities}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          estimatedItemSize={100}
+          getItemType={(item) => item.type}
+          onRefresh={onRefresh}
+          refreshing={false}
+          ListEmptyComponent={
+            <EmptyState
+              icon="clock.fill"
+              title={
+                searchQuery ? "Không tìm thấy kết quả" : "Chưa có hoạt động nào"
+              }
+              description={
+                searchQuery
+                  ? "Thử tìm kiếm với từ khóa khác"
+                  : "Các hoạt động sẽ hiển thị ở đây"
+              }
+            />
           }
-          description={
-            searchQuery
-              ? "Thử tìm kiếm với từ khóa khác"
-              : "Các hoạt động sẽ hiển thị ở đây"
-          }
+          contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
         />
       )}
     </View>

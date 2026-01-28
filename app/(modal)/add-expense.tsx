@@ -1,5 +1,6 @@
 import { AppText } from "@/components/app-text";
 import { ScreenScrollView } from "@/components/screen-scroll-view";
+import { FormSection } from "@/components/ui/form-section";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { EXPENSE_CATEGORIES } from "@/constants";
 import { useCreateExpense, useGroup, useGroups } from "@/lib/hooks";
@@ -10,16 +11,16 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  Avatar,
-  Button,
-  Card,
-  Checkbox,
-  PressableFeedback,
-  Select,
-  Skeleton,
-  TextField,
-  useThemeColor,
-  useToast,
+    Avatar,
+    Button,
+    Card,
+    Checkbox,
+    PressableFeedback,
+    Select,
+    Skeleton,
+    TextField,
+    useThemeColor,
+    useToast,
 } from "heroui-native";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -329,142 +330,126 @@ export default function AddExpenseScreen() {
           </View>
         )}
 
-        {!hasPreselectedGroup && (
-          <TextField
-            isRequired
-            isInvalid={!!errors.groupId}
-            className="mb-6 mt-4"
-          >
-            <TextField.Label className="mb-3 ml-1">NHÓM</TextField.Label>
-            <Controller
-              control={control}
-              name="groupId"
-              render={({ field: { onChange, value } }) => (
-                <Select
-                  value={groupOptions.find((g) => g.value === value) as any}
-                  onValueChange={(opt: any) => opt && onChange(opt.value)}
-                >
-                  <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
-                    <View className="flex-row items-center gap-3">
-                      <IconSymbol
-                        name="person.3.fill"
-                        size={20}
-                        color={accent}
-                      />
-                      <Select.Value
-                        className="text-base font-medium"
-                        placeholder="Chọn nhóm"
-                      />
-                    </View>
+        <FormSection
+          label="NHÓM"
+          isRequired
+          error={errors.groupId?.message}
+          className={hasPreselectedGroup ? "hidden" : "mb-6 mt-4"}
+        >
+          <Controller
+            control={control}
+            name="groupId"
+            render={({ field: { onChange, value } }) => (
+              <Select
+                value={groupOptions.find((g) => g.value === value) as any}
+                onValueChange={(opt: any) => opt && onChange(opt.value)}
+              >
+                <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                  <View className="flex-row items-center gap-3">
                     <IconSymbol
-                      name="chevron.right"
-                      size={16}
-                      color={muted}
-                      className="rotate-90"
+                      name="person.3.fill"
+                      size={20}
+                      color={accent}
                     />
-                  </Select.Trigger>
-                  <Select.Portal>
-                    <Select.Overlay className="bg-black/20" />
-                    <Select.Content
-                      placement="bottom"
-                      className="rounded-2xl bg-surface border border-divider/10"
-                      width={300}
-                    >
-                      {groupOptions.map((group) => (
-                        <Select.Item
-                          key={group.value}
-                          value={group.value}
-                          label={group.label}
-                          className="p-4"
-                        >
-                          <View className="flex-row items-center gap-3">
-                            <IconSymbol
-                              name="person.3.fill"
-                              size={18}
-                              color={accent}
-                            />
-                            <Select.ItemLabel className="text-base" />
-                          </View>
-                          <Select.ItemIndicator />
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Portal>
-                </Select>
-              )}
-            />
-            {errors.groupId && (
-              <TextField.ErrorMessage className="ml-1 mt-1">
-                {errors.groupId.message}
-              </TextField.ErrorMessage>
+                    <Select.Value
+                      className="text-base font-medium"
+                      placeholder="Chọn nhóm"
+                    />
+                  </View>
+                  <IconSymbol
+                    name="chevron.right"
+                    size={16}
+                    color={muted}
+                    className="rotate-90"
+                  />
+                </Select.Trigger>
+                <Select.Portal>
+                  <Select.Overlay className="bg-black/20" />
+                  <Select.Content
+                    placement="bottom"
+                    className="rounded-2xl bg-surface border border-divider/10"
+                    width={300}
+                  >
+                    {groupOptions.map((group) => (
+                      <Select.Item
+                        key={group.value}
+                        value={group.value}
+                        label={group.label}
+                        className="p-4"
+                      >
+                        <View className="flex-row items-center gap-3">
+                          <IconSymbol
+                            name="person.3.fill"
+                            size={18}
+                            color={accent}
+                          />
+                          <Select.ItemLabel className="text-base" />
+                        </View>
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Portal>
+              </Select>
             )}
-          </TextField>
-        )}
-
-        <View className="mb-6">
+          />
+        </FormSection>
+        
+        <FormSection
+          label="SỐ TIỀN"
+          isRequired
+          error={errors.amount?.message}
+        >
           <Controller
             control={control}
             name="amount"
             render={({ field: { onChange, value } }) => (
-              <TextField isRequired isInvalid={!!errors.amount}>
-                <TextField.Label className="mb-3 ml-1">SỐ TIỀN</TextField.Label>
-                <View className="justify-center">
-                  <TextField.Input
-                    placeholder="0"
-                    value={value}
-                    onChangeText={onChange}
-                    keyboardType="numeric"
-                    className="bg-surface border border-divider/10 h-16 rounded-2xl px-4 text-2xl font-bold text-center"
-                  />
-                  <View className="absolute right-4" pointerEvents="none">
-                    <AppText className="text-muted text-xl font-bold">
-                      {currency === "VND"
-                        ? "₫"
-                        : currency === "USD"
-                        ? "$"
-                        : "€"}
-                    </AppText>
-                  </View>
+              <View className="justify-center">
+                <TextField.Input
+                  placeholder="0"
+                  value={value}
+                  onChangeText={onChange}
+                  keyboardType="numeric"
+                  className="bg-surface border border-divider/10 h-16 rounded-2xl px-4 text-2xl font-bold text-center"
+                />
+                <View className="absolute right-4" pointerEvents="none">
+                  <AppText className="text-muted text-xl font-bold">
+                    {currency === "VND"
+                      ? "₫"
+                      : currency === "USD"
+                      ? "$"
+                      : "€"}
+                  </AppText>
                 </View>
-                {errors.amount && (
-                  <TextField.ErrorMessage className="ml-1 mt-1">
-                    {errors.amount.message}
-                  </TextField.ErrorMessage>
-                )}
-              </TextField>
+              </View>
             )}
           />
-        </View>
+        </FormSection>
 
-        <View className="mb-6">
+        <FormSection
+          label="MÔ TẢ"
+          isRequired
+          error={errors.title?.message}
+        >
           <Controller
             control={control}
             name="title"
             render={({ field: { onChange, value } }) => (
-              <TextField isRequired isInvalid={!!errors.title}>
-                <TextField.Label className="mb-3 ml-1">MÔ TẢ</TextField.Label>
-                <TextField.Input
-                  placeholder="Bạn đã chi cho việc gì? (e.g. Ăn trưa)"
-                  value={value}
-                  onChangeText={onChange}
-                  className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
-                />
-                {errors.title && (
-                  <TextField.ErrorMessage className="ml-1 mt-1">
-                    {errors.title.message}
-                  </TextField.ErrorMessage>
-                )}
-              </TextField>
+              <TextField.Input
+                placeholder="Bạn đã chi cho việc gì? (e.g. Ăn trưa)"
+                value={value}
+                onChangeText={onChange}
+                className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
+              />
             )}
           />
-        </View>
+        </FormSection>
 
-        <TextField
+        <FormSection
+          label="PHÂN LOẠI"
           isRequired
-          isInvalid={!!errors.category}
-          className="mb-6"
+          error={errors.category?.message}
         >
-          <TextField.Label className="mb-3 ml-1">PHÂN LOẠI</TextField.Label>
           <Controller
             control={control}
             name="category"
@@ -542,19 +527,13 @@ export default function AddExpenseScreen() {
               </Select>
             )}
           />
-          {errors.category && (
-            <TextField.ErrorMessage className="ml-1 mt-1">
-              {errors.category.message}
-            </TextField.ErrorMessage>
-          )}
-        </TextField>
+        </FormSection>
 
-        <TextField
+        <FormSection
+          label="NGƯỜI TRẢ TIỀN"
           isRequired
-          isInvalid={!!errors.paidById}
-          className="mb-6"
+          error={errors.paidById?.message}
         >
-          <TextField.Label className="mb-3 ml-1">NGƯỜI TRẢ TIỀN</TextField.Label>
           <Controller
             control={control}
             name="paidById"
@@ -623,19 +602,14 @@ export default function AddExpenseScreen() {
               );
             }}
           />
-          {errors.paidById && (
-            <TextField.ErrorMessage className="ml-1 mt-1">
-              {errors.paidById.message}
-            </TextField.ErrorMessage>
-          )}
-        </TextField>
+        </FormSection>
 
-        <TextField
+        <FormSection
+          label="CHIA CHO"
           isRequired
-          isInvalid={!!errors.participantIds}
+          error={errors.participantIds?.message}
           className="mb-8"
         >
-          <TextField.Label className="mb-3 ml-1">CHIA CHO</TextField.Label>
           <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
             {members.map((member, index) => {
               const isSelected = participantIds.includes(member.id);
@@ -687,40 +661,31 @@ export default function AddExpenseScreen() {
               );
             })}
           </Card>
-          {errors.participantIds && (
-            <TextField.ErrorMessage className="ml-1 mt-1">
-              {errors.participantIds.message}
-            </TextField.ErrorMessage>
-          )}
-        </TextField>
+        </FormSection>
 
-        <View className="mb-6">
-          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-            GHI CHÚ (TÙY CHỌN)
-          </AppText>
+        <FormSection
+          label="GHI CHÚ (TÙY CHỌN)"
+          error={errors.notes?.message}
+        >
           <Controller
             control={control}
             name="notes"
             render={({ field: { onChange, value } }) => (
-              <TextField>
-                <TextField.Input
-                  placeholder="Ghi chú thêm về khoản chi này..."
-                  value={value}
-                  onChangeText={onChange}
-                  multiline
-                  numberOfLines={3}
-                  className="bg-surface border border-divider/10 rounded-2xl px-4 py-3 text-base min-h-[80px]"
-                />
-              </TextField>
+              <TextField.Input
+                placeholder="Ghi chú thêm về khoản chi này..."
+                value={value}
+                onChangeText={onChange}
+                multiline
+                numberOfLines={3}
+                className="bg-surface border border-divider/10 rounded-2xl px-4 py-3 text-base min-h-[80px]"
+              />
             )}
           />
-        </View>
+        </FormSection>
 
-        {/* Receipt Upload */}
-        <View className="mb-6">
-          <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-            ẢNH HÓA ĐƠN (TÙY CHỌN)
-          </AppText>
+        <FormSection
+          label="ẢNH HÓA ĐƠN (TÙY CHỌN)"
+        >
           {selectedReceipt ? (
             <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
               <View className="relative">
@@ -766,7 +731,7 @@ export default function AddExpenseScreen() {
               </Card>
             </PressableFeedback>
           )}
-        </View>
+        </FormSection>
 
         <Button
           variant="primary"

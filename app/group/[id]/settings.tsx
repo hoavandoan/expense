@@ -5,8 +5,10 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ModalHeader } from "@/components/ui/modal-header";
+import { ShareQRSheet } from "@/components/ui/share-qr-sheet";
 import { useGroup, useLeaveGroup, useUpdateGroup } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
+import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   Avatar,
@@ -22,6 +24,7 @@ import {
 } from "heroui-native";
 import React, { useState } from "react";
 import { View } from "react-native";
+import QRCode from "react-native-qrcode-svg";
 
 export default function GroupSettingsScreen() {
   const { id } = useLocalSearchParams();
@@ -34,6 +37,7 @@ export default function GroupSettingsScreen() {
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
+  const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
 
   const { data: group, isLoading, error, refetch } = useGroup(id as string);
   const updateGroup = useUpdateGroup();
@@ -216,8 +220,9 @@ export default function GroupSettingsScreen() {
                     {groupData.invite_code || "N/A"}
                   </AppText>
                   <Button
-                    onPress={() => {
-                      // TODO: Copy invite code to clipboard
+                    onPress={async () => {
+                      if (!groupData.invite_code) return;
+                      await Clipboard.setStringAsync(groupData.invite_code);
                       toast.show({
                         label: "Đã sao chép",
                         description: "Mã mời đã được lưu vào bộ nhớ tạm",
@@ -235,6 +240,30 @@ export default function GroupSettingsScreen() {
                   </Button>
                 </View>
               </View>
+            </Card>
+          </View>
+
+          {/* QR Share Section */}
+          <View>
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
+              CHIA SẺ NHÓM
+            </AppText>
+            <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
+              <PressableFeedback onPress={() => setIsShareSheetOpen(true)}>
+                <View className="p-4 flex-row items-center gap-4">
+                  <View className="bg-white p-2 rounded-xl border border-divider/10">
+                    <QRCode
+                      value={`expense://join-group/${groupData.invite_code}`}
+                      size={60}
+                    />
+                  </View>
+                  <View className="flex-1">
+                    <AppText className="font-bold text-base mb-0.5">Mã QR nhóm</AppText>
+                    <AppText className="text-muted text-xs">Chia sẻ hoặc quét để tham gia nhóm</AppText>
+                  </View>
+                  <IconSymbol name="chevron.right" size={20} color="gray" />
+                </View>
+              </PressableFeedback>
             </Card>
           </View>
 
@@ -374,6 +403,13 @@ export default function GroupSettingsScreen() {
         variant="danger"
         isLoading={leaveGroup.isPending}
         onConfirm={handleLeaveGroup}
+      />
+
+      <ShareQRSheet
+        isOpen={isShareSheetOpen}
+        onOpenChange={setIsShareSheetOpen}
+        groupName={group.name}
+        inviteCode={groupData.invite_code}
       />
     </View>
   );

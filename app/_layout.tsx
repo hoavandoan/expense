@@ -3,32 +3,38 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { AppThemeProvider } from "@/contexts/app-theme-context";
 import { useAuth } from "@/lib/hooks";
 import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  useFonts,
+    IBMPlexSans_400Regular,
+    IBMPlexSans_500Medium,
+    IBMPlexSans_600SemiBold,
+    IBMPlexSans_700Bold,
+} from "@expo-google-fonts/ibm-plex-sans";
+import {
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    useFonts,
 } from "@expo-google-fonts/inter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { HeroUINativeConfig, HeroUINativeProvider } from "heroui-native";
 import { useCallback } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    View,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
-  KeyboardProvider,
+    KeyboardProvider,
 } from "react-native-keyboard-controller";
 import {
-  configureReanimatedLogger,
-  ReanimatedLogLevel,
+    configureReanimatedLogger,
+    ReanimatedLogLevel,
 } from "react-native-reanimated";
 import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
+    SafeAreaProvider,
+    useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import "./global.css";
 
@@ -126,6 +132,10 @@ export default function RootLayout() {
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
+    IBMPlexSans_400Regular,
+    IBMPlexSans_500Medium,
+    IBMPlexSans_600SemiBold,
+    IBMPlexSans_700Bold,
   });
 
   if (!fonts) {

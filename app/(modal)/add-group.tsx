@@ -1,5 +1,6 @@
 import { AppText } from "@/components/app-text";
 import { ScreenScrollView } from "@/components/screen-scroll-view";
+import { FormSection } from "@/components/ui/form-section";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { CURRENCIES, GROUP_TYPES } from "@/constants";
 import { useCreateGroup } from "@/lib/hooks";
@@ -127,63 +128,51 @@ export default function AddGroupScreen() {
         </View>
 
         <View className="gap-6 px-4">
-          <View>
+        <View className="gap-2 px-4">
+          <FormSection
+            label="TÊN NHÓM"
+            isRequired
+            error={errors.name?.message}
+          >
             <Controller
               control={control}
               name="name"
               render={({ field: { onChange, value } }) => (
-                <TextField isRequired isInvalid={!!errors.name}>
-                  <TextField.Label className="mb-3 ml-1">
-                    TÊN NHÓM
-                  </TextField.Label>
-                  <TextField.Input
-                    placeholder="e.g. Du lịch Đà Lạt"
-                    value={value}
-                    onChangeText={onChange}
-                    className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
-                  />
-                  {errors.name && (
-                    <TextField.ErrorMessage className="ml-1 mt-1">
-                      {errors.name.message}
-                    </TextField.ErrorMessage>
-                  )}
-                </TextField>
+                <TextField.Input
+                  placeholder="e.g. Du lịch Đà Lạt"
+                  value={value}
+                  onChangeText={onChange}
+                  className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
+                />
               )}
             />
-          </View>
+          </FormSection>
 
-          <View>
+          <FormSection
+            label="MÔ TẢ (TÙY CHỌN)"
+            error={errors.description?.message}
+          >
             <Controller
               control={control}
               name="description"
               render={({ field: { onChange, value } }) => (
-                <TextField isInvalid={!!errors.description}>
-                  <TextField.Label className="mb-3 ml-1">
-                    MÔ TẢ (TÙY CHỌN)
-                  </TextField.Label>
-                  <TextField.Input
-                    placeholder="Mô tả ngắn gọn về nhóm..."
-                    value={value}
-                    onChangeText={onChange}
-                    className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
-                  />
-                  {errors.description && (
-                    <TextField.ErrorMessage className="ml-1 mt-1">
-                      {errors.description.message}
-                    </TextField.ErrorMessage>
-                  )}
-                </TextField>
+                <TextField.Input
+                  placeholder="Mô tả ngắn gọn về nhóm..."
+                  value={value}
+                  onChangeText={onChange}
+                  className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
+                />
               )}
             />
-          </View>
+          </FormSection>
 
           <View className="flex-row gap-4">
             <View className="flex-1">
-              <TextField
+              <FormSection
+                label="LOẠI NHÓM"
                 isRequired
-                isInvalid={!!errors.groupType}
+                error={errors.groupType?.message}
               >
-                <TextField.Label className="mb-3 ml-1">LOẠI NHÓM</TextField.Label>
                 <Controller
                   control={control}
                   name="groupType"
@@ -244,20 +233,15 @@ export default function AddGroupScreen() {
                     </Select>
                   )}
                 />
-                {errors.groupType && (
-                    <TextField.ErrorMessage className="ml-1 mt-1">
-                        {errors.groupType.message}
-                    </TextField.ErrorMessage>
-                )}
-              </TextField>
+              </FormSection>
             </View>
 
             <View className="flex-1">
-              <TextField
+              <FormSection
+                label="TIỀN TỆ"
                 isRequired
-                isInvalid={!!errors.currency}
+                error={errors.currency?.message}
               >
-                <TextField.Label className="mb-3 ml-1">TIỀN TỆ</TextField.Label>
                 <Controller
                   control={control}
                   name="currency"
@@ -311,14 +295,10 @@ export default function AddGroupScreen() {
                     </Select>
                   )}
                 />
-                {errors.currency && (
-                    <TextField.ErrorMessage className="ml-1 mt-1">
-                        {errors.currency.message}
-                    </TextField.ErrorMessage>
-                )}
-              </TextField>
+              </FormSection>
             </View>
           </View>
+        </View>
         </View>
 
         <View className="my-10 px-4">

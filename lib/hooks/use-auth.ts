@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
+import { apiClient } from '../api-client';
 import { useAuthStore } from '../stores/auth-store';
 import { supabase } from '../supabase';
 import type { User } from '../types';
@@ -18,27 +19,24 @@ export const useAuth = () => {
         logout,
     } = useAuthStore();
 
+    const fetchProfile = useCallback(async () => {
+        try {
+            const profile = await apiClient<User>('/profile');
+            if (profile) {
+                setUser(profile);
+            }
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            setLoading(false);
+        }
+    }, [setUser, setLoading]);
+
     useEffect(() => {
         // Check current session on mount
         const checkSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
-
             if (session?.user) {
-                const { data: profile } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('id', session.user.id)
-                    .single();
-
-                if (profile) {
-                    setUser({
-                        id: profile.id,
-                        email: profile.email,
-                        name: profile.name,
-                        avatarUrl: profile.avatar_url,
-                        createdAt: profile.created_at,
-                    });
-                }
+                await fetchProfile();
             } else {
                 setLoading(false);
             }
@@ -50,21 +48,7 @@ export const useAuth = () => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
                 if (event === 'SIGNED_IN' && session?.user) {
-                    const { data: profile } = await supabase
-                        .from('users')
-                        .select('*')
-                        .eq('id', session.user.id)
-                        .single();
-
-                    if (profile) {
-                        setUser({
-                            id: profile.id,
-                            email: profile.email,
-                            name: profile.name,
-                            avatarUrl: profile.avatar_url,
-                            createdAt: profile.created_at,
-                        });
-                    }
+                    await fetchProfile();
                 } else if (event === 'SIGNED_OUT') {
                     logout();
                 }
@@ -74,7 +58,7 @@ export const useAuth = () => {
         return () => {
             subscription.unsubscribe();
         };
-    }, [setUser, setLoading, logout]);
+    }, [fetchProfile, logout, setLoading]);
 
     const signInWithEmail = async (email: string, password: string) => {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -106,24 +90,13 @@ export const useAuth = () => {
     const updateProfile = async (updates: Partial<User>) => {
         if (!user) throw new Error('Not authenticated');
 
-        const { data, error } = await supabase
-            .from('users')
-            .update({
-                name: updates.name,
-                avatar_url: updates.avatarUrl,
-            })
-            .eq('id', user.id)
-            .select()
-            .single();
-
-        if (error) throw error;
-
-        setUser({
-            ...user,
-            ...updates,
+        const profile = await apiClient<User>('/profile', {
+            method: 'PATCH',
+            body: JSON.stringify(updates),
         });
 
-        return data;
+        setUser(profile);
+        return profile;
     };
 
     return {
@@ -139,3 +112,4 @@ export const useAuth = () => {
         updateProfile,
     };
 };
+

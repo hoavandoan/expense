@@ -36,6 +36,7 @@ import {
 } from "heroui-native";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
+import Animated, { FadeInDown, FadeInRight, FadeInUp, Layout } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
@@ -77,7 +78,7 @@ export default function HomeScreen() {
   const HOME_HEADER_HEIGHT = 140;
 
   const renderTopNavBarComponent = () => (
-    <HeaderNavBar useBlur={true} className="border-b border-divider/10">
+    <HeaderNavBar useBlur={true} tint="light" intensity={80} className="border-b border-divider/10">
       <View className="flex-row items-center h-full w-full">
         <View className="flex-1 items-start">
           <PressableFeedback
@@ -207,10 +208,13 @@ export default function HomeScreen() {
       >
         <View>
           {/* Hero Balance Section with Accent Gradient */}
-          <View className="px-6">
+          <Animated.View 
+            entering={FadeInUp.delay(200).duration(800).springify()}
+            className="px-6"
+          >
             <Surface
               variant="default"
-              className="p-8 rounded-3xl shadow-2xl overflow-hidden bg-accent relative"
+              className="p-8 rounded-[32px] shadow-2xl overflow-hidden bg-accent relative"
             >
               <LinearGradient
                 colors={["rgba(0,0,0,0.5)", "transparent"]}
@@ -219,7 +223,7 @@ export default function HomeScreen() {
                 style={StyleSheet.absoluteFill}
               />
               <View className="flex-row items-center justify-between mb-4">
-                <AppText className="text-white/80 text-sm font-semibold tracking-wider uppercase">
+                <AppText weight="bold" className="text-white/80 text-[10px] uppercase tracking-[2px]">
                   Số dư của bạn
                 </AppText>
                 <PressableFeedback className="w-10 h-10 items-center justify-center rounded-full bg-white/10">
@@ -233,7 +237,9 @@ export default function HomeScreen() {
 
               <View className="flex-row items-baseline gap-2 mb-8">
                 <AppText
-                  className="text-white text-5xl font-black"
+                  variant="heading"
+                  weight="bold"
+                  className="text-white text-5xl"
                   numberOfLines={1}
                   adjustsFontSizeToFit
                 >
@@ -243,7 +249,7 @@ export default function HomeScreen() {
                         .trim()
                     : "••••••••"}
                 </AppText>
-                <AppText className="text-white/90 text-2xl font-bold">
+                <AppText variant="heading" weight="bold" className="text-white/90 text-2xl">
                   đ
                 </AppText>
               </View>
@@ -259,12 +265,14 @@ export default function HomeScreen() {
                         color="#4ade80"
                       />
                     </View>
-                    <AppText className="text-white/70 text-[11px] font-bold uppercase tracking-tight">
+                    <AppText weight="bold" className="text-white/70 text-[10px] uppercase tracking-wider">
                       Bạn được trả
                     </AppText>
                   </View>
                   <AppText
-                    className="text-white text-lg font-bold"
+                    variant="heading"
+                    weight="bold"
+                    className="text-white text-xl"
                     numberOfLines={1}
                     adjustsFontSizeToFit
                   >
@@ -287,12 +295,14 @@ export default function HomeScreen() {
                         color="#fb7185"
                       />
                     </View>
-                    <AppText className="text-white/70 text-[11px] font-bold uppercase tracking-tight">
+                    <AppText weight="bold" className="text-white/70 text-[10px] uppercase tracking-wider">
                       Bạn nợ
                     </AppText>
                   </View>
                   <AppText
-                    className="text-white text-lg font-bold"
+                    variant="heading"
+                    weight="bold"
+                    className="text-white text-xl"
                     numberOfLines={1}
                     adjustsFontSizeToFit
                   >
@@ -305,37 +315,46 @@ export default function HomeScreen() {
                 </View>
               </View>
             </Surface>
-          </View>
+          </Animated.View>
 
           {/* Quick Actions Row */}
           <View className="flex-row justify-center px-6 my-8 gap-6">
-            <ActionIcon
-              name="creditcard"
-              label="Chi tiêu"
-              onPress={() => router.push("/add-expense")}
-            />
-            <ActionIcon
-              name="plus"
-              label="Tạo nhóm"
-              onPress={() => router.push("/add-group")}
-            />
-            <ActionIcon
-              name="qrcode"
-              label="Tham gia"
-              onPress={() => router.push("/join-group")}
-            />
+            <Animated.View entering={FadeInDown.delay(400).springify()}>
+              <ActionIcon
+                name="creditcard"
+                label="Chi tiêu"
+                onPress={() => router.push("/add-expense")}
+              />
+            </Animated.View>
+            <Animated.View entering={FadeInDown.delay(500).springify()}>
+              <ActionIcon
+                name="plus"
+                label="Tạo nhóm"
+                onPress={() => router.push("/add-group")}
+              />
+            </Animated.View>
+            <Animated.View entering={FadeInDown.delay(600).springify()}>
+              <ActionIcon
+                name="qrcode"
+                label="Tham gia"
+                onPress={() => router.push("/join-group")}
+              />
+            </Animated.View>
           </View>
 
           {/* Horizontal Groups Section */}
           <View className="mb-8 w-full">
-            <View className="px-6 flex-row items-center justify-between mb-4">
+            <Animated.View 
+              entering={FadeInRight.delay(700).springify()}
+              className="px-6 flex-row items-center justify-between mb-4"
+            >
               <AppText className="text-lg font-bold">Nhóm của bạn</AppText>
               <PressableFeedback onPress={() => router.push("/groups" as any)}>
                 <AppText className="text-accent font-semibold text-sm">
                   Xem tất cả
                 </AppText>
               </PressableFeedback>
-            </View>
+            </Animated.View>
             {isLoading ? (
               <View className="h-32 items-center justify-center">
                 <Spinner size="md" color={accent} />
@@ -346,23 +365,27 @@ export default function HomeScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: 24, gap: 16 }}
               >
-                {groups.map((group) => (
-                  <GroupCard
+                {groups.map((group, index) => (
+                  <Animated.View 
                     key={group.id}
-                    variant="horizontal"
-                    title={group.name}
-                    memberCount={group.memberCount || 0}
-                    balance={group.totalExpenses || 0}
-                    members={
-                      group.group_members?.map((m: any) => ({
-                        id: m.user_id,
-                        name: m.user?.name || "",
-                        avatarUrl: m.user?.avatar_url,
-                      })) || []
-                    }
-                    bgImage={group.cover_image_url}
-                    onPress={() => router.push(`/group/${group.id}` as any)}
-                  />
+                    entering={FadeInRight.delay(800 + index * 100).springify()}
+                  >
+                    <GroupCard
+                      variant="horizontal"
+                      title={group.name}
+                      memberCount={group.memberCount || 0}
+                      balance={group.totalExpenses || 0}
+                      members={
+                        group.group_members?.map((m: any) => ({
+                          id: m.user_id,
+                          name: m.user?.name || "",
+                          avatarUrl: m.user?.avatar_url,
+                        })) || []
+                      }
+                      bgImage={group.cover_image_url}
+                      onPress={() => router.push(`/group/${group.id}` as any)}
+                    />
+                  </Animated.View>
                 ))}
               </ScrollView>
             ) : (
@@ -413,34 +436,39 @@ export default function HomeScreen() {
                   <Spinner size="sm" color={accent} />
                 </View>
               ) : recentExpenses && recentExpenses.length > 0 ? (
-                recentExpenses.map((expense: any) => {
+                recentExpenses.map((expense: any, index: number) => {
                   const categoryConfig =
                     CATEGORY_CONFIG[expense.category] || CATEGORY_CONFIG.other;
                   const isMe = expense.paid_by === user?.id;
 
                   return (
-                    <ActivityItem
+                    <Animated.View 
                       key={expense.id}
-                      user={{
-                        name: isMe
-                          ? "Bạn"
-                          : expense.paid_by_user?.name || "Ai đó",
-                        avatar: expense.paid_by_user?.avatar_url || "",
-                      }}
-                      action="đã thêm"
-                      subject={expense.title}
-                      group={expense.group?.name || "Nhóm"}
-                      groupIcon="person.3.fill"
-                      amount={formatCurrency(
-                        expense.amount,
-                        expense.group?.currency || "VND"
-                      )}
-                      status=""
-                      typeIcon={categoryConfig.icon}
-                      typeColor={categoryConfig.bg}
-                      iconColor={categoryConfig.color}
-                      isMe={isMe}
-                    />
+                      entering={FadeInDown.delay(1000 + index * 100).springify()}
+                      layout={Layout.springify()}
+                    >
+                      <ActivityItem
+                        user={{
+                          name: isMe
+                            ? "Bạn"
+                            : expense.paid_by_user?.name || "Ai đó",
+                          avatar: expense.paid_by_user?.avatar_url || "",
+                        }}
+                        action="đã thêm"
+                        subject={expense.title}
+                        group={expense.group?.name || "Nhóm"}
+                        groupIcon="person.3.fill"
+                        amount={formatCurrency(
+                          expense.amount,
+                          expense.group?.currency || "VND"
+                        )}
+                        status=""
+                        typeIcon={categoryConfig.icon}
+                        typeColor={categoryConfig.bg}
+                        iconColor={categoryConfig.color}
+                        isMe={isMe}
+                      />
+                    </Animated.View>
                   );
                 })
               ) : (
@@ -452,6 +480,8 @@ export default function HomeScreen() {
               )}
             </View>
           </View>
+          {/* Bottom Spacer for Floating Tab Bar */}
+          <View style={{ height: 100 + insets.bottom }} />
         </View>
       </AnimatedScrollView>
     </View>

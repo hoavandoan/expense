@@ -1,18 +1,44 @@
-import { ScreenScrollView } from "@/components/screen-scroll-view";
 import { EmptyState } from "@/components/ui/empty-state";
 import { GroupCard } from "@/components/ui/group-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
 import { useGroups } from "@/lib/hooks";
+import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { Button, Spinner, useThemeColor } from "heroui-native";
-import React from "react";
+import React, { useCallback } from "react";
 import { View } from "react-native";
+import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function GroupsListScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const accent = useThemeColor("accent");
-  const { data: groups, isLoading } = useGroups();
+  const { data: groups, isLoading, refetch } = useGroups();
+
+  const renderItem = useCallback(({ item, index }: { item: any; index: number }) => (
+    <Animated.View 
+      className="mb-4"
+      entering={FadeInUp.delay(index * 60).duration(300).springify().damping(15)}
+      exiting={FadeOut.duration(200)}
+    >
+      <GroupCard
+        title={item.name}
+        memberCount={item.memberCount || 0}
+        balance={item.totalExpenses || 0}
+        members={
+          item.group_members?.map((m: any) => ({
+            id: m.user_id,
+            name: m.user?.name || "",
+            avatarUrl: m.user?.avatar_url,
+          })) || []
+        }
+        onPress={() => router.push(`/group/${item.id}` as any)}
+      />
+    </Animated.View>
+  ), [router]);
+
 
   return (
     <View className="flex-1 bg-background">
@@ -31,40 +57,34 @@ export default function GroupsListScreen() {
         }
       />
       
-      <ScreenScrollView contentContainerStyle={{ padding: 20 }}>
-        {isLoading ? (
-          <View className="py-20 items-center justify-center">
-            <Spinner size="lg" color={accent} />
-          </View>
-        ) : groups && groups.length > 0 ? (
-          <View className="gap-4">
-            {groups.map((group) => (
-              <GroupCard
-                key={group.id}
-                title={group.name}
-                memberCount={group.memberCount || 0}
-                balance={group.totalExpenses || 0}
-                members={
-                  group.group_members?.map((m: any) => ({
-                    id: m.user_id,
-                    name: m.user?.name || "",
-                    avatarUrl: m.user?.avatar_url,
-                  })) || []
-                }
-                onPress={() => router.push(`/group/${group.id}` as any)}
-              />
-            ))}
-          </View>
-        ) : (
-          <EmptyState
-            icon="person.3.fill"
-            title="Chưa có nhóm nào"
-            description="Tạo nhóm mới hoặc tham gia nhóm bạn bè để bắt đầu chia sẻ chi phí."
-            actionLabel="Tạo nhóm ngay"
-            onAction={() => router.push("/add-group")}
-          />
-        )}
-      </ScreenScrollView>
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <Spinner size="lg" color={accent} />
+        </View>
+      ) : (
+        <FlashList
+          data={groups}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          estimatedItemSize={150}
+          onRefresh={refetch}
+          refreshing={false}
+          ListEmptyComponent={
+            <EmptyState
+              icon="person.3.fill"
+              title="Chưa có nhóm nào"
+              description="Tạo nhóm mới hoặc tham gia nhóm bạn bè để bắt đầu chia sẻ chi phí."
+              actionLabel="Tạo nhóm ngay"
+              onAction={() => router.push("/add-group")}
+            />
+          }
+          contentContainerStyle={{ 
+            paddingHorizontal: 20, 
+            paddingTop: 20,
+            paddingBottom: insets.bottom + 100 
+          }}
+        />
+      )}
     </View>
   );
 }

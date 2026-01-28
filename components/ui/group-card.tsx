@@ -1,9 +1,14 @@
 import { AppText } from "@/components/app-text";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { Avatar, Card, cn, PressableFeedback } from "heroui-native";
+import { Avatar, Card, cn } from "heroui-native";
 import React, { FC } from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+} from "react-native-reanimated";
 
 interface Member {
   id: string;
@@ -22,6 +27,8 @@ interface GroupCardProps {
   bgImage?: string;
 }
 
+const AnimatedCard = Animated.createAnimatedComponent(Card);
+
 export const GroupCard: FC<GroupCardProps> = ({
   title,
   memberCount,
@@ -32,6 +39,20 @@ export const GroupCard: FC<GroupCardProps> = ({
   variant = "default",
   bgImage = "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1000",
 }) => {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+  };
+
   const isPositive = balance >= 0;
   const balanceText = isPositive
     ? `+${(balance / 1000).toFixed(0)}k`
@@ -41,81 +62,92 @@ export const GroupCard: FC<GroupCardProps> = ({
 
   if (variant === "horizontal") {
     return (
-      <PressableFeedback
-        onPress={onPress}
-        className="w-[220px] bg-accent-soft rounded-2xl"
-      >
-        <Card
-          variant="default"
-          className={cn(
-            "relative p-0 w-full rounded-2xl border border-divider/10",
-            className
-          )}
+      <Animated.View className="w-[240px]" style={animatedStyle}>
+        <Pressable
+          onPress={onPress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          className="bg-accent-soft rounded-3xl"
         >
-          {bgImage && (
-            <Image
-              source={{ uri: bgImage }}
-              contentFit="cover"
-              className="absolute h-[140px] w-full"
+          <Card
+            variant="default"
+            className={cn(
+              "relative p-0 w-full rounded-3xl border border-divider/10 overflow-hidden",
+              className
+            )}
+          >
+            {bgImage && (
+              <Image
+                source={{ uri: bgImage }}
+                contentFit="cover"
+                className="absolute h-[150px] w-full"
+              />
+            )}
+            <LinearGradient
+              colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.6)"]}
+              style={StyleSheet.absoluteFill}
+              className="w-full"
             />
-          )}
-          <LinearGradient
-            colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.5)"]}
-            style={StyleSheet.absoluteFill}
-            className="w-full"
-          />
-          <Card.Body className="flex-row items-center justify-between p-4 gap-2 w-full">
-            <View className="flex-row items-center">
-              {members.slice(0, 3).map((member, index) => (
-                <Avatar
-                  key={member.id}
-                  size="sm"
-                  alt={member.name}
-                  className={cn(
-                    "w-8 h-8",
-                    index > 0 && "-ml-4",
-                    "rounded-full"
+            <View className="p-4 pt-20">
+              <AppText variant="heading" weight="bold" className="text-white text-lg mb-2">
+                {title}
+              </AppText>
+
+              <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center">
+                  {members.slice(0, 3).map((member, index) => (
+                    <Avatar
+                      key={member.id}
+                      size="sm"
+                      alt={member.name}
+                      className={cn("size-6 border-background border-[2px]")}
+                      style={{
+                        marginLeft: index > 0 ? -8 : 0,
+                      }}
+                    >
+                      <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
+                        <Image
+                          source={{ uri: member.avatarUrl }}
+                          style={{ width: "100%", height: "100%" }}
+                          contentFit="cover"
+                        />
+                      </Avatar.Image>
+                      <Avatar.Fallback className="w-7 h-7 bg-accent/20">
+                        <AppText weight="bold" className="text-[10px] text-white">
+                          {member.name.charAt(0)}
+                        </AppText>
+                      </Avatar.Fallback>
+                    </Avatar>
+                  ))}
+                  {memberCount > 3 && (
+                    <View className="w-7 h-7 rounded-full bg-white/20 border border-white/20 items-center justify-center -ml-3">
+                      <AppText weight="bold" className="text-[8px] text-white">
+                        +{memberCount - 3}
+                      </AppText>
+                    </View>
                   )}
-                >
-                  <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
-                    <Image
-                      source={{ uri: member.avatarUrl }}
-                      style={{ width: "100%", height: "100%" }}
-                      contentFit="cover"
-                    />
-                  </Avatar.Image>
-                  <Avatar.Fallback className="w-8 h-8">
-                    {member.name.charAt(0)}
-                  </Avatar.Fallback>
-                </Avatar>
-              ))}
-              {memberCount > 3 && (
-                <View className="w-8 h-8 rounded-full bg-surface-secondary border-2 border-surface items-center justify-center -ml-3">
-                  <AppText className="text-[10px] text-muted font-bold">
-                    +{memberCount - 3}
+                </View>
+
+                <View className="items-end">
+                  <AppText
+                    weight="bold"
+                    className="text-white/70 text-[8px] uppercase tracking-widest"
+                  >
+                    BẠN ĐƯỢC TRẢ
+                  </AppText>
+                  <AppText
+                    variant="heading"
+                    weight="bold"
+                    className={cn("text-base", balanceColor)}
+                  >
+                    {balanceText}
                   </AppText>
                 </View>
-              )}
+              </View>
             </View>
-            <View className="items-end flex-1 ml-2">
-              <AppText
-                className="text-muted text-[8px] uppercase font-bold"
-                numberOfLines={1}
-                adjustsFontSizeToFit
-              >
-                BẠN ĐƯỢC TRẢ
-              </AppText>
-              <AppText
-                className={cn("font-bold text-sm", balanceColor)}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-              >
-                {balanceText}
-              </AppText>
-            </View>
-          </Card.Body>
-        </Card>
-      </PressableFeedback>
+          </Card>
+        </Pressable>
+      </Animated.View>
     );
   }
 
@@ -123,17 +155,23 @@ export const GroupCard: FC<GroupCardProps> = ({
     ? `Bạn được trả: ${balance.toLocaleString()}đ`
     : `Bạn nợ: ${Math.abs(balance).toLocaleString()}đ`;
 
-  const Content = (
-    <Card
+  return (
+    <AnimatedCard
       variant="default"
-      className={cn("mb-4 p-4 rounded-2xl border border-divider/10", className)}
+      className={cn("mb-4 p-5 rounded-3xl border border-divider/10 bg-surface", className)}
+      style={animatedStyle}
     >
-      <Card.Body className="flex-row items-center justify-between">
+      <Pressable
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        className="flex-row items-center justify-between"
+      >
         <View className="flex-1 mr-4">
-          <AppText className="text-lg font-bold text-foreground mb-1">
+          <AppText variant="heading" weight="bold" className="text-lg mb-1">
             {title}
           </AppText>
-          <AppText className="text-muted text-sm mb-2">
+          <AppText weight="medium" className="text-muted text-xs mb-3">
             {memberCount} thành viên
           </AppText>
 
@@ -145,7 +183,7 @@ export const GroupCard: FC<GroupCardProps> = ({
                 alt={member.name}
                 className={cn(
                   index !== 0 && "-ml-3",
-                  "border-background border-[2px]"
+                  "w-8 h-8 rounded-full border-2 border-surface"
                 )}
               >
                 {member.avatarUrl ? (
@@ -157,34 +195,31 @@ export const GroupCard: FC<GroupCardProps> = ({
                     />
                   </Avatar.Image>
                 ) : (
-                  <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
+                  <Avatar.Fallback className="bg-accent/10">
+                    <AppText weight="bold" className="text-xs text-accent">
+                      {member.name.charAt(0)}
+                    </AppText>
+                  </Avatar.Fallback>
                 )}
               </Avatar>
             ))}
             {memberCount > 4 && (
-              <Avatar
-                size="sm"
-                alt="More members"
-                className="-ml-3 border-2 border-surface"
-              >
-                <Avatar.Fallback>+{memberCount - 4}</Avatar.Fallback>
-              </Avatar>
+              <View className="w-8 h-8 rounded-full bg-surface-secondary border-2 border-surface items-center justify-center -ml-3">
+                <AppText weight="bold" className="text-[10px] text-muted">
+                  +{memberCount - 4}
+                </AppText>
+              </View>
             )}
           </View>
         </View>
 
-        <View className="items-end">
-          <AppText className={cn("text-sm font-semibold", balanceColor)}>
+        <View className="items-end bg-accent-soft px-4 py-2 rounded-2xl">
+          <AppText weight="bold" className={cn("text-sm", balanceColor)}>
             {balanceDisplay}
           </AppText>
         </View>
-      </Card.Body>
-    </Card>
+      </Pressable>
+    </AnimatedCard>
   );
-
-  if (onPress) {
-    return <PressableFeedback onPress={onPress}>{Content}</PressableFeedback>;
-  }
-
-  return Content;
 };
+
