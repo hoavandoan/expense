@@ -1,5 +1,6 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../api-client';
+import { useAuthStore } from '../stores/auth-store';
 import type { Settlement } from '../types';
 import { groupQueryOptions } from './use-groups';
 
@@ -19,14 +20,22 @@ export const pendingSettlementsQueryOptions = (groupId: string | null) => queryO
  * Fetch settlements for a group
  */
 export const useSettlements = (groupId: string | null) => {
-    return useQuery(settlementsQueryOptions(groupId));
+    const session = useAuthStore((state) => state.session);
+    return useQuery({
+        ...settlementsQueryOptions(groupId),
+        enabled: !!session && !!groupId,
+    });
 };
 
 /**
  * Fetch pending settlements where current user is the receiver
  */
 export const usePendingSettlements = (groupId: string | null) => {
-    return useQuery(pendingSettlementsQueryOptions(groupId));
+    const session = useAuthStore((state) => state.session);
+    return useQuery({
+        ...pendingSettlementsQueryOptions(groupId),
+        enabled: !!session && !!groupId,
+    });
 };
 
 /**

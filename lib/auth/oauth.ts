@@ -8,6 +8,11 @@ import type { User } from '../types';
 // Ensure browser session closes properly after auth
 WebBrowser.maybeCompleteAuthSession();
 
+// iOS: Warm up the browser to handle cookies/session reliably
+if (Platform.OS === 'ios') {
+    void WebBrowser.warmUpAsync();
+}
+
 /**
  * Get the correct redirect URI for the current platform
  */
@@ -87,140 +92,165 @@ const extractTokensFromUrl = (url: string): { accessToken: string; refreshToken:
  * Initiate Google Sign-In flow
  */
 export const signInWithGoogle = async () => {
-    const redirectUri = getRedirectUri();
+    try {
+        const redirectUri = getRedirectUri();
 
-    const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-            redirectTo: redirectUri,
-            skipBrowserRedirect: true,
-        },
-    });
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: redirectUri,
+                skipBrowserRedirect: true,
+            },
+        });
 
-    if (error) {
-        console.error('OAuth error:', error);
-        throw error;
-    }
-
-    if (!data.url) {
-        throw new Error('No OAuth URL returned');
-    }
-
-    console.log('Opening OAuth URL...');
-
-    const result = await WebBrowser.openAuthSessionAsync(
-        data.url,
-        redirectUri,
-        {
-            showInRecents: true,
-            preferEphemeralSession: false,
+        if (error) {
+            console.error('OAuth error:', error);
+            throw error;
         }
-    );
 
-    console.log('WebBrowser result:', result.type);
+        if (!data.url) {
+            throw new Error('No OAuth URL returned');
+        }
 
-    if (result.type === 'success' && result.url) {
-        console.log('OAuth callback received');
+        console.log('Opening OAuth URL...');
 
-        const tokens = extractTokensFromUrl(result.url);
-
-        if (tokens) {
-            console.log('Tokens extracted');
-
-            // Decode JWT to get user data directly (avoid setSession hang)
-            const payload = decodeJwt(tokens.accessToken);
-            const user = parseUserFromJwt(payload);
-
-            if (user) {
-                console.log('User parsed from JWT:', user.email);
-
-                // Update auth store immediately
-                useAuthStore.getState().setUser(user);
-
-                // Try to set session in background (don't await)
-                supabase.auth.setSession({
-                    access_token: tokens.accessToken,
-                    refresh_token: tokens.refreshToken,
-                }).then(({ error }) => {
-                    if (error) {
-                        console.log('Background setSession error:', error.message);
-                    } else {
-                        console.log('Background setSession success');
-                    }
-                }).catch((e) => {
-                    console.log('Background setSession failed:', e.message);
-                });
-
-                return { user, session: { access_token: tokens.accessToken } };
+        const result = await WebBrowser.openAuthSessionAsync(
+            data.url,
+            redirectUri,
+            {
+                showInRecents: true,
+                preferEphemeralSession: false,
             }
+        );
+
+        console.log('WebBrowser result:', result.type);
+
+        if (result.type === 'success' && result.url) {
+            console.log('OAuth callback received');
+
+            const tokens = extractTokensFromUrl(result.url);
+
+            if (tokens) {
+                console.log('Tokens extracted');
+
+                // Decode JWT to get user data directly
+                const payload = decodeJwt(tokens.accessToken);
+                const user = parseUserFromJwt(payload);
+
+                if (user) {
+                    console.log('User parsed from JWT:', user.email);
+
+                    // Await setSession - this triggers onAuthStateChange which handles:
+                    // 1. setSession() in store
+                    // 2. fetchProfile()
+                    // 3. queryClient.invalidateQueries()
+                    const { error: sessionError } = await supabase.auth.setSession({
+                        access_token: tokens.accessToken,
+                        refresh_token: tokens.refreshToken,
+                    });
+
+                    if (sessionError) {
+                        console.warn('setSession error:', sessionError.message);
+                        // Even if setSession fails, set user from JWT
+                        useAuthStore.getState().setUser(user);
+                    }
+
+                    console.log('Session set successfully');
+                    return { user, session: { access_token: tokens.accessToken } };
+                }
+            }
+
+            throw new Error('Không thể lấy thông tin người dùng');
         }
 
-        throw new Error('Không thể lấy thông tin người dùng');
-    }
+        if (result.type === 'cancel') {
+            throw new Error('Đăng nhập đã bị hủy');
+        }
 
-    if (result.type === 'cancel') {
-        throw new Error('Đăng nhập đã bị hủy');
+        throw new Error('Đăng nhập thất bại');
+    } catch (err) {
+        if (err instanceof Error && err.message.includes('User cancelled')) {
+            throw new Error('Đăng nhập đã bị hủy');
+        }
+        throw err;
+    } finally {
+        if (Platform.OS === 'ios') {
+            void WebBrowser.coolDownAsync();
+        }
     }
-
-    throw new Error('Đăng nhập thất bại');
 };
 
 /**
  * Initiate Apple Sign-In flow
  */
 export const signInWithApple = async () => {
-    const redirectUri = getRedirectUri();
+    try {
+        const redirectUri = getRedirectUri();
 
-    const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: {
-            redirectTo: redirectUri,
-            skipBrowserRedirect: true,
-        },
-    });
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'apple',
+            options: {
+                redirectTo: redirectUri,
+                skipBrowserRedirect: true,
+            },
+        });
 
-    if (error) throw error;
-    if (!data.url) throw new Error('No OAuth URL returned');
+        if (error) throw error;
+        if (!data.url) throw new Error('No OAuth URL returned');
 
-    const result = await WebBrowser.openAuthSessionAsync(
-        data.url,
-        redirectUri,
-        {
-            showInRecents: true,
-            preferEphemeralSession: false,
-        }
-    );
-
-    console.log('WebBrowser result:', result.type);
-
-    if (result.type === 'success' && result.url) {
-        const tokens = extractTokensFromUrl(result.url);
-
-        if (tokens) {
-            const payload = decodeJwt(tokens.accessToken);
-            const user = parseUserFromJwt(payload);
-
-            if (user) {
-                useAuthStore.getState().setUser(user);
-
-                // Background setSession
-                supabase.auth.setSession({
-                    access_token: tokens.accessToken,
-                    refresh_token: tokens.refreshToken,
-                }).catch(() => { });
-
-                return { user };
+        const result = await WebBrowser.openAuthSessionAsync(
+            data.url,
+            redirectUri,
+            {
+                showInRecents: true,
+                preferEphemeralSession: false,
             }
+        );
+
+        console.log('WebBrowser result:', result.type);
+
+        if (result.type === 'success' && result.url) {
+            const tokens = extractTokensFromUrl(result.url);
+
+            if (tokens) {
+                const payload = decodeJwt(tokens.accessToken);
+                const user = parseUserFromJwt(payload);
+
+                if (user) {
+                    // Await setSession - triggers onAuthStateChange
+                    const { error: sessionError } = await supabase.auth.setSession({
+                        access_token: tokens.accessToken,
+                        refresh_token: tokens.refreshToken,
+                    });
+
+                    if (sessionError) {
+                        console.warn('setSession error:', sessionError.message);
+                        useAuthStore.getState().setUser(user);
+                    }
+
+                    console.log('Apple session set successfully');
+                    return { user };
+                }
+            }
+
+            throw new Error('Không thể lấy thông tin người dùng');
         }
 
-        throw new Error('Không thể lấy thông tin người dùng');
-    }
+        if (result.type === 'cancel') {
+            throw new Error('Đăng nhập đã bị hủy');
+        }
 
-    if (result.type === 'cancel') {
-        throw new Error('Đăng nhập đã bị hủy');
+        throw new Error('Đăng nhập thất bại');
+    } catch (err) {
+        if (err instanceof Error && err.message.includes('User cancelled')) {
+            throw new Error('Đăng nhập đã bị hủy');
+        }
+        throw err;
+    } finally {
+        if (Platform.OS === 'ios') {
+            void WebBrowser.coolDownAsync();
+        }
     }
-
-    throw new Error('Đăng nhập thất bại');
 };
 
 /**

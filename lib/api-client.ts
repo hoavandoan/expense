@@ -1,4 +1,5 @@
-import { supabase } from './supabase';
+
+import { useAuthStore } from './stores/auth-store';
 
 const API_BASE_URL = '/api'; // Expo Router API routes are relative to the root
 
@@ -19,8 +20,17 @@ export async function apiClient<T>(path: string, options: RequestOptions = {}): 
         url += `?${searchParams.toString()}`;
     }
 
-    // Get current session for the access token
-    const { data: { session } } = await supabase.auth.getSession();
+    // Get session from store (source of truth mirrored from Supabase)
+    let session = useAuthStore.getState().session;
+
+    // If we think we are authenticated but session is null, 
+    // it's likely a sync delay on app start. Wait once.
+    if (!session && useAuthStore.getState().isAuthenticated) {
+        console.log('[apiClient] Session null but authenticated, waiting for sync...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+        session = useAuthStore.getState().session;
+    }
+
     const token = session?.access_token;
 
     const headers = new Headers(init.headers);

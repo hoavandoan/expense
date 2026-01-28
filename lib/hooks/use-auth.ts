@@ -1,4 +1,6 @@
-import { useCallback, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
+
 import { apiClient } from '../api-client';
 import { useAuthStore } from '../stores/auth-store';
 import { supabase } from '../supabase';
@@ -6,19 +8,25 @@ import type { User } from '../types';
 
 /**
  * Hook to manage authentication state
+ * Follows Supabase official pattern for session management
  */
 export const useAuth = () => {
     const {
         user,
+        session,
         isAuthenticated,
         isLoading,
         isLoginSheetOpen,
         setUser,
+        setSession,
         setLoading,
         setLoginSheetOpen,
         logout,
     } = useAuthStore();
 
+    const queryClient = useQueryClient();
+
+    // ACTIONS
     const fetchProfile = useCallback(async () => {
         try {
             const profile = await apiClient<User>('/profile');
@@ -26,39 +34,58 @@ export const useAuth = () => {
                 setUser(profile);
             }
         } catch (error) {
-            console.error('Error fetching profile:', error);
+            console.error('[Auth] Error fetching profile:', error);
             setLoading(false);
         }
     }, [setUser, setLoading]);
 
-    useEffect(() => {
-        // Check current session on mount
-        const checkSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
+    /**
+     * Initialize session on app start
+     * Should only be called ONCE at the root level
+     */
+    const initializeAuth = useCallback(async () => {
+        setLoading(true);
+        try {
+            const { data: { session: initialSession } } = await supabase.auth.getSession();
+            setSession(initialSession);
+
+            if (initialSession?.user) {
                 await fetchProfile();
             } else {
                 setLoading(false);
             }
-        };
+        } catch (err) {
+            console.error('[Auth] Initialization error:', err);
+            setLoading(false);
+        }
+    }, [fetchProfile, setLoading, setSession]);
 
-        checkSession();
-
-        // Listen for auth changes
+    /**
+     * Set up auth state change listener
+     * Should only be called ONCE at the root level
+     */
+    const setupAuthListener = useCallback(() => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (event, session) => {
-                if (event === 'SIGNED_IN' && session?.user) {
+            async (event, currentSession) => {
+                console.log('[Auth] State Change Event:', event);
+
+                // Update session in store
+                setSession(currentSession);
+
+                if (event === 'SIGNED_IN' && currentSession?.user) {
                     await fetchProfile();
+                    queryClient.invalidateQueries();
                 } else if (event === 'SIGNED_OUT') {
                     logout();
+                    queryClient.clear();
+                } else if (event === 'TOKEN_REFRESHED') {
+                    queryClient.invalidateQueries();
                 }
             }
         );
 
-        return () => {
-            subscription.unsubscribe();
-        };
-    }, [fetchProfile, logout, setLoading]);
+        return subscription;
+    }, [fetchProfile, logout, setSession, queryClient]);
 
     const signInWithEmail = async (email: string, password: string) => {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -101,15 +128,17 @@ export const useAuth = () => {
 
     return {
         user,
+        session,
         isAuthenticated,
         isLoading,
         isLoginSheetOpen,
         setLoginSheetOpen,
         setUser,
+        initializeAuth,
+        setupAuthListener,
         signInWithEmail,
         signUpWithEmail,
         signOut,
         updateProfile,
     };
 };
-
