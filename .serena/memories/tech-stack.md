@@ -1,25 +1,30 @@
 # Tech Stack
 
-## Frontend
-- **Framework**: Expo 54 (Managed Workflow)
-- **Navigation**: Expo Router 6 (File-based)
-- **Language**: TypeScript
-- **UI Library**: HeroUI Native, Lucide React Native
-- **Styling**: Uniwind (Tailwind CSS 4), Tailwind Variants
-- **Animation**: React Native Reanimated 4
-- **Icons**: Lucide icons, SF Symbols (via `expo-symbols`)
-- **Charts**: Victory Native, React Native Gifted Charts
+This project is a mobile application built with **Expo** and **React Native**.
 
-## State & Data
-- **State Management**: Zustand
-- **Data Fetching**: React Query (TanStack Query)
-- **Forms**: React Hook Form, Zod (validation)
-- **Local Storage**: AsyncStorage
+## Core Technologies
+- **Framework**: [Expo](https://expo.dev/) (Managed Workflow)
+- **Navigation**: [Expo Router](https://docs.expo.dev/router/introduction/) (File-based routing)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Runtime/Package Manager**: [Bun](https://bun.sh/)
 
-## Backend
-- **Database/Auth**: Supabase
+## Frontend & UI
+- **UI Component Library**: [HeroUI Native](https://v3.heroui.com/docs/native/getting-started)
+- **Styling**: 
+    - [Uniwind](https://uniwind.dev/) (Tailwind CSS for React Native)
+    - Native CSS Variables (defined in `global.css`)
+- **Icons**: [Lucide React Native](https://lucide.dev/guide/packages/lucide-react-native)
+- **Animations**: `react-native-reanimated`, `react-native-gesture-handler`
+- **Charts**: `react-native-gifted-charts`, `victory-native`
+- **Safe Area**: `react-native-safe-area-context`
 
-## Tooling
-- **PackageManager**: Bun / npm
-- **Linting**: ESLint (expo-config-expo)
-- **TypeScript**: Strict mode enabled
+## State & Data Management
+- **Global State**: [Zustand](https://github.com/pmndrs/zustand)
+- **Data Fetching/Caching**: [TanStack React Query](https://tanstack.com/query/latest)
+- **Form Handling**: `react-hook-form` with `zod` validation.
+- **Database & Auth**: [Supabase](https://supabase.com/)
+
+## Infrastructure & Utilities
+- **Payment/QR**: `react-native-qrcode-svg`, VietQR custom logic.
+- **Date/Time**: `Intl` API for formatting.
+- **Storage**: `@react-native-async-storage/async-storage`.

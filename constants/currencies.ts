@@ -11,9 +11,9 @@ export const CURRENCIES = [
  * Currency config lookup map for quick access
  */
 export const CURRENCY_CONFIG: Record<string, { symbol: string; label: string; locale: string }> = {
-    VND: { symbol: '₫', label: 'Việt Nam Đồng', locale: 'vi-VN' },
-    USD: { symbol: '$', label: 'Đô la Mỹ', locale: 'en-US' },
-    EUR: { symbol: '€', label: 'Euro', locale: 'de-DE' },
+    VND: { symbol: '₫', label: 'VND', locale: 'vi-VN' },
+    USD: { symbol: '$', label: 'USD', locale: 'en-US' },
+    EUR: { symbol: '€', label: 'EUR', locale: 'de-DE' },
 };
 
 /**

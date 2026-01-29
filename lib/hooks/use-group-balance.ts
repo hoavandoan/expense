@@ -2,9 +2,10 @@ import { useMemo } from 'react';
 import type { Group, GroupWithDetails } from '../types';
 
 interface BalanceStats {
-  totalPaid: number;
-  totalOwed: number;
-  balance: number;
+  totalPaid: number; // Total amount user has spent
+  totalOwed: number; // Amount others owe to user
+  totalOwing: number; // Amount user owes to others
+  balance: number; // Net balance
 }
 
 interface MemberBalance {
@@ -24,31 +25,38 @@ export const useUserBalanceInGroup = (
 ): BalanceStats => {
   return useMemo(() => {
     if (!group || !userId) {
-      return { totalPaid: 0, totalOwed: 0, balance: 0 };
+      return { totalPaid: 0, totalOwed: 0, totalOwing: 0, balance: 0 };
     }
 
     const groupData = group as any;
     let totalPaid = 0;
-    let totalOwed = 0;
+    let othersOweMe = 0;
+    let iOweOthers = 0;
 
     groupData.expenses?.forEach((expense: any) => {
-      // Money user has paid
       if (expense.paid_by === userId) {
         totalPaid += expense.amount;
+        // Calculate what others owe me from this expense
+        expense.expense_splits?.forEach((split: any) => {
+          if (split.user_id !== userId) {
+            othersOweMe += split.amount;
+          }
+        });
+      } else {
+        // Someone else paid, calculate what I owe
+        expense.expense_splits?.forEach((split: any) => {
+          if (split.user_id === userId) {
+            iOweOthers += split.amount;
+          }
+        });
       }
-
-      // Money user owes from splits
-      expense.expense_splits?.forEach((split: any) => {
-        if (split.user_id === userId) {
-          totalOwed += split.amount;
-        }
-      });
     });
 
     return {
       totalPaid,
-      totalOwed,
-      balance: totalPaid - totalOwed,
+      totalOwed: othersOweMe,
+      totalOwing: iOweOthers,
+      balance: othersOweMe - iOweOthers,
     };
   }, [group, userId]);
 };
@@ -102,26 +110,28 @@ export const useTotalBalanceAcrossGroups = (
 ): BalanceStats => {
   return useMemo(() => {
     if (!groups || !userId) {
-      return { totalOwed: 0, totalOwing: 0, balance: 0 };
+      return { totalPaid: 0, totalOwed: 0, totalOwing: 0, balance: 0 };
     }
 
-    let totalOwed = 0; // Others owe to user
-    let totalOwing = 0; // User owes to others
+    let totalPaidOverall = 0;
+    let totalOwedOthersToMe = 0;
+    let totalOwingMeToOthers = 0;
 
     groups.forEach((group: any) => {
       group.expenses?.forEach((expense: any) => {
         if (expense.paid_by === userId) {
-          // User paid, others owe to user
+          totalPaidOverall += expense.amount;
+          // Others owe to user
           expense.expense_splits?.forEach((split: any) => {
             if (split.user_id !== userId) {
-              totalOwed += split.amount;
+              totalOwedOthersToMe += split.amount;
             }
           });
         } else {
-          // Someone else paid, check if user owes
+          // User owes to others
           expense.expense_splits?.forEach((split: any) => {
             if (split.user_id === userId) {
-              totalOwing += split.amount;
+              totalOwingMeToOthers += split.amount;
             }
           });
         }
@@ -129,10 +139,10 @@ export const useTotalBalanceAcrossGroups = (
     });
 
     return {
-      totalPaid: totalOwed,
-      totalOwed,
-      totalOwing,
-      balance: totalOwed - totalOwing,
+      totalPaid: totalPaidOverall,
+      totalOwed: totalOwedOthersToMe,
+      totalOwing: totalOwingMeToOthers,
+      balance: totalOwedOthersToMe - totalOwingMeToOthers,
     };
   }, [groups, userId]);
 };

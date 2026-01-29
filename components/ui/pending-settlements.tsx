@@ -104,16 +104,18 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
 
       <Card variant="default" className="rounded-2xl overflow-hidden border border-warning/30 bg-warning/5">
         {pendingSettlements.map((settlement, idx) => {
-          const fromUser = (settlement as any).from_user;
+          const fromUser = settlement.fromUser;
+
+          console.log('fromUser', fromUser);
           
           return (
             <View key={settlement.id}>
               <View className="p-4">
                 <View className="flex-row items-center mb-3">
                   <Avatar size="md" alt={fromUser?.name || 'User'} className="mr-3">
-                    {fromUser?.avatar_url ? (
-                      <Avatar.Image source={{ uri: fromUser.avatar_url }} asChild>
-                        <Image source={{ uri: fromUser.avatar_url }} style={{ width: '100%', height: '100%' }} />
+                    {fromUser?.avatarUrl ? (
+                      <Avatar.Image source={{ uri: fromUser.avatarUrl }} asChild>
+                        <Image source={{ uri: fromUser.avatarUrl }} style={{ width: '100%', height: '100%' }} />
                       </Avatar.Image>
                     ) : (
                       <Avatar.Fallback className="bg-warning/20">

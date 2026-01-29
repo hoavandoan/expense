@@ -5,10 +5,11 @@ import React from "react";
 import { View } from "react-native";
 
 export interface ActivityItemProps {
-  user: { name: string; avatar: string };
+  userName: string;
+  userAvatar: string;
   action: string;
   subject?: string;
-  group: string;
+  groupName: string;
   groupIcon: any;
   amount?: string;
   status?: string;
@@ -18,19 +19,20 @@ export interface ActivityItemProps {
   isMe?: boolean;
 }
 
-export const ActivityItem = ({
-                               user,
-                               action,
-                               subject,
-                               group,
-                               groupIcon,
-                               amount,
-                               status,
-                               typeIcon,
-                               typeColor,
-                               iconColor,
-                               isMe,
-                             }: ActivityItemProps) => {
+export const ActivityItem = React.memo(({
+                                userName,
+                                userAvatar,
+                                action,
+                                subject,
+                                groupName,
+                                groupIcon,
+                                amount,
+                                status,
+                                typeIcon,
+                                typeColor,
+                                iconColor,
+                                isMe,
+                              }: ActivityItemProps) => {
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
 
@@ -38,18 +40,18 @@ export const ActivityItem = ({
     <PressableFeedback className="bg-surface p-4 rounded-2xl border border-divider/10">
       <View className="flex-row items-center">
         <View className="relative">
-          <Avatar size="lg" alt={user.name} className="w-14 h-14">
+          <Avatar size="lg" alt={userName} className="w-14 h-14">
             {isMe ? (
               <View className="w-full h-full bg-accent-soft items-center justify-center">
                 <AppText className="text-accent font-bold text-xs uppercase">
                   Bạn
                 </AppText>
               </View>
-            ) : user.avatar ? (
-              <Avatar.Image source={{ uri: user.avatar }} />
+            ) : userAvatar ? (
+              <Avatar.Image source={{ uri: userAvatar }} />
             ) : (
               <Avatar.Fallback className="bg-surface-secondary">
-                {user.name.charAt(0)}
+                {userName.charAt(0)}
               </Avatar.Fallback>
             )}
           </Avatar>
@@ -65,7 +67,7 @@ export const ActivityItem = ({
 
         <View className="flex-1 ml-4 justify-center">
           <AppText className="text-base text-foreground leading-tight">
-            <AppText className="font-bold">{user.name}</AppText>
+            <AppText className="font-bold">{userName}</AppText>
             <AppText className="text-foreground/70"> {action}</AppText>
             {subject && (
               <AppText className="text-foreground font-semibold">
@@ -77,7 +79,7 @@ export const ActivityItem = ({
           <View className="flex-row items-center mt-1">
             <IconSymbol name={groupIcon} size={14} color={muted} />
             <AppText className="text-muted text-xs ml-1 font-medium">
-              {group}
+              {groupName}
             </AppText>
           </View>
         </View>
@@ -106,4 +108,4 @@ export const ActivityItem = ({
       </View>
     </PressableFeedback>
   );
-};
+});

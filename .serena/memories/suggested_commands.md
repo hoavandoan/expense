@@ -1,16 +1,16 @@
 # Suggested Commands
 
 ## Development
-- `bun run dev`: Start Expo dev server.
-- `bunx expo start`: Start Expo dev server.
-- `bun run ios`: Run on iOS simulator.
-- `bun run android`: Run on Android emulator.
-- `npbunm run web`: Run on web browser.
+- `bun run dev`: Start Expo development server with cache clearing.
+- `bun run ios`: Run the application in the iOS simulator.
+- `bun run android`: Run the application in the Android emulator.
+- `bun run web`: Run the application in the browser.
 
-## Quality
-- `bun run lint`: Run ESLint.
-- `expo lint`: Run Expo linting.
+## Maintenance
+- `bun run lint`: Run ESLint and Expo linting checks.
+- `bun run reset-project`: Run the project reset script (use with caution).
 
-## Project Management
-- `bun i`: Install dependencies.
-- `bun run reset-project`: Reset the starter code.
+## Dependencies
+- `bun add <package>`: Add a new package.
+- `npx expo install <package>`: Install Expo-compatible packages.
+- `bun install`: Install all dependencies.

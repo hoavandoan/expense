@@ -400,30 +400,32 @@ export default function AddExpenseScreen() {
           isRequired
           error={errors.amount?.message}
         >
-          <Controller
-            control={control}
-            name="amount"
-            render={({ field: { onChange, value } }) => (
-              <View className="justify-center">
-                <TextField.Input
-                  placeholder="0"
-                  value={value}
-                  onChangeText={onChange}
-                  keyboardType="numeric"
-                  className="bg-surface border border-divider/10 h-16 rounded-2xl px-4 text-2xl font-bold text-center"
-                />
-                <View className="absolute right-4" pointerEvents="none">
-                  <AppText className="text-muted text-xl font-bold">
-                    {currency === "VND"
-                      ? "₫"
-                      : currency === "USD"
-                      ? "$"
-                      : "€"}
-                  </AppText>
+          <TextField isRequired isInvalid={!!errors.amount}>
+            <Controller
+              control={control}
+              name="amount"
+              render={({ field: { onChange, value } }) => (
+                <View className="justify-center">
+                  <TextField.Input
+                    placeholder="0"
+                    value={value}
+                    onChangeText={onChange}
+                    keyboardType="numeric"
+                    className="bg-surface border border-divider/10 h-16 rounded-2xl px-4 text-2xl font-bold text-center"
+                  />
+                  <View className="absolute right-4" pointerEvents="none">
+                    <AppText className="text-muted text-xl font-bold">
+                      {currency === "VND"
+                        ? "₫"
+                        : currency === "USD"
+                        ? "$"
+                        : "€"}
+                    </AppText>
+                  </View>
                 </View>
-              </View>
-            )}
-          />
+              )}
+            />
+          </TextField>
         </FormSection>
 
         <FormSection
@@ -431,18 +433,20 @@ export default function AddExpenseScreen() {
           isRequired
           error={errors.title?.message}
         >
-          <Controller
-            control={control}
-            name="title"
-            render={({ field: { onChange, value } }) => (
-              <TextField.Input
-                placeholder="Bạn đã chi cho việc gì? (e.g. Ăn trưa)"
-                value={value}
-                onChangeText={onChange}
-                className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
-              />
-            )}
-          />
+          <TextField isRequired isInvalid={!!errors.title}>
+            <Controller
+              control={control}
+              name="title"
+              render={({ field: { onChange, value } }) => (
+                <TextField.Input
+                  placeholder="Bạn đã chi cho việc gì? (e.g. Ăn trưa)"
+                  value={value}
+                  onChangeText={onChange}
+                  className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
+                />
+              )}
+            />
+          </TextField>
         </FormSection>
 
         <FormSection
@@ -667,20 +671,22 @@ export default function AddExpenseScreen() {
           label="GHI CHÚ (TÙY CHỌN)"
           error={errors.notes?.message}
         >
-          <Controller
-            control={control}
-            name="notes"
-            render={({ field: { onChange, value } }) => (
-              <TextField.Input
-                placeholder="Ghi chú thêm về khoản chi này..."
-                value={value}
-                onChangeText={onChange}
-                multiline
-                numberOfLines={3}
-                className="bg-surface border border-divider/10 rounded-2xl px-4 py-3 text-base min-h-[80px]"
-              />
-            )}
-          />
+          <TextField isInvalid={!!errors.notes}>
+            <Controller
+              control={control}
+              name="notes"
+              render={({ field: { onChange, value } }) => (
+                <TextField.Input
+                  placeholder="Ghi chú thêm về khoản chi này..."
+                  value={value}
+                  onChangeText={onChange}
+                  multiline
+                  numberOfLines={3}
+                  className="bg-surface border border-divider/10 rounded-2xl px-4 py-3 text-base min-h-[80px]"
+                />
+              )}
+            />
+          </TextField>
         </FormSection>
 
         <FormSection

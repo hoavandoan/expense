@@ -1,10 +1,10 @@
 import {
-    BlurMask,
-    Canvas,
-    Circle,
-    LinearGradient,
-    Rect,
-    vec,
+  BlurMask,
+  Canvas,
+  Circle,
+  LinearGradient,
+  Rect,
+  vec,
 } from "@shopify/react-native-skia";
 import { useThemeColor } from "heroui-native";
 import React, { useEffect } from "react";
@@ -15,10 +15,10 @@ import { Easing, useDerivedValue, useSharedValue, withDelay, withRepeat, withTim
  * Animated Skia background with soft blobs and gradients for a premium onboarding feel.
  * Optimized for Reanimated v4 + Skia performance.
  */
-export const SkiaOnboardingBackground = () => {
+export const SkiaOnboardingBackground = ({primaryColor = 'accent', secondaryColor = 'background'}: {primaryColor: string, secondaryColor: string}) => {
   const { width, height } = useWindowDimensions();
-  const accent = useThemeColor("accent");
-  const background = useThemeColor("surface-secondary");
+  const accent = useThemeColor(primaryColor);
+  const background = useThemeColor(secondaryColor);
   
   // Animation values for blobs
   const blob1X = useSharedValue(width * 0.2);

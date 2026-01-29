@@ -11,7 +11,11 @@ import { FlashList } from "@shopify/flash-list";
 import { cn, Spinner, Tabs, TextField, useThemeColor } from "heroui-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
-import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
+import Animated, {
+  FadeInDown,
+  FadeOut,
+  Layout
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const FILTERS = [
@@ -177,6 +181,7 @@ export default function ActivityScreen() {
   const muted = useThemeColor("muted");
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuthStore();
 
   const { data: activities, isLoading, error, refetch } = useRecentActivity(50);
@@ -258,13 +263,20 @@ export default function ActivityScreen() {
   }, [activities, activeFilter, searchQuery]);
 
   const onRefresh = useCallback(async () => {
+    setRefreshing(true);
     await refetch();
+    setRefreshing(false);
   }, [refetch]);
 
-  const renderItem = useCallback(({ item, index }: { item: ActivityListItem; index: number }) => {
+  const renderItem = useCallback(({ item, index }: { item: ActivityListItem }) => {
     if (item.type === "header") {
       return (
-        <Animated.View entering={FadeInUp.delay(index * 30).duration(300)} exiting={FadeOut.duration(200)}>
+        <Animated.View 
+        entering={FadeInDown.delay(1000 + index * 100).springify()}
+                 exiting={FadeOut.duration(200)}
+                 layout={Layout.springify()}
+                 className="mb-3"
+        >
           <AppText className="text-xl font-bold text-foreground mb-5 px-6 mt-8">
             {item.title}
           </AppText>
@@ -296,17 +308,16 @@ export default function ActivityScreen() {
     return (
       <Animated.View 
         className="mb-4" 
-        entering={FadeInUp.delay(index * 40).duration(300).springify().damping(15)}
-        exiting={FadeOut.duration(200)}
+        entering={FadeInDown.delay(1000 + index * 100).springify()}
+                 exiting={FadeOut.duration(200)}
+                 layout={Layout.springify()}
       >
         <ActivityItem
-          user={{
-            name: isMe ? "Bạn" : activity.user?.name || "Ai đó",
-            avatar: activity.user?.avatarUrl || "",
-          }}
+          userName={isMe ? "Bạn" : activity.user?.name || "Ai đó"}
+          userAvatar={activity.user?.avatarUrl || ""}
           action={action}
           subject={subject}
-          group={activity.group?.name || "Nhóm"}
+          groupName={activity.group?.name || "Nhóm"}
           groupIcon="person.3.fill"
           amount={amount}
           typeIcon={categoryConfig.icon}
@@ -401,10 +412,11 @@ export default function ActivityScreen() {
           data={flattenedActivities}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
-          estimatedItemSize={100}
+          estimatedItemSize={92}
           getItemType={(item) => item.type}
           onRefresh={onRefresh}
-          refreshing={false}
+          refreshing={refreshing}
+          className="px-6"
           ListEmptyComponent={
             <EmptyState
               icon="clock.fill"

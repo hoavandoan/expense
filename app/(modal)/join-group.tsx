@@ -15,8 +15,9 @@ import {
   useThemeColor,
   useToast,
 } from "heroui-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
 export default function JoinGroupScreen() {
   const router = useRouter();
@@ -29,6 +30,20 @@ export default function JoinGroupScreen() {
   const accent = useThemeColor("accent");
   const success = useThemeColor("success");
   const danger = useThemeColor("danger");
+
+  const scanLineValue = useSharedValue(0);
+
+  useEffect(() => {
+    scanLineValue.value = withRepeat(
+      withTiming(1, { duration: 2500 }),
+      -1,
+      true
+    );
+  }, []);
+
+  const animatedLineStyle = useAnimatedStyle(() => ({
+    top: `${scanLineValue.value * 100}%`,
+  }));
 
   const parseCode = (data: string) => {
     // Support deep link expense://join-group/{code} or raw code
@@ -201,14 +216,12 @@ export default function JoinGroupScreen() {
           />
 
           <View className="absolute inset-0 items-center justify-center pointer-events-none">
-            <View
-              className="w-64 h-64 border-2 border-accent/50 rounded-3xl"
-              style={{ borderStyle: "dashed" }}
-            />
-            <View
-              className="absolute w-full h-0.5 bg-accent/30"
-              style={{ top: "50%" }}
-            />
+            <View className="w-64 h-64 border-2 border-accent/50 rounded-3xl overflow-hidden relative" style={{ borderStyle: "dashed" }}>
+              <Animated.View
+                className="absolute w-full h-0.5 bg-accent/60"
+                style={animatedLineStyle}
+              />
+            </View>
           </View>
 
           {/* Corner Markers */}

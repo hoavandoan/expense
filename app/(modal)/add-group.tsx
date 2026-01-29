@@ -11,12 +11,12 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import {
-  Avatar,
-  Button,
-  PressableFeedback,
-  Select,
-  TextField,
-  useThemeColor
+    Avatar,
+    Button,
+    PressableFeedback,
+    Select,
+    TextField,
+    useThemeColor
 } from "heroui-native";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -28,7 +28,7 @@ const groupSchema = z.object({
   description: z.string().optional(),
   groupType: z.enum(["trip", "home", "couple", "other"]),
   currency: z.string().min(1, "Vui lòng chọn tiền tệ"),
-  avatarUrl: z.string().optional(),
+  coverImageUrl: z.string().optional(),
 });
 
 type GroupFormValues = z.infer<typeof groupSchema>;
@@ -75,11 +75,11 @@ export default function AddGroupScreen() {
   const onSubmit = async (values: GroupFormValues) => {
     try {
       setIsUploading(true);
-      let avatarUrl = values.avatarUrl;
+      let coverImageUrl = values.coverImageUrl;
 
       if (selectedImage && user?.id) {
         const fileName = `group-${Date.now()}`;
-        avatarUrl = await uploadImage(
+        coverImageUrl = await uploadImage(
           selectedImage,
           "groups",
           `${user.id}/${fileName}`
@@ -88,7 +88,7 @@ export default function AddGroupScreen() {
 
       await createGroup.mutateAsync({
         ...values,
-        avatarUrl,
+        coverImageUrl,
       });
 
       router.back();
@@ -128,42 +128,45 @@ export default function AddGroupScreen() {
         </View>
 
         <View className="gap-6 px-4">
-        <View className="gap-2 px-4">
           <FormSection
             label="TÊN NHÓM"
             isRequired
             error={errors.name?.message}
           >
-            <Controller
-              control={control}
-              name="name"
-              render={({ field: { onChange, value } }) => (
-                <TextField.Input
-                  placeholder="e.g. Du lịch Đà Lạt"
-                  value={value}
-                  onChangeText={onChange}
-                  className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
-                />
-              )}
-            />
+            <TextField isRequired isInvalid={!!errors.name}>
+              <Controller
+                control={control}
+                name="name"
+                render={({ field: { onChange, value } }) => (
+                  <TextField.Input
+                    placeholder="e.g. Du lịch Đà Lạt"
+                    value={value}
+                    onChangeText={onChange}
+                    className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
+                  />
+                )}
+              />
+            </TextField>
           </FormSection>
 
           <FormSection
             label="MÔ TẢ (TÙY CHỌN)"
             error={errors.description?.message}
           >
-            <Controller
-              control={control}
-              name="description"
-              render={({ field: { onChange, value } }) => (
-                <TextField.Input
-                  placeholder="Mô tả ngắn gọn về nhóm..."
-                  value={value}
-                  onChangeText={onChange}
-                  className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
-                />
-              )}
-            />
+            <TextField isInvalid={!!errors.description}>
+              <Controller
+                control={control}
+                name="description"
+                render={({ field: { onChange, value } }) => (
+                  <TextField.Input
+                    placeholder="Mô tả ngắn gọn về nhóm..."
+                    value={value}
+                    onChangeText={onChange}
+                    className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
+                  />
+                )}
+              />
+            </TextField>
           </FormSection>
 
           <View className="flex-row gap-4">
@@ -298,7 +301,6 @@ export default function AddGroupScreen() {
               </FormSection>
             </View>
           </View>
-        </View>
         </View>
 
         <View className="my-10 px-4">
