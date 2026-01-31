@@ -70,7 +70,7 @@ export const RecentActivity = ({ expenses, isLoading, userId }: RecentActivityPr
       <View className="flex-row items-center justify-between mb-4">
         <AppText className="text-lg font-bold">Hoạt động gần đây</AppText>
         <PressableFeedback onPress={() => router.push("/activity")}>
-          <AppText className="text-accent font-semibold text-sm">
+          <AppText className="text-foreground font-semibold text-sm">
             Xem tất cả
           </AppText>
         </PressableFeedback>

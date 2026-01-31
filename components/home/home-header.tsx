@@ -3,7 +3,7 @@ import { HeaderComponentWrapper } from "@/components/parallax-header";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { Avatar, PressableFeedback, useThemeColor } from "heroui-native";
+import { Avatar, Button, PressableFeedback, useThemeColor } from "heroui-native";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -57,19 +57,25 @@ export const HomeHeader = ({ user, isAuthenticated, unreadCount = 0 }: HomeHeade
           </View>
         </View>
         <View className="flex-row gap-2">
-          <PressableFeedback
+          <Button
+            isIconOnly
+            size="sm"
+            variant="ghost"
             onPress={() => router.push("/search" as any)}
-            className="w-10 h-10 rounded-full bg-surface items-center justify-center border border-divider/10"
+            className="w-10 h-10 rounded-full bg-surface border border-white/10"
           >
-            <IconSymbol name="magnifyingglass" size={20} color={foreground} />
-          </PressableFeedback>
-          <View>
-            <PressableFeedback
+            <IconSymbol name="magnifyingglass" size={18} color={foreground} />
+          </Button>
+          <View className="relative">
+            <Button
+              isIconOnly
+              size="sm"
+              variant="ghost"
               onPress={() => router.push("/notifications" as any)}
-              className="w-10 h-10 rounded-full bg-surface items-center justify-center border border-divider/10"
+              className="w-10 h-10 rounded-full bg-surface border border-white/10"
             >
-              <IconSymbol name="bell" size={20} color={foreground} />
-            </PressableFeedback>
+              <IconSymbol name="bell" size={18} color={foreground} />
+            </Button>
             {unreadCount > 0 && (
               <View className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-surface" />
             )}

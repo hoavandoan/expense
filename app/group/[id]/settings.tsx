@@ -385,9 +385,9 @@ export default function GroupSettingsScreen() {
 
           {/* Danger Zone */}
           <View>
-            <Button variant="danger-soft" onPress={() => setShowLeaveDialog(true)}>
-              <IconSymbol name="arrow.right.square" size={20} color={useThemeColor("foreground")} />
-              <Button.Label className="text-foreground">Rời nhóm</Button.Label>
+            <Button variant="danger" onPress={() => setShowLeaveDialog(true)}>
+              <IconSymbol name="arrow.right.square" size={20} color={useThemeColor("surface")} />
+              <Button.Label>Rời nhóm</Button.Label>
             </Button>
           </View>
         </View>

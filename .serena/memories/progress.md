@@ -17,7 +17,8 @@ The project is currently in active development. Basic core functionalities like 
 - Implemented `ArticleList` dynamic fetching (wait, this might be from a different conversation context, but I'll stick to what I see in the files).
 
 ## Pending Tasks (TODOs)
-- [ ] **Notifications**: Implement navigation to relevant screens based on notification type (`app/notifications/index.tsx`).
-- [ ] **Group Settings**: Implement "Add Member" screen and logic (`app/group/[id]/settings.tsx`).
-- [ ] **Group Settings**: Implement "Remove Member" functionality (`app/group/[id]/settings.tsx`).
-- [ ] **UI/UX**: Refine animations and transitions using Reanimated.
+- [ ] **Notifications**: Implement navigation to relevant screens based on notification type (`app/notifications/index.tsx`, Line 114).
+- [ ] **Group Settings**: Implement "Add Member" screen and navigation (`app/group/[id]/settings.tsx`, Line 279).
+- [ ] **Group Settings**: Implement "Remove Member" functionality (`app/group/[id]/settings.tsx`, Line 361).
+- [ ] **Search**: Refine search behavior and result filtering if needed.
+- [ ] **UI/UX**: Further refine animations and transitions using Reanimated spring configurations.

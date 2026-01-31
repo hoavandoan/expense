@@ -12,12 +12,14 @@ The project follows a modular structure organized by concerns (UI, Logic, Routes
     - `ui/`: Design system atoms and HeroUI-based components.
     - Feature directories: `auth/`, `home/`, `debt-assignment/`, etc.
 - `lib/`: Core business logic and integrations.
-    - `auth/`: Authentication logic.
-    - `stores/`: Zustand store definitions for global state.
-    - `hooks/`: Custom React hooks for data fetching (React Query) and UI logic.
-    - `utils/`: Helper functions for formatting, calculations, and storage.
-    - `types/`: Global TypeScript interfaces and types.
-    - `supabase.ts`: Supabase client configuration.
+    - `api-client.ts`: Enhanced `fetch` wrapper for calling Expo API routes with automatic authentication.
+    - `auth/`: Authentication logic and OAuth configurations.
+    - `stores/`: Zustand store definitions for global state (Auth, Groups, UI).
+    - `hooks/`: Custom React hooks using TanStack React Query for data fetching and mutations.
+    - `utils/`: Helper functions for debt calculations, formatting, and local storage.
+    - `types/`: Global TypeScript interfaces and Zod schemas.
+    - `supabase.ts`: Client configuration for Supabase.
+    - `supabase-server.ts`: Server-side Supabase client for API routes.
 - `contexts/`: React Context providers for global theme and state.
 - `supabase/`: Database migrations and configuration.
 - `assets/`: Static assets like images and fonts.

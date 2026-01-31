@@ -17,10 +17,12 @@
 - **Performance**: Memoize expensive calculations with `useMemo` and callbacks with `useCallback` when passed to optimized children.
 
 ## UI & Styling
-- Use **HeroUI Native** components as the primary building blocks.
-- Prefer **Tailwind CSS** (via Uniwind) for layout and spacing.
-- Follow the design system tokens defined in `global.css`.
-- Ensure all interactive elements have safe touch areas and provide feedback using `PressableFeedback`.
+- **Design System**: Built on HeroUI Native components and Uniwind (Tailwind CSS for React Native).
+- **Global Styles**: Design tokens and semantic variables are defined in `app/global.css` using `oklch` for color precision.
+- **Theming**: Supports Dark/Light modes through CSS variables and `AppThemeProvider`.
+- **Layout**: Use `ScreenSurface` and `ScreenScrollView` for consistent screen structures.
+- **Micro-interactions**: Use `PressableFeedback` for all touch targets to provide instant haptic and visual feedback.
+- **Typography**: Custom fonts (Inter, IBM Plex Sans) are managed globally in `RootLayout`.
 
 ## Testing & Validation
 - Use **Zod** for runtime schema validation (forms, API responses).

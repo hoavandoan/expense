@@ -23,7 +23,7 @@ export const FormSection = ({
 }: FormSectionProps) => {
   return (
     <View className={className}>
-      <AppText className="text-[12px] font-heading-bold text-muted uppercase tracking-widest mb-3 ml-1">
+      <AppText className="text-[12px] font-heading-bold text-muted capitalize tracking-widest mb-2 ml-1">
         {label}
         {isRequired && <AppText className="text-danger ml-1">*</AppText>}
       </AppText>
@@ -34,7 +34,7 @@ export const FormSection = ({
         <Animated.View 
           entering={FadeIn.duration(200)} 
           exiting={FadeOut.duration(200)}
-          className="ml-1 mt-1.5"
+          className="ml-1 mt-2"
         >
           <AppText className="text-danger text-xs font-medium">
             {error}

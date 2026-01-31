@@ -58,15 +58,7 @@ export default function JoinGroupScreen() {
     const code = parseCode(data);
     setInviteCode(code);
 
-    toast.show({
-      label: "Đã quét được mã",
-      description: `Mã: ${code}`,
-      variant: "success",
-    });
-
-    // Option to auto-join or just fill the field
-    // For better UX, let's just fill the field and stay interactive
-    setTimeout(() => setIsScanning(true), 3000);
+    handleJoinGroup(code);
   };
 
   const handlePickImage = async () => {
@@ -84,11 +76,7 @@ export default function JoinGroupScreen() {
       if (scannedResults.length > 0) {
         const code = parseCode(scannedResults[0].data);
         setInviteCode(code);
-        toast.show({
-          label: "Đã nhận diện QR",
-          description: `Mã: ${code}`,
-          variant: "success",
-        });
+        handleJoinGroup(code);
       } else {
         toast.show({
           label: "Không tìm thấy mã",
@@ -114,8 +102,10 @@ export default function JoinGroupScreen() {
     }
   };
 
-  const handleJoinGroup = async () => {
-    if (!inviteCode.trim()) {
+  const handleJoinGroup = async (codeToJoin?: string) => {
+    const finalCode = (codeToJoin || inviteCode).trim();
+
+    if (!finalCode) {
       toast.show({
         label: 'Mục nhập trống',
         description: 'Vui lòng nhập mã mời hoặc dán liên kết mời để tiếp tục',
@@ -128,7 +118,7 @@ export default function JoinGroupScreen() {
     }
 
     try {
-      const groupId = await joinGroup.mutateAsync(inviteCode.trim());
+      const groupId = await joinGroup.mutateAsync(finalCode);
       toast.show({
         label: 'Tham gia thành công',
         description: 'Bạn đã trở thành thành viên của nhóm mới',
@@ -307,7 +297,7 @@ export default function JoinGroupScreen() {
         <Button
           size="lg"
           className="h-16 rounded-2xl bg-accent shadow-lg"
-          onPress={handleJoinGroup}
+          onPress={() => handleJoinGroup()}
           isDisabled={joinGroup.isPending || !inviteCode.trim()}
         >
           <View className="flex-row items-center gap-2">

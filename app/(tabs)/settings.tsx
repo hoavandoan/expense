@@ -7,6 +7,7 @@ import {
 } from "@/components/parallax-header";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { SettingsItem } from "@/components/ui/settings-item";
+import { SkiaOnboardingBackground } from "@/components/ui/skia-onboarding-background";
 import { useAppTheme } from "@/contexts/app-theme-context";
 import { useAuth } from "@/lib/hooks";
 import { Image } from "expo-image";
@@ -44,7 +45,7 @@ export default function SettingsScreen() {
             isIconOnly
             variant="ghost"
             onPress={() => router.back()}
-            className="w-10 h-10 bg-black/20 border border-white/10"
+            className="w-10 h-10 bg-surface border border-white/10"
           >
             <IconSymbol name="chevron.left" size={24} color={foreground} />
           </Button>
@@ -60,7 +61,7 @@ export default function SettingsScreen() {
   );
 
   const renderHeaderComponent = () => (
-    <HeaderComponentWrapper className="bg-background" useGradient={false}>
+    <HeaderComponentWrapper className="bg-transparent" useGradient={false}>
       {/* Initial Header Bar (Scrolls away) */}
       <View
         style={{ paddingTop: insets.top + 16 }}
@@ -69,7 +70,7 @@ export default function SettingsScreen() {
         <Button
           isIconOnly
           onPress={() => router.back()}
-          className="w-10 h-10 bg-black/20 border border-white/10"
+          className="w-10 h-10 bg-surface border border-white/10"
         >
           <IconSymbol name="chevron.left" size={20} color={foreground} />
         </Button>
@@ -129,6 +130,7 @@ export default function SettingsScreen() {
 
   return (
     <View className="flex-1 bg-background">
+      <SkiaOnboardingBackground primaryColor="accent-soft" secondaryColor="background"/>
       <AnimatedScrollView
         headerMaxHeight={SETTINGS_HEADER_HEIGHT}
         disableScale={true}

@@ -15,6 +15,7 @@ export const HomeNavbar = ({ user, isAuthenticated, unreadCount = 0 }: HomeNavba
   const router = useRouter();
   const accent = useThemeColor("accent");
   const foreground = useThemeColor("foreground");
+  const surface = useThemeColor("surface");
 
   return (
     <HeaderNavBar useBlur tint="light" intensity={80} className="border-b border-divider/10">
@@ -49,7 +50,7 @@ export const HomeNavbar = ({ user, isAuthenticated, unreadCount = 0 }: HomeNavba
             size="sm"
             variant="ghost"
             onPress={() => router.push("/search" as any)}
-            className="w-10 h-10 bg-black/20 border border-white/10"
+            className="w-10 h-10 rounded-full bg-surface border border-white/10"
           >
             <IconSymbol name="magnifyingglass" size={18} color={foreground} />
           </Button>
@@ -59,12 +60,12 @@ export const HomeNavbar = ({ user, isAuthenticated, unreadCount = 0 }: HomeNavba
               size="sm"
               variant="ghost"
               onPress={() => router.push("/notifications" as any)}
-              className="w-10 h-10 bg-black/20 border border-white/10"
+              className="w-10 h-10 rounded-full bg-surface border border-white/10"
             >
               <IconSymbol name="bell" size={18} color={foreground} />
             </Button>
             {unreadCount > 0 && (
-              <View className="absolute top-0 right-0 w-2 h-2 bg-danger rounded-full border border-white" />
+              <View className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-surface" />
             )}
           </View>
         </View>

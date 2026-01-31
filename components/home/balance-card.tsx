@@ -24,7 +24,7 @@ export const BalanceCard = ({
   return (
     <Animated.View
       entering={FadeInUp.delay(200).duration(800).springify()}
-      className="px-6"
+      className="px-6 mt-6"
     >
       <Surface
         variant="default"

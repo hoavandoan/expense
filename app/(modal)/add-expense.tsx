@@ -11,16 +11,16 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    Avatar,
-    Button,
-    Card,
-    Checkbox,
-    PressableFeedback,
-    Select,
-    Skeleton,
-    TextField,
-    useThemeColor,
-    useToast,
+  Avatar,
+  Button,
+  Card,
+  Checkbox,
+  PressableFeedback,
+  Select,
+  Skeleton,
+  TextField,
+  useThemeColor,
+  useToast,
 } from "heroui-native";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -269,7 +269,7 @@ export default function AddExpenseScreen() {
     return (
       <View className="flex-1 bg-background p-6">
         <View className="animate-pulse">
-          <Skeleton className="w-full h-14 rounded-2xl mb-6" />
+          <Skeleton className="w-full h-12 rounded-2xl mb-6" />
           <Skeleton className="w-2/3 h-16 rounded-2xl mb-4 self-center" />
           <Skeleton className="w-full h-32 rounded-2xl mb-6" />
         </View>
@@ -290,14 +290,14 @@ export default function AddExpenseScreen() {
         <View className="flex-row gap-3">
           <Button
             variant="secondary"
-            className="flex-1 h-14 rounded-2xl"
+            className="flex-1 h-12 rounded-2xl"
             onPress={() => router.replace("/(modal)/join-group")}
           >
             <Button.Label className="font-bold">Tham gia nhóm</Button.Label>
           </Button>
           <Button
             variant="primary"
-            className="flex-1 h-14 rounded-2xl bg-accent"
+            className="flex-1 h-12 rounded-2xl bg-accent"
             onPress={() => router.replace("/(modal)/add-group")}
           >
             <Button.Label className="font-bold text-white">
@@ -331,7 +331,7 @@ export default function AddExpenseScreen() {
         )}
 
         <FormSection
-          label="NHÓM"
+          label="Nhóm"
           isRequired
           error={errors.groupId?.message}
           className={hasPreselectedGroup ? "hidden" : "mb-6 mt-4"}
@@ -344,7 +344,7 @@ export default function AddExpenseScreen() {
                 value={groupOptions.find((g) => g.value === value) as any}
                 onValueChange={(opt: any) => opt && onChange(opt.value)}
               >
-                <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                   <View className="flex-row items-center gap-3">
                     <IconSymbol
                       name="person.3.fill"
@@ -396,7 +396,7 @@ export default function AddExpenseScreen() {
         </FormSection>
         
         <FormSection
-          label="SỐ TIỀN"
+          label="Số tiền"
           isRequired
           error={errors.amount?.message}
         >
@@ -411,7 +411,7 @@ export default function AddExpenseScreen() {
                     value={value}
                     onChangeText={onChange}
                     keyboardType="numeric"
-                    className="bg-surface border border-divider/10 h-16 rounded-2xl px-4 text-2xl font-bold text-center"
+                    className="bg-surface h-16 rounded-2xl px-4 text-2xl font-bold text-center"
                   />
                   <View className="absolute right-4" pointerEvents="none">
                     <AppText className="text-muted text-xl font-bold">
@@ -429,7 +429,7 @@ export default function AddExpenseScreen() {
         </FormSection>
 
         <FormSection
-          label="MÔ TẢ"
+          label="Mô tả"
           isRequired
           error={errors.title?.message}
         >
@@ -442,7 +442,7 @@ export default function AddExpenseScreen() {
                   placeholder="Bạn đã chi cho việc gì? (e.g. Ăn trưa)"
                   value={value}
                   onChangeText={onChange}
-                  className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
+                  className="bg-surface border border-divider/10 h-12 rounded-2xl px-4 text-base"
                 />
               )}
             />
@@ -450,7 +450,7 @@ export default function AddExpenseScreen() {
         </FormSection>
 
         <FormSection
-          label="PHÂN LOẠI"
+          label="Phân loại"
           isRequired
           error={errors.category?.message}
         >
@@ -462,7 +462,7 @@ export default function AddExpenseScreen() {
                 value={EXPENSE_CATEGORIES.find((c) => c.value === value) as any}
                 onValueChange={(opt: any) => opt && onChange(opt.value || opt)}
               >
-                <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                   <View className="flex-row items-center gap-3">
                     <View
                       className="w-8 h-8 rounded-lg items-center justify-center"
@@ -534,7 +534,7 @@ export default function AddExpenseScreen() {
         </FormSection>
 
         <FormSection
-          label="NGƯỜI TRẢ TIỀN"
+          label="Người trả"
           isRequired
           error={errors.paidById?.message}
         >
@@ -556,7 +556,7 @@ export default function AddExpenseScreen() {
                   value={currentPayerOption as any}
                   onValueChange={(opt: any) => opt && onChange(opt.value)}
                 >
-                  <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                  <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                     <View className="flex-row items-center gap-3">
                       <View className="w-8 h-8 rounded-full bg-accent/10 items-center justify-center">
                         <AppText className="font-bold text-accent text-sm">
@@ -609,7 +609,7 @@ export default function AddExpenseScreen() {
         </FormSection>
 
         <FormSection
-          label="CHIA CHO"
+          label="Chia cho"
           isRequired
           error={errors.participantIds?.message}
           className="mb-8"
@@ -668,7 +668,7 @@ export default function AddExpenseScreen() {
         </FormSection>
 
         <FormSection
-          label="GHI CHÚ (TÙY CHỌN)"
+          label="Ghi chú"
           error={errors.notes?.message}
         >
           <TextField isInvalid={!!errors.notes}>
@@ -690,7 +690,7 @@ export default function AddExpenseScreen() {
         </FormSection>
 
         <FormSection
-          label="ẢNH HÓA ĐƠN (TÙY CHỌN)"
+          label="Ảnh hóa đơn"
         >
           {selectedReceipt ? (
             <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">

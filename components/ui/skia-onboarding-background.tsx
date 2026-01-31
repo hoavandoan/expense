@@ -15,7 +15,7 @@ import { Easing, useDerivedValue, useSharedValue, withDelay, withRepeat, withTim
  * Animated Skia background with soft blobs and gradients for a premium onboarding feel.
  * Optimized for Reanimated v4 + Skia performance.
  */
-export const SkiaOnboardingBackground = ({primaryColor = 'accent', secondaryColor = 'background'}: {primaryColor: string, secondaryColor: string}) => {
+export const SkiaOnboardingBackground = ({primaryColor = 'accent', secondaryColor = 'background'}: {primaryColor?: string, secondaryColor?: string}) => {
   const { width, height } = useWindowDimensions();
   const accent = useThemeColor(primaryColor);
   const background = useThemeColor(secondaryColor);

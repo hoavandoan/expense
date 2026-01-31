@@ -53,7 +53,7 @@ export const GroupsSection = ({ groups, isLoading }: GroupsSectionProps) => {
       >
         <AppText className="text-xl font-bold">Nhóm của bạn</AppText>
         <PressableFeedback onPress={() => router.push("/groups" as any)}>
-          <AppText className="text-accent font-semibold text-sm">
+          <AppText className="text-foreground font-semibold text-sm">
             Xem tất cả
           </AppText>
         </PressableFeedback>

@@ -2,9 +2,9 @@
  * Currency definitions with symbols and labels
  */
 export const CURRENCIES = [
-    { value: 'VND', label: 'Việt Nam Đồng (đ)', symbol: '₫', locale: 'vi-VN' },
-    { value: 'USD', label: 'Đô la Mỹ ($)', symbol: '$', locale: 'en-US' },
-    { value: 'EUR', label: 'Euro (€)', symbol: '€', locale: 'de-DE' },
+    { value: 'VND', label: 'VND', symbol: '₫', locale: 'vi-VN' },
+    { value: 'USD', label: 'USD', symbol: '$', locale: 'en-US' },
+    { value: 'EUR', label: 'EUR', symbol: '€', locale: 'de-DE' },
 ] as const;
 
 /**

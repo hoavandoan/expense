@@ -11,12 +11,12 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import {
-    Avatar,
-    Button,
-    PressableFeedback,
-    Select,
-    TextField,
-    useThemeColor
+  Avatar,
+  Button,
+  PressableFeedback,
+  Select,
+  TextField,
+  useThemeColor
 } from "heroui-native";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -104,7 +104,7 @@ export default function AddGroupScreen() {
       <ScreenScrollView withKeyboardAvoidingView>
         <View className="items-center my-8">
           <PressableFeedback onPress={pickImage} className="relative">
-            <Avatar size="lg" alt="Avatar" className="w-24 h-24 rounded-3xl bg-accent/5">
+            <Avatar size="lg" alt="Avatar" className="w-24 h-24 rounded-full bg-accent/5">
               {selectedImage ? (
                 <Avatar.Image source={{ uri: selectedImage }} asChild>
                   <Image
@@ -118,18 +118,18 @@ export default function AddGroupScreen() {
                 </Avatar.Fallback>
               )}
             </Avatar>
-            <View className="absolute -bottom-1 -right-1 bg-accent w-8 h-8 rounded-xl items-center justify-center border-2 border-background">
+            <View className="absolute z-10 bottom-0 right-0 bg-accent w-8 h-8 rounded-full items-center justify-center border-2 border-background">
               <IconSymbol name="plus" size={16} color="white" />
             </View>
           </PressableFeedback>
-          <AppText className="text-muted text-xs mt-3 uppercase font-bold tracking-widest">
+          <AppText className="text-muted text-xs mt-3 font-bold tracking-widest">
             Ảnh đại diện nhóm
           </AppText>
         </View>
 
-        <View className="gap-6 px-4">
+        <View className="gap-2 px-4">
           <FormSection
-            label="TÊN NHÓM"
+            label="Tên nhóm"
             isRequired
             error={errors.name?.message}
           >
@@ -142,7 +142,7 @@ export default function AddGroupScreen() {
                     placeholder="e.g. Du lịch Đà Lạt"
                     value={value}
                     onChangeText={onChange}
-                    className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
+                    className="bg-surface border border-divider/10 h-12 rounded-2xl px-4 text-base"
                   />
                 )}
               />
@@ -150,7 +150,7 @@ export default function AddGroupScreen() {
           </FormSection>
 
           <FormSection
-            label="MÔ TẢ (TÙY CHỌN)"
+            label="Mô tả"
             error={errors.description?.message}
           >
             <TextField isInvalid={!!errors.description}>
@@ -162,7 +162,7 @@ export default function AddGroupScreen() {
                     placeholder="Mô tả ngắn gọn về nhóm..."
                     value={value}
                     onChangeText={onChange}
-                    className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 text-base"
+                    className="bg-surface border border-divider/10 h-12 rounded-2xl px-4 text-base"
                   />
                 )}
               />
@@ -172,7 +172,7 @@ export default function AddGroupScreen() {
           <View className="flex-row gap-4">
             <View className="flex-1">
               <FormSection
-                label="LOẠI NHÓM"
+                label="Loại nhóm"
                 isRequired
                 error={errors.groupType?.message}
               >
@@ -184,7 +184,7 @@ export default function AddGroupScreen() {
                       value={GROUP_TYPES.find((t) => t.value === value) as any}
                       onValueChange={(opt: any) => opt && onChange(opt.value)}
                     >
-                      <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                      <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                         <View className="flex-row items-center gap-3">
                           <IconSymbol
                             name={
@@ -241,7 +241,7 @@ export default function AddGroupScreen() {
 
             <View className="flex-1">
               <FormSection
-                label="TIỀN TỆ"
+                label="Tiền tệ"
                 isRequired
                 error={errors.currency?.message}
               >
@@ -253,7 +253,7 @@ export default function AddGroupScreen() {
                       value={CURRENCIES.find((c) => c.value === value) as any}
                       onValueChange={(opt: any) => opt && onChange(opt.value)}
                     >
-                      <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                      <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                         <View className="flex-row items-center gap-3">
                           <AppText className="font-bold text-accent text-lg">
                             {CURRENCIES.find((c) => c.value === value)?.symbol}
@@ -303,7 +303,7 @@ export default function AddGroupScreen() {
           </View>
         </View>
 
-        <View className="my-10 px-4">
+        <View className="my-6 px-4">
           <Button
             size="lg"
             onPress={handleSubmit(onSubmit)}

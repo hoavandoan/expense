@@ -532,7 +532,7 @@ export default function GroupDetailScreen() {
                     variant="ghost"
                     onPress={() => router.push(`/group/${id}/expenses` as any)}
                   >
-                    <Button.Label className="text-accent font-bold text-sm">
+                    <Button.Label className="text-foreground font-bold text-sm">
                       Xem tất cả
                     </Button.Label>
                   </Button>
