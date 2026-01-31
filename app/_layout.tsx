@@ -2,6 +2,7 @@ import { LoginBottomSheet } from "@/components/auth/LoginBottomSheet";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { AppThemeProvider } from "@/contexts/app-theme-context";
 import { useAuth } from "@/lib/hooks";
+import { useReactQueryDevTools } from '@dev-plugins/react-query';
 import {
   IBMPlexSans_400Regular,
   IBMPlexSans_500Medium,
@@ -153,7 +154,7 @@ export default function RootLayout() {
   if (!fonts) {
     return null;
   }
-
+useReactQueryDevTools(queryClient)
   return (
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>

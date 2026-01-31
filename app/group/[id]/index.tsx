@@ -5,22 +5,22 @@ import { AssigneeSelector } from "@/components/debt-assignment/assignee-selector
 import { CreateRequestModal } from "@/components/debt-assignment/create-request-modal";
 import { PendingRequestsList } from "@/components/debt-assignment/pending-requests-list";
 import {
-  AnimatedScrollView,
-  AnimatedScrollViewTitle,
-  AnimatedScrollViewTitleWrapper,
-  HeaderComponentWrapper,
-  HeaderNavBar,
+    AnimatedScrollView,
+    AnimatedScrollViewTitle,
+    AnimatedScrollViewTitleWrapper,
+    HeaderComponentWrapper,
+    HeaderNavBar,
 } from "@/components/parallax-header";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ExpenseCard } from "@/components/ui/expense-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { PendingSettlements } from "@/components/ui/pending-settlements";
 import {
-  useDebtAssignment,
-  useDisableDebtAssignment,
-  useGroup,
-  useMembersBalance,
-  useUserBalanceInGroup,
+    useDebtAssignment,
+    useDisableDebtAssignment,
+    useGroup,
+    useMembersBalance,
+    useUserBalanceInGroup,
 } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { assignDebtsOptimized } from "@/lib/utils/debt-calculator";
@@ -28,15 +28,15 @@ import { formatCurrency } from "@/lib/utils/format";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  Avatar,
-  Button,
-  Card,
-  cn,
-  Divider,
-  PressableFeedback,
-  Skeleton,
-  Tabs,
-  useThemeColor,
+    Avatar,
+    Button,
+    Card,
+    cn,
+    Divider,
+    PressableFeedback,
+    Skeleton,
+    Tabs,
+    useThemeColor,
 } from "heroui-native";
 import React, { useMemo, useState } from "react";
 import { RefreshControl, View } from "react-native";
@@ -76,9 +76,10 @@ export default function GroupDetailScreen() {
   const userStats = useUserBalanceInGroup(group, user?.id || null);
 
   // Transform members with balance calculation
-  const membersWithBalanceRaw = useMembersBalance(group);
+  const { data: membersData } = useMembersBalance(group);
+  const membersWithBalanceRaw = membersData || [];
   const membersWithBalance = useMemo(() => {
-    return membersWithBalanceRaw.map((member) => ({
+    return membersWithBalanceRaw.map((member: any) => ({
       id: member.userId,
       name: member.name,
       avatarUrl: member.avatarUrl,
@@ -93,7 +94,7 @@ export default function GroupDetailScreen() {
     if (!membersWithBalanceRaw) return [];
     
     const balanceRecord: Record<string, number> = {};
-    membersWithBalanceRaw.forEach(m => {
+    membersWithBalanceRaw.forEach((m: any) => {
       balanceRecord[m.userId] = m.balance;
     });
     

@@ -1,20 +1,60 @@
-import { useMemo } from 'react';
-import type { Group, GroupWithDetails } from '../types';
+import { queryOptions, useQuery } from '@tanstack/react-query';
+import { supabase } from '../supabase';
+import type { GroupWithDetails } from '../types';
 
-interface BalanceStats {
+export interface BalanceStats {
   totalPaid: number; // Total amount user has spent
   totalOwed: number; // Amount others owe to user
   totalOwing: number; // Amount user owes to others
   balance: number; // Net balance
 }
 
-interface MemberBalance {
+export interface MemberBalance {
   userId: string;
   name: string;
   avatarUrl: string | null;
   role: string;
   balance: number;
 }
+
+export const membersBalanceQueryOptions = (groupId: string | null | undefined) => queryOptions({
+  queryKey: ['group-balances', groupId],
+  queryFn: async () => {
+    if (!groupId) return [];
+
+    const { data, error } = await supabase.rpc('get_group_member_balances', {
+      p_group_id: groupId
+    });
+
+    if (error) throw error;
+
+    return data.map((m: any) => ({
+      userId: m.user_id,
+      name: m.name,
+      avatarUrl: m.avatar_url,
+      role: m.role,
+      balance: m.balance,
+      totalPaid: m.total_paid,
+      totalShare: m.total_share
+    }));
+  },
+  enabled: !!groupId,
+});
+
+export const userGlobalStatsQueryOptions = (userId: string | null | undefined) => queryOptions({
+  queryKey: ['user-stats', userId],
+  queryFn: async () => {
+    if (!userId) return { totalPaid: 0, totalOwed: 0, totalOwing: 0, balance: 0 };
+
+    const { data, error } = await supabase.rpc('get_user_stats', {
+      p_user_id: userId
+    });
+
+    if (error) throw error;
+    return data as BalanceStats;
+  },
+  enabled: !!userId,
+});
 
 /**
  * Calculate balance for a specific user in a group
@@ -23,126 +63,85 @@ export const useUserBalanceInGroup = (
   group: GroupWithDetails | null | undefined,
   userId: string | null | undefined
 ): BalanceStats => {
-  return useMemo(() => {
-    if (!group || !userId) {
-      return { totalPaid: 0, totalOwed: 0, totalOwing: 0, balance: 0 };
-    }
+  // We can derive this from useMembersBalance
+  const { data: members } = useQuery(membersBalanceQueryOptions(group?.id));
 
-    const groupData = group as any;
-    let totalPaid = 0;
-    let othersOweMe = 0;
-    let iOweOthers = 0;
+  if (!userId || !members) {
+    return { totalPaid: 0, totalOwed: 0, totalOwing: 0, balance: 0 };
+  }
 
-    groupData.expenses?.forEach((expense: any) => {
-      if (expense.paid_by === userId) {
-        totalPaid += expense.amount;
-        // Calculate what others owe me from this expense
-        expense.expense_splits?.forEach((split: any) => {
-          if (split.user_id !== userId) {
-            othersOweMe += split.amount;
-          }
-        });
-      } else {
-        // Someone else paid, calculate what I owe
-        expense.expense_splits?.forEach((split: any) => {
-          if (split.user_id === userId) {
-            iOweOthers += split.amount;
-          }
-        });
-      }
-    });
+  const member = members.find((m: any) => m.userId === userId);
+  if (!member) return { totalPaid: 0, totalOwed: 0, totalOwing: 0, balance: 0 };
 
-    return {
-      totalPaid,
-      totalOwed: othersOweMe,
-      totalOwing: iOweOthers,
-      balance: othersOweMe - iOweOthers,
-    };
-  }, [group, userId]);
+  const bal = member.balance;
+  return {
+    totalPaid: (member as any).totalPaid || 0,
+    totalOwed: bal > 0 ? bal : 0,
+    totalOwing: bal < 0 ? -bal : 0,
+    balance: bal
+  };
 };
 
 /**
- * Calculate balances for all members in a group
+ * Calculate balances for all members in a group using Supabase RPC
  */
 export const useMembersBalance = (
-  group: GroupWithDetails | null | undefined
-): MemberBalance[] => {
-  return useMemo(() => {
-    const groupData = group as any;
-    if (!groupData?.group_members) {
-      return [];
-    }
-
-    return groupData.group_members.map((member: any) => {
-      let balance = 0;
-
-      groupData.expenses?.forEach((expense: any) => {
-        // Money this member has paid
-        if (expense.paid_by === member.user_id) {
-          balance += expense.amount;
-        }
-
-        // Money this member owes from splits
-        expense.expense_splits?.forEach((split: any) => {
-          if (split.user_id === member.user_id) {
-            balance -= split.amount;
-          }
-        });
-      });
-
-      return {
-        userId: member.user_id,
-        name: member.user?.name || 'Thành viên',
-        avatarUrl: member.user?.avatar_url,
-        role: member.role,
-        balance,
-      };
-    });
-  }, [group]);
+  groupOrId: GroupWithDetails | string | null | undefined
+) => {
+  const groupId = typeof groupOrId === 'string' ? groupOrId : groupOrId?.id;
+  return useQuery(membersBalanceQueryOptions(groupId));
 };
+
 
 /**
- * Calculate total balance across all groups for a user
+ * Calculate total balance across all groups for a user using Supabase RPC
  */
 export const useTotalBalanceAcrossGroups = (
-  groups: Group[] | null | undefined,
+  groups: GroupWithDetails[] | null | undefined, // Keeping signature for compatibility but ignoring 'groups'
   userId: string | null | undefined
-): BalanceStats => {
-  return useMemo(() => {
-    if (!groups || !userId) {
-      return { totalPaid: 0, totalOwed: 0, totalOwing: 0, balance: 0 };
-    }
+) => {
+  const { data } = useQuery(userGlobalStatsQueryOptions(userId));
+  return data || { totalPaid: 0, totalOwed: 0, totalOwing: 0, balance: 0 };
+};
 
-    let totalPaidOverall = 0;
-    let totalOwedOthersToMe = 0;
-    let totalOwingMeToOthers = 0;
+export interface CategoryStat {
+  category: string;
+  amount: number;
+}
 
-    groups.forEach((group: any) => {
-      group.expenses?.forEach((expense: any) => {
-        if (expense.paid_by === userId) {
-          totalPaidOverall += expense.amount;
-          // Others owe to user
-          expense.expense_splits?.forEach((split: any) => {
-            if (split.user_id !== userId) {
-              totalOwedOthersToMe += split.amount;
-            }
-          });
-        } else {
-          // User owes to others
-          expense.expense_splits?.forEach((split: any) => {
-            if (split.user_id === userId) {
-              totalOwingMeToOthers += split.amount;
-            }
-          });
-        }
-      });
+
+export interface GroupSpendingStats {
+  totalAmount: number;
+  memberCount: number;
+  categoryStats: CategoryStat[];
+}
+
+export const groupSpendingStatsQueryOptions = (groupId: string | null | undefined) => queryOptions({
+  queryKey: ['group-stats', groupId],
+  queryFn: async () => {
+    if (!groupId) return { totalAmount: 0, memberCount: 0, categoryStats: [] };
+
+    const { data, error } = await supabase.rpc('get_group_spending_stats', {
+      p_group_id: groupId
     });
 
-    return {
-      totalPaid: totalPaidOverall,
-      totalOwed: totalOwedOthersToMe,
-      totalOwing: totalOwingMeToOthers,
-      balance: totalOwedOthersToMe - totalOwingMeToOthers,
-    };
-  }, [groups, userId]);
+    if (error) throw error;
+    return data as GroupSpendingStats;
+  },
+  enabled: !!groupId,
+});
+
+/**
+ * Calculate spending stats for a group (Total, Category breakdown)
+ */
+export const useGroupSpendingStats = (groupId: string | null | undefined) => {
+  const { data } = useQuery(groupSpendingStatsQueryOptions(groupId));
+
+  // Ensure default values if data is loading or null
+  return data || {
+    totalAmount: 0,
+    memberCount: 0,
+    categoryStats: []
+  };
 };
+

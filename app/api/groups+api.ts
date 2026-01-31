@@ -13,7 +13,17 @@ export async function GET(request: Request) {
             role,
             user:users(id, name, avatar_url)
           ),
-          expenses(amount)
+          expenses!inner(
+          amount,
+           paid_by,
+           expense_splits(
+            user_id,
+            amount,
+            is_paid,
+            user:users(id, name, avatar_url)
+           )
+           )
+          
       `)
             .order('created_at', { ascending: false });
 

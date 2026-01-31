@@ -11,11 +11,7 @@ import { FlashList } from "@shopify/flash-list";
 import { cn, Spinner, Tabs, TextField, useThemeColor } from "heroui-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
-import Animated, {
-  FadeInDown,
-  FadeOut,
-  Layout
-} from "react-native-reanimated";
+import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const FILTERS = [
@@ -273,9 +269,8 @@ export default function ActivityScreen() {
       return (
         <Animated.View 
         entering={FadeInDown.delay(1000 + index * 100).springify()}
-                 exiting={FadeOut.duration(200)}
-                 layout={Layout.springify()}
-                 className="mb-3"
+        exiting={FadeOut.duration(200)}
+        className="mb-3"
         >
           <AppText className="text-xl font-bold text-foreground mb-5 px-6 mt-8">
             {item.title}
@@ -309,8 +304,7 @@ export default function ActivityScreen() {
       <Animated.View 
         className="mb-4" 
         entering={FadeInDown.delay(1000 + index * 100).springify()}
-                 exiting={FadeOut.duration(200)}
-                 layout={Layout.springify()}
+        exiting={FadeOut.duration(200)}
       >
         <ActivityItem
           userName={isMe ? "Bạn" : activity.user?.name || "Ai đó"}
@@ -412,7 +406,7 @@ export default function ActivityScreen() {
           data={flattenedActivities}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
-          estimatedItemSize={92}
+          estimatedItemSize={100}
           getItemType={(item) => item.type}
           onRefresh={onRefresh}
           refreshing={refreshing}

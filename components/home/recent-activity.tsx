@@ -8,7 +8,7 @@ import { useRouter } from "expo-router";
 import { PressableFeedback, Skeleton } from "heroui-native";
 import React, { useCallback } from "react";
 import { View } from "react-native";
-import Animated, { FadeInDown, Layout } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 interface RecentActivityProps {
   expenses: any[] | null;
@@ -26,7 +26,6 @@ export const RecentActivity = ({ expenses, isLoading, userId }: RecentActivityPr
     return (
       <Animated.View
         entering={FadeInDown.delay(1000 + index * 100).springify()}
-                layout={Layout.springify()}
         className="mb-3"
       >
         <ActivityItem

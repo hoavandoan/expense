@@ -2,10 +2,10 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { cn, PressableFeedback } from 'heroui-native';
 import React from 'react';
 import Animated, {
-    FadeInDown,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring
+  FadeInDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -23,7 +23,7 @@ export const FAB = ({ onPress, icon = 'plus', className = '' }: FABProps) => {
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-    bottom: insets.bottom + 100, // Elevated to sit above the floating tab bar
+    bottom: insets.bottom + 60, // Elevated to sit above the floating tab bar
   }));
 
   const handlePressIn = () => {
