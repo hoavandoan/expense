@@ -64,6 +64,7 @@ export default function HomeScreen() {
             balance={balanceStats.balance}
             totalOwed={balanceStats.totalOwing}
             totalOweMe={balanceStats.totalOwed}
+            selfExpenses={balanceStats.selfExpenses}
             showBalance={showBalance}
             onToggleBalance={handleToggleBalance}
           />

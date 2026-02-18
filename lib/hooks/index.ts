@@ -16,6 +16,7 @@ export {
   useDeleteExpense,
   useExpense,
   useExpenses,
+  useInfiniteExpenses,
   useRecentExpenses,
   useUpdateExpense
 } from "./use-expenses";

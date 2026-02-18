@@ -5,7 +5,7 @@ import { ExpenseCard } from "@/components/ui/expense-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
 import { EXPENSE_CATEGORIES } from "@/constants";
-import { useExpenses, useGroup } from "@/lib/hooks";
+import { useGroup, useInfiniteExpenses } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatDate } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
@@ -19,14 +19,27 @@ import {
   cn,
   useThemeColor
 } from "heroui-native";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-type ExpenseListItem = 
+const DEBOUNCE_MS = 500;
+
+type ExpenseListItem =
   | { type: "header"; title: string; id: string }
   | { type: "expense"; data: any; id: string };
+
+function useDebounced<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debounced;
+}
 
 export default function GroupExpensesScreen() {
   const { id } = useLocalSearchParams();
@@ -35,69 +48,41 @@ export default function GroupExpensesScreen() {
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
   const { user } = useAuthStore();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"date" | "amount">("date");
 
+  const debouncedSearch = useDebounced(searchQuery, DEBOUNCE_MS);
+
   const { data: group, isLoading: isLoadingGroup } = useGroup(id as string);
-  const {
-    data: expenses,
-    isLoading: isLoadingExpenses,
-    error,
-    refetch,
-  } = useExpenses(id as string);
 
   const groupData = group as any;
   const members = groupData?.group_members || [];
 
-  const flattenedExpenses = useMemo(() => {
-    if (!expenses) return [];
+  const {
+    data,
+    isLoading: isLoadingExpenses,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteExpenses({
+    groupId: id as string,
+    search: debouncedSearch,
+    category: selectedCategory ?? undefined,
+    memberId: selectedMember ?? undefined,
+    sortBy,
+  });
 
-    let filtered = expenses;
+  // Flatten pages → grouped list items for FlashList
+  const flattenedExpenses = useMemo<ExpenseListItem[]>(() => {
+    const allExpenses = data?.pages.flatMap((page) => page.data) ?? [];
 
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((expense: any) => {
-        const title = expense.title?.toLowerCase() || "";
-        const description = expense.description?.toLowerCase() || "";
-        return title.includes(query) || description.includes(query);
-      });
-    }
-
-    // Filter by category
-    if (selectedCategory) {
-      filtered = filtered.filter(
-        (expense: any) => expense.category === selectedCategory
-      );
-    }
-
-    // Filter by member
-    if (selectedMember) {
-      filtered = filtered.filter((expense: any) => {
-        if (expense.paid_by === selectedMember) return true;
-        return expense.expense_splits?.some(
-          (split: any) => split.user_id === selectedMember
-        );
-      });
-    }
-
-    // Sort
-    filtered = [...filtered].sort((a: any, b: any) => {
-      if (sortBy === "amount") {
-        return b.amount - a.amount;
-      }
-      // Sort by date (newest first)
-      return (
-        new Date(b.expense_date || b.created_at).getTime() -
-        new Date(a.expense_date || a.created_at).getTime()
-      );
-    });
-
-    // Group and flatten
     const groups: Record<string, any[]> = {};
-    filtered.forEach((expense: any) => {
+    allExpenses.forEach((expense: any) => {
       const date = new Date(expense.expense_date || expense.created_at);
       const dateKey = formatDate(date.toISOString());
       if (!groups[dateKey]) {
@@ -106,16 +91,14 @@ export default function GroupExpensesScreen() {
       groups[dateKey].push(expense);
     });
 
-    const flattened: ExpenseListItem[] = [];
-    Object.keys(groups).forEach((dateKey) => {
-      flattened.push({ type: "header", title: dateKey, id: `header-${dateKey}` });
+    return Object.keys(groups).reduce<ExpenseListItem[]>((acc, dateKey) => {
+      acc.push({ type: "header", title: dateKey, id: `header-${dateKey}` });
       groups[dateKey].forEach((expense) => {
-        flattened.push({ type: "expense", data: expense, id: expense.id });
+        acc.push({ type: "expense", data: expense, id: expense.id });
       });
-    });
-
-    return flattened;
-  }, [expenses, searchQuery, selectedCategory, selectedMember, sortBy]);
+      return acc;
+    }, []);
+  }, [data]);
 
   const memberMap = useMemo(() => {
     const map = new Map();
@@ -129,38 +112,54 @@ export default function GroupExpensesScreen() {
     return map;
   }, [groupData]);
 
-  const renderItem = useCallback(({ item, index }: { item: ExpenseListItem; index: number }) => {
-    if (item.type === "header") {
+  const memberOptions = useMemo(() =>
+    (groupData?.group_members ?? []).map((member: any) => ({
+      value: member.user_id,
+      label: member.user?.name || "Thành viên",
+    })),
+    [groupData]
+  );
+
+  const renderItem = useCallback(
+    ({ item, index }: { item: ExpenseListItem; index: number }) => {
+      if (item.type === "header") {
+        return (
+          <Animated.View
+            entering={FadeInUp.delay(index * 30).duration(250)}
+            exiting={FadeOut.duration(200)}
+          >
+            <AppText className="text-lg font-bold text-foreground mb-4 px-6 mt-6">
+              {item.title}
+            </AppText>
+          </Animated.View>
+        );
+      }
+
+      const { data: expense } = item;
       return (
-        <Animated.View 
-          entering={FadeInUp.delay(index * 30).duration(250)}
+        <Animated.View
+          className="px-6 mb-3"
+          entering={FadeInUp.delay(index * 40)
+            .duration(300)
+            .springify()
+            .damping(15)}
           exiting={FadeOut.duration(200)}
         >
-          <AppText className="text-lg font-bold text-foreground mb-4 px-6 mt-6">
-            {item.title}
-          </AppText>
+          <ExpenseCard
+            expense={expense}
+            currency={groupData?.currency || "VND"}
+            memberMap={memberMap}
+            currentUserId={user?.id}
+            onPress={() => router.push(`/expense/${expense.id}` as any)}
+            className="mb-1"
+          />
         </Animated.View>
       );
-    }
+    },
+    [groupData?.currency, memberMap, user?.id, router]
+  );
 
-    const { data: expense } = item;
-    return (
-      <Animated.View 
-        className="px-6 mb-3"
-        entering={FadeInUp.delay(index * 40).duration(300).springify().damping(15)}
-        exiting={FadeOut.duration(200)}
-      >
-        <ExpenseCard
-          expense={expense}
-          currency={groupData?.currency || "VND"}
-          memberMap={memberMap}
-          currentUserId={user?.id}
-          onPress={() => router.push(`/expense/${expense.id}` as any)}
-          className="mb-1"
-        />
-      </Animated.View>
-    );
-  }, [groupData?.currency, memberMap, user?.id, router]);
+  const hasActiveFilters = !!(debouncedSearch || selectedCategory || selectedMember);
 
   if (isLoadingGroup || isLoadingExpenses) {
     return (
@@ -225,7 +224,6 @@ export default function GroupExpensesScreen() {
             onValueChange={(opt: any) =>
               setSelectedCategory(opt?.value || null)
             }
-            placeholder="Tất cả danh mục"
             className="flex-1"
           >
             <Select.Trigger className="h-12 border border-divider/10 bg-surface-secondary rounded-xl px-4">
@@ -233,14 +231,21 @@ export default function GroupExpensesScreen() {
             </Select.Trigger>
             <Select.Portal>
               <Select.Overlay />
-              <Select.Content className="rounded-xl bg-surface border border-divider/10">
-                <Select.Item value={null} label="Tất cả danh mục" />
+              <Select.Content placement="bottom" width={200} className="rounded-xl bg-surface border border-divider/10">
+                <Select.Item value={null} label="Tất cả danh mục" className="p-4">
+                  <Select.ItemLabel />
+                  <Select.ItemIndicator />
+                </Select.Item>
                 {EXPENSE_CATEGORIES.map((category) => (
                   <Select.Item
                     key={category.value}
                     value={category.value}
                     label={category.label}
-                  />
+                    className="p-4"
+                  >
+                    <Select.ItemLabel />
+                    <Select.ItemIndicator />
+                  </Select.Item>
                 ))}
               </Select.Content>
             </Select.Portal>
@@ -249,13 +254,12 @@ export default function GroupExpensesScreen() {
           <Select
             value={
               selectedMember
-                ? members.find((m: any) => m.user_id === selectedMember) || null
+                ? memberOptions.find((m) => m.value === selectedMember) || null
                 : null
             }
             onValueChange={(opt: any) =>
-              setSelectedMember(opt?.user_id || null)
+              setSelectedMember(opt?.value || null)
             }
-            placeholder="Tất cả thành viên"
             className="flex-1"
           >
             <Select.Trigger className="h-12 border border-divider/10 bg-surface-secondary rounded-xl px-4">
@@ -263,14 +267,21 @@ export default function GroupExpensesScreen() {
             </Select.Trigger>
             <Select.Portal>
               <Select.Overlay />
-              <Select.Content className="rounded-xl bg-surface border border-divider/10">
-                <Select.Item value={null} label="Tất cả thành viên" />
-                {members.map((member: any) => (
+              <Select.Content placement="bottom" width={200} className="rounded-xl bg-surface border border-divider/10">
+                <Select.Item value={null} label="Tất cả thành viên" className="p-4">
+                  <Select.ItemLabel />
+                  <Select.ItemIndicator />
+                </Select.Item>
+                {memberOptions.map((member) => (
                   <Select.Item
-                    key={member.user_id}
-                    value={member.user_id}
-                    label={member.user?.name || "Thành viên"}
-                  />
+                    key={member.value}
+                    value={member.value}
+                    label={member.label}
+                    className="p-4"
+                  >
+                    <Select.ItemLabel />
+                    <Select.ItemIndicator />
+                  </Select.Item>
                 ))}
               </Select.Content>
             </Select.Portal>
@@ -320,22 +331,28 @@ export default function GroupExpensesScreen() {
         data={flattenedExpenses}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        estimatedItemSize={100}
         getItemType={(item) => item.type}
-        onRefresh={refetch}
+        onRefresh={() => refetch()}
         refreshing={false}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        }}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View className="py-6 items-center">
+              <Spinner size="sm" color={accent} />
+            </View>
+          ) : null
+        }
         ListEmptyComponent={
           <EmptyState
             icon="doc.text.fill"
-            title={
-              searchQuery || selectedCategory || selectedMember
-                ? "Không tìm thấy kết quả"
-                : "Chưa có khoản chi nào"
-            }
+            title={hasActiveFilters ? "Không tìm thấy kết quả" : "Chưa có khoản chi nào"}
             description={
-              searchQuery || selectedCategory || selectedMember
-                ? "Thử thay đổi bộ lọc"
-                : "Thêm khoản chi mới để bắt đầu"
+              hasActiveFilters ? "Thử thay đổi bộ lọc" : "Thêm khoản chi mới để bắt đầu"
             }
           />
         }

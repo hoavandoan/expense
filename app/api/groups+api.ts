@@ -13,7 +13,7 @@ export async function GET(request: Request) {
             role,
             user:users(id, name, avatar_url)
           ),
-          expenses!inner(
+          expenses(
           amount,
            paid_by,
            expense_splits(
@@ -28,6 +28,8 @@ export async function GET(request: Request) {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
+
+        console.log('[GET /api/groups] Raw count:', data?.length, 'Groups:', data?.map((g: any) => ({ name: g.name, expenses: g.expenses?.length })));
 
         // Transform to include computed fields
         const groups = (data || []).map((group: any) => ({

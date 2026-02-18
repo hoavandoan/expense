@@ -6,6 +6,7 @@ export interface BalanceStats {
   totalPaid: number; // Total amount user has spent
   totalOwed: number; // Amount others owe to user
   totalOwing: number; // Amount user owes to others
+  selfExpenses: number; // Personal spending in single-member groups
   balance: number; // Net balance
 }
 
@@ -44,7 +45,7 @@ export const membersBalanceQueryOptions = (groupId: string | null | undefined) =
 export const userGlobalStatsQueryOptions = (userId: string | null | undefined) => queryOptions({
   queryKey: ['user-stats', userId],
   queryFn: async () => {
-    if (!userId) return { totalPaid: 0, totalOwed: 0, totalOwing: 0, balance: 0 };
+    if (!userId) return { totalPaid: 0, totalOwed: 0, totalOwing: 0, selfExpenses: 0, balance: 0 };
 
     const { data, error } = await supabase.rpc('get_user_stats', {
       p_user_id: userId
@@ -67,17 +68,18 @@ export const useUserBalanceInGroup = (
   const { data: members } = useQuery(membersBalanceQueryOptions(group?.id));
 
   if (!userId || !members) {
-    return { totalPaid: 0, totalOwed: 0, totalOwing: 0, balance: 0 };
+    return { totalPaid: 0, totalOwed: 0, totalOwing: 0, selfExpenses: 0, balance: 0 };
   }
 
   const member = members.find((m: any) => m.userId === userId);
-  if (!member) return { totalPaid: 0, totalOwed: 0, totalOwing: 0, balance: 0 };
+  if (!member) return { totalPaid: 0, totalOwed: 0, totalOwing: 0, selfExpenses: 0, balance: 0 };
 
   const bal = member.balance;
   return {
     totalPaid: (member as any).totalPaid || 0,
     totalOwed: bal > 0 ? bal : 0,
     totalOwing: bal < 0 ? -bal : 0,
+    selfExpenses: 0,
     balance: bal
   };
 };
@@ -101,7 +103,7 @@ export const useTotalBalanceAcrossGroups = (
   userId: string | null | undefined
 ) => {
   const { data } = useQuery(userGlobalStatsQueryOptions(userId));
-  return data || { totalPaid: 0, totalOwed: 0, totalOwing: 0, balance: 0 };
+  return data || { totalPaid: 0, totalOwed: 0, totalOwing: 0, selfExpenses: 0, balance: 0 };
 };
 
 export interface CategoryStat {

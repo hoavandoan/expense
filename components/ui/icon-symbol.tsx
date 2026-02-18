@@ -92,6 +92,7 @@ const MAPPING = {
   'trash': 'delete',
   'doc.on.doc': 'content-copy',
   'arrow.right.square': 'exit-to-app',
+  'gift.fill': 'card-giftcard',
 } as const;
 
 /**

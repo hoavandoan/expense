@@ -1,28 +1,119 @@
-import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  infiniteQueryOptions,
+  queryOptions,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { apiClient } from "../api-client";
 import { useAuthStore } from "../stores/auth-store";
 import type { Expense, ExpenseSplit } from "../types";
 import { groupQueryOptions, groupsQueryOptions } from "./use-groups";
 
-export const recentExpensesQueryOptions = (limit = 5) => queryOptions({
-  queryKey: ["recent-expenses", limit],
-  queryFn: () => apiClient<Expense[]>(`/expenses?limit=${limit}`),
-});
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
-export const expensesQueryOptions = (groupId: string | null) => queryOptions({
-  queryKey: ["expenses", groupId],
-  queryFn: () => apiClient<(Expense & { expense_splits: ExpenseSplit[] })[]>(`/expenses?groupId=${groupId}`),
-  enabled: !!groupId,
-});
+export interface ExpensesFilterParams {
+  groupId: string;
+  search?: string;
+  category?: string;
+  memberId?: string;
+  sortBy?: "date" | "amount";
+}
 
-export const expenseQueryOptions = (expenseId: string | null) => queryOptions({
-  queryKey: ["expense", expenseId],
-  queryFn: () => apiClient<Expense & {
-    expense_splits: ExpenseSplit[];
-    group?: { id: string; name: string; currency: string };
-  }>(`/expenses/${expenseId}`),
-  enabled: !!expenseId,
-});
+export interface ExpensesPage {
+  data: (Expense & { expense_splits: ExpenseSplit[] })[];
+  nextCursor: string | null;
+  nextCursorId: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Query options
+// ---------------------------------------------------------------------------
+
+export const recentExpensesQueryOptions = (limit = 5) =>
+  queryOptions({
+    queryKey: ["recent-expenses", limit],
+    queryFn: () => apiClient<Expense[]>(`/expenses?limit=${limit}`),
+  });
+
+/**
+ * @deprecated Use infiniteExpensesQueryOptions for the group expenses list.
+ * Kept for backward-compat with mutation invalidation.
+ */
+export const expensesQueryOptions = (groupId: string | null) =>
+  queryOptions({
+    queryKey: ["expenses", groupId],
+    queryFn: () =>
+      apiClient<(Expense & { expense_splits: ExpenseSplit[] })[]>(
+        `/expenses?groupId=${groupId}`
+      ),
+    enabled: !!groupId,
+  });
+
+export const expenseQueryOptions = (expenseId: string | null) =>
+  queryOptions({
+    queryKey: ["expense", expenseId],
+    queryFn: () =>
+      apiClient<
+        Expense & {
+          expense_splits: ExpenseSplit[];
+          group?: { id: string; name: string; currency: string };
+        }
+      >(`/expenses/${expenseId}`),
+    enabled: !!expenseId,
+  });
+
+const buildExpensesUrl = (
+  params: ExpensesFilterParams,
+  cursor?: string,
+  cursorId?: string
+) => {
+  const searchParams = new URLSearchParams({ groupId: params.groupId });
+
+  if (params.search) searchParams.set("search", params.search);
+  if (params.category) searchParams.set("category", params.category);
+  if (params.memberId) searchParams.set("memberId", params.memberId);
+  if (params.sortBy) searchParams.set("sortBy", params.sortBy);
+  if (cursor) searchParams.set("cursor", cursor);
+  if (cursorId) searchParams.set("cursorId", cursorId);
+
+  return `/expenses?${searchParams.toString()}`;
+};
+
+export const infiniteExpensesQueryOptions = (params: ExpensesFilterParams) =>
+  infiniteQueryOptions({
+    queryKey: [
+      "expenses-infinite",
+      params.groupId,
+      params.search,
+      params.category,
+      params.memberId,
+      params.sortBy,
+    ],
+    queryFn: ({ pageParam }) =>
+      apiClient<ExpensesPage>(
+        buildExpensesUrl(
+          params,
+          (pageParam as { cursor: string; cursorId: string } | undefined)?.cursor,
+          (pageParam as { cursor: string; cursorId: string } | undefined)?.cursorId
+        )
+      ),
+    initialPageParam: undefined as
+      | { cursor: string; cursorId: string }
+      | undefined,
+    getNextPageParam: (lastPage: ExpensesPage) => {
+      if (!lastPage.nextCursor || !lastPage.nextCursorId) return undefined;
+      return { cursor: lastPage.nextCursor, cursorId: lastPage.nextCursorId };
+    },
+    enabled: !!params.groupId,
+  });
+
+// ---------------------------------------------------------------------------
+// Hooks
+// ---------------------------------------------------------------------------
 
 /**
  * Fetch recent expenses across all user's groups
@@ -36,10 +127,17 @@ export const useRecentExpenses = (limit = 5) => {
 };
 
 /**
- * Fetch expenses for a group
+ * @deprecated Use useInfiniteExpenses for the group expenses list screen.
  */
 export const useExpenses = (groupId: string | null) => {
   return useQuery(expensesQueryOptions(groupId));
+};
+
+/**
+ * Fetch expenses for a group with infinite scroll, server-side search/filter/sort.
+ */
+export const useInfiniteExpenses = (params: ExpensesFilterParams) => {
+  return useInfiniteQuery(infiniteExpensesQueryOptions(params));
 };
 
 /**
@@ -73,10 +171,19 @@ export const useCreateExpense = () => {
       });
     },
     onSuccess: (_, { groupId }) => {
-      queryClient.invalidateQueries({ queryKey: expensesQueryOptions(groupId).queryKey });
-      queryClient.invalidateQueries({ queryKey: groupQueryOptions(groupId).queryKey });
+      queryClient.invalidateQueries({
+        queryKey: ["expenses-infinite", groupId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: expensesQueryOptions(groupId).queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: groupQueryOptions(groupId).queryKey,
+      });
       queryClient.invalidateQueries({ queryKey: groupsQueryOptions.queryKey });
-      queryClient.invalidateQueries({ queryKey: recentExpensesQueryOptions().queryKey });
+      queryClient.invalidateQueries({
+        queryKey: recentExpensesQueryOptions().queryKey,
+      });
     },
   });
 };
@@ -109,9 +216,18 @@ export const useUpdateExpense = () => {
       });
     },
     onSuccess: (_, { groupId }) => {
-      queryClient.invalidateQueries({ queryKey: expensesQueryOptions(groupId).queryKey });
-      queryClient.invalidateQueries({ queryKey: groupQueryOptions(groupId).queryKey });
-      queryClient.invalidateQueries({ queryKey: recentExpensesQueryOptions().queryKey });
+      queryClient.invalidateQueries({
+        queryKey: ["expenses-infinite", groupId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: expensesQueryOptions(groupId).queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: groupQueryOptions(groupId).queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: recentExpensesQueryOptions().queryKey,
+      });
     },
   });
 };
@@ -125,7 +241,6 @@ export const useDeleteExpense = () => {
   return useMutation({
     mutationFn: async ({
       expenseId,
-      groupId,
     }: {
       expenseId: string;
       groupId: string;
@@ -135,11 +250,19 @@ export const useDeleteExpense = () => {
       });
     },
     onSuccess: (_, { groupId }) => {
-      queryClient.invalidateQueries({ queryKey: expensesQueryOptions(groupId).queryKey });
-      queryClient.invalidateQueries({ queryKey: groupQueryOptions(groupId).queryKey });
+      queryClient.invalidateQueries({
+        queryKey: ["expenses-infinite", groupId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: expensesQueryOptions(groupId).queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: groupQueryOptions(groupId).queryKey,
+      });
       queryClient.invalidateQueries({ queryKey: groupsQueryOptions.queryKey });
-      queryClient.invalidateQueries({ queryKey: recentExpensesQueryOptions().queryKey });
+      queryClient.invalidateQueries({
+        queryKey: recentExpensesQueryOptions().queryKey,
+      });
     },
   });
 };
-

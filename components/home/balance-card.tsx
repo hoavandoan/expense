@@ -10,6 +10,7 @@ interface BalanceCardProps {
   balance: number;
   totalOwed: number;
   totalOweMe: number;
+  selfExpenses: number;
   showBalance: boolean;
   onToggleBalance: () => void;
 }
@@ -18,6 +19,7 @@ export const BalanceCard = ({
   balance,
   totalOwed,
   totalOweMe,
+  selfExpenses,
   showBalance,
   onToggleBalance,
 }: BalanceCardProps) => {
@@ -52,7 +54,7 @@ export const BalanceCard = ({
           </PressableFeedback>
         </View>
 
-        <View className="flex-row items-baseline gap-2 mb-8">
+        <View className="flex-row items-baseline gap-2 mb-4">
           <AppText
             className="text-white font-bold text-3xl"
             numberOfLines={1}
@@ -63,6 +65,26 @@ export const BalanceCard = ({
               : "••••••••"}
           </AppText>
         </View>
+
+        {selfExpenses > 0 && (
+          <View className="flex-row items-center gap-2 mb-4 bg-white/10 rounded-xl px-3 py-2">
+            <View className="w-6 h-6 bg-white/20 rounded-full items-center justify-center">
+              <IconSymbol name="person.3.fill" size={12} color="white" />
+            </View>
+            <AppText className="text-white/80 text-xs font-medium">
+              Chi tiêu cá nhân
+            </AppText>
+            <AppText
+              className="text-white font-semibold text-xs ml-auto"
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
+              {showBalance
+                ? formatCurrency(selfExpenses, "VND")
+                : "••••"}
+            </AppText>
+          </View>
+        )}
 
         <View className="flex-row bg-black/10 rounded-2xl p-3 gap-4">
           <View className="flex-1">

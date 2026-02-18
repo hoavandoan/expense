@@ -50,6 +50,7 @@ const expenseSchema = z.object({
     "shopping",
     "entertainment",
     "utilities",
+    "gift",
     "other",
   ]),
   notes: z.string().optional(),
