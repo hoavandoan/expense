@@ -1,7 +1,7 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../api-client";
 import { useAuthStore } from "../stores/auth-store";
-import type { Group, GroupWithDetails } from "../types";
+import type { Group, GroupType, GroupWithDetails } from "../types";
 import { generateInviteCode } from "../utils/format";
 import { recentExpensesQueryOptions } from "./use-expenses";
 
@@ -52,8 +52,6 @@ export const useCreateGroup = () => {
       currency?: string;
       groupType?: string;
     }) => {
-      // Invite code generation remains on client for now or can be moved to server
-      // The implementation plan had it as a separate task but let's just generate it here
       const inviteCode = generateInviteCode();
 
       return apiClient<Group>("/groups", {
@@ -61,7 +59,36 @@ export const useCreateGroup = () => {
         body: JSON.stringify({ ...input, inviteCode }),
       });
     },
-    onSuccess: () => {
+    onMutate: async (newGroupInput) => {
+      const queryKey = groupsQueryOptions.queryKey;
+      await queryClient.cancelQueries({ queryKey });
+
+      const previousGroups = queryClient.getQueryData<Group[]>(queryKey);
+
+      const optimisticGroup: Group = {
+        id: Date.now().toString(),
+        name: newGroupInput.name,
+        description: newGroupInput.description || null,
+        coverImageUrl: newGroupInput.coverImageUrl || null,
+        inviteCode: '......', // Server will generate
+        currency: newGroupInput.currency || 'USD',
+        groupType: (newGroupInput.groupType as GroupType) || 'other',
+        createdBy: '', // Will be filled by server
+        createdAt: new Date().toISOString(),
+        hasDebtAssignment: false,
+        debtAssignmentEnabled: false,
+      };
+
+      queryClient.setQueryData<Group[]>(queryKey, (old) => [...(old || []), optimisticGroup]);
+
+      return { previousGroups };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousGroups) {
+        queryClient.setQueryData(groupsQueryOptions.queryKey, context.previousGroups);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: groupsQueryOptions.queryKey });
     },
   });
@@ -75,9 +102,6 @@ export const useJoinGroup = () => {
 
   return useMutation({
     mutationFn: async (inviteCodeOrId: string) => {
-      // Join logic might require a specific endpoint or be part of groups POST
-      // For now, let's assume we have a join endpoint or just use the existing logic if it was simple
-      // But actually, joining is better as a separate POST /api/groups/join
       return apiClient<string>("/groups/join", {
         method: "POST",
         body: JSON.stringify({ inviteCodeOrId }),
@@ -103,7 +127,24 @@ export const useLeaveGroup = () => {
         method: "DELETE",
       });
     },
-    onSuccess: () => {
+    onMutate: async (groupId) => {
+      const queryKey = groupsQueryOptions.queryKey;
+      await queryClient.cancelQueries({ queryKey });
+
+      const previousGroups = queryClient.getQueryData<Group[]>(queryKey);
+
+      queryClient.setQueryData<Group[]>(queryKey, (old) =>
+        old?.filter((g) => g.id !== groupId)
+      );
+
+      return { previousGroups };
+    },
+    onError: (err, groupId, context) => {
+      if (context?.previousGroups) {
+        queryClient.setQueryData(groupsQueryOptions.queryKey, context.previousGroups);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: groupsQueryOptions.queryKey });
     },
   });
@@ -129,7 +170,40 @@ export const useUpdateGroup = () => {
         body: JSON.stringify(updates),
       });
     },
-    onSuccess: (_, { groupId }) => {
+    onMutate: async ({ groupId, ...updates }) => {
+      const listKey = groupsQueryOptions.queryKey;
+      const detailKey = groupQueryOptions(groupId).queryKey;
+
+      await queryClient.cancelQueries({ queryKey: listKey });
+      await queryClient.cancelQueries({ queryKey: detailKey });
+
+      const previousGroups = queryClient.getQueryData<Group[]>(listKey);
+      const previousDetail = queryClient.getQueryData<GroupWithDetails>(detailKey);
+
+      // Update list
+      queryClient.setQueryData<Group[]>(listKey, (old) =>
+        old?.map((g) => g.id === groupId ? { ...g, ...updates } : g)
+      );
+
+      // Update detail
+      if (previousDetail) {
+        queryClient.setQueryData<GroupWithDetails>(detailKey, {
+          ...previousDetail,
+          ...updates,
+        });
+      }
+
+      return { previousGroups, previousDetail };
+    },
+    onError: (err, { groupId }, context) => {
+      if (context?.previousGroups) {
+        queryClient.setQueryData(groupsQueryOptions.queryKey, context.previousGroups);
+      }
+      if (context?.previousDetail) {
+        queryClient.setQueryData(groupQueryOptions(groupId).queryKey, context.previousDetail);
+      }
+    },
+    onSettled: (_, __, { groupId }) => {
       queryClient.invalidateQueries({ queryKey: groupsQueryOptions.queryKey });
       queryClient.invalidateQueries({ queryKey: groupQueryOptions(groupId).queryKey });
     },

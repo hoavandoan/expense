@@ -54,8 +54,44 @@ export const useCreateSettlement = () => {
             method: 'POST',
             body: JSON.stringify(input),
         }),
-        onSuccess: (_, { groupId }) => {
-            queryClient.invalidateQueries({ queryKey: settlementsQueryOptions(groupId).queryKey });
+        onMutate: async (newSettlementInput) => {
+            const { groupId } = newSettlementInput;
+            const queryKey = settlementsQueryOptions(groupId).queryKey;
+            const pendingQueryKey = pendingSettlementsQueryOptions(groupId).queryKey;
+
+            await queryClient.cancelQueries({ queryKey });
+            await queryClient.cancelQueries({ queryKey: pendingQueryKey });
+
+            const previousSettlements = queryClient.getQueryData<Settlement[]>(queryKey);
+            const previousPending = queryClient.getQueryData<Settlement[]>(pendingQueryKey);
+
+            const optimisticSettlement: Settlement = {
+                id: Date.now().toString(),
+                groupId: groupId,
+                fromUserId: '', // Will be filled by server, but we can assume current user if needed
+                toUserId: newSettlementInput.toUserId,
+                amount: newSettlementInput.amount,
+                status: 'pending',
+                createdAt: new Date().toISOString(),
+                completedAt: null,
+            };
+
+            queryClient.setQueryData<Settlement[]>(queryKey, (old) => [optimisticSettlement, ...(old || [])]);
+            queryClient.setQueryData<Settlement[]>(pendingQueryKey, (old) => [optimisticSettlement, ...(old || [])]);
+
+            return { previousSettlements, previousPending };
+        },
+        onError: (err, variables, context) => {
+            if (context?.previousSettlements) {
+                queryClient.setQueryData(settlementsQueryOptions(variables.groupId).queryKey, context.previousSettlements);
+            }
+            if (context?.previousPending) {
+                queryClient.setQueryData(pendingSettlementsQueryOptions(variables.groupId).queryKey, context.previousPending);
+            }
+        },
+        onSettled: (_, __, variables) => {
+            queryClient.invalidateQueries({ queryKey: settlementsQueryOptions(variables.groupId).queryKey });
+            queryClient.invalidateQueries({ queryKey: pendingSettlementsQueryOptions(variables.groupId).queryKey });
         },
     });
 };
@@ -71,8 +107,35 @@ export const useCompleteSettlement = () => {
             method: "PATCH",
             body: JSON.stringify({ settlementId, status: "completed" }),
         }),
-        onSuccess: (_, { groupId }) => {
+        onMutate: async ({ settlementId, groupId }) => {
+            const queryKey = settlementsQueryOptions(groupId).queryKey;
+            const pendingQueryKey = pendingSettlementsQueryOptions(groupId).queryKey;
+
+            await queryClient.cancelQueries({ queryKey });
+            await queryClient.cancelQueries({ queryKey: pendingQueryKey });
+
+            const previousSettlements = queryClient.getQueryData<Settlement[]>(queryKey);
+            const previousPending = queryClient.getQueryData<Settlement[]>(pendingQueryKey);
+
+            const updater = (old: Settlement[] | undefined) =>
+                old?.map((s) => s.id === settlementId ? { ...s, status: 'completed' as const, completedAt: new Date().toISOString() } : s);
+
+            queryClient.setQueryData<Settlement[]>(queryKey, updater);
+            queryClient.setQueryData<Settlement[]>(pendingQueryKey, (old) => old?.filter(s => s.id !== settlementId));
+
+            return { previousSettlements, previousPending };
+        },
+        onError: (err, { groupId }, context) => {
+            if (context?.previousSettlements) {
+                queryClient.setQueryData(settlementsQueryOptions(groupId).queryKey, context.previousSettlements);
+            }
+            if (context?.previousPending) {
+                queryClient.setQueryData(pendingSettlementsQueryOptions(groupId).queryKey, context.previousPending);
+            }
+        },
+        onSettled: (_, __, { groupId }) => {
             queryClient.invalidateQueries({ queryKey: settlementsQueryOptions(groupId).queryKey });
+            queryClient.invalidateQueries({ queryKey: pendingSettlementsQueryOptions(groupId).queryKey });
             queryClient.invalidateQueries({ queryKey: groupQueryOptions(groupId).queryKey });
         },
     });
@@ -89,8 +152,35 @@ export const useRejectSettlement = () => {
             method: "PATCH",
             body: JSON.stringify({ settlementId, status: "rejected" }),
         }),
-        onSuccess: (_, { groupId }) => {
+        onMutate: async ({ settlementId, groupId }) => {
+            const queryKey = settlementsQueryOptions(groupId).queryKey;
+            const pendingQueryKey = pendingSettlementsQueryOptions(groupId).queryKey;
+
+            await queryClient.cancelQueries({ queryKey });
+            await queryClient.cancelQueries({ queryKey: pendingQueryKey });
+
+            const previousSettlements = queryClient.getQueryData<Settlement[]>(queryKey);
+            const previousPending = queryClient.getQueryData<Settlement[]>(pendingQueryKey);
+
+            const updater = (old: Settlement[] | undefined) =>
+                old?.map((s) => s.id === settlementId ? { ...s, status: 'rejected' as const } : s);
+
+            queryClient.setQueryData<Settlement[]>(queryKey, updater);
+            queryClient.setQueryData<Settlement[]>(pendingQueryKey, (old) => old?.filter(s => s.id !== settlementId));
+
+            return { previousSettlements, previousPending };
+        },
+        onError: (err, { groupId }, context) => {
+            if (context?.previousSettlements) {
+                queryClient.setQueryData(settlementsQueryOptions(groupId).queryKey, context.previousSettlements);
+            }
+            if (context?.previousPending) {
+                queryClient.setQueryData(pendingSettlementsQueryOptions(groupId).queryKey, context.previousPending);
+            }
+        },
+        onSettled: (_, __, { groupId }) => {
             queryClient.invalidateQueries({ queryKey: settlementsQueryOptions(groupId).queryKey });
+            queryClient.invalidateQueries({ queryKey: pendingSettlementsQueryOptions(groupId).queryKey });
         },
     });
 };
