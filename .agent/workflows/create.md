@@ -14,26 +14,35 @@ This command starts a new application creation process.
 
 ### Steps:
 
-1. **Request Analysis**
+1. **Load Guards & Context**
+   - Read `.agent/guards/before-code.md` — verify coding standards loaded
+   - If UI changes involved: also read `.agent/guards/before-ui.md`
+   - Read `.agent/context/architecture.md` — understand current architecture
+   - Read `.agent/context/app-flow.md` — understand current screen map
+   - Read `.agent/context/decisions.md` — check for relevant ADRs
+
+2. **Request Analysis**
    - Understand what the user wants
    - If information is missing, use `conversation-manager` skill to ask
 
-2. **Project Planning**
+3. **Project Planning**
    - Use `project-planner` agent for task breakdown
-   - Determine tech stack
+   - Determine tech stack (follow `01-project-identity.md`)
    - Plan file structure
    - Create plan file and proceed to building
 
-3. **Application Building (After Approval)**
-   - Orchestrate with `app-builder` skill
+4. **Application Building (After Approval)**
+   - Follow `02-coding-standards.md` and `03-ui-ux-patterns.md` strictly
    - Coordinate expert agents:
-     - `database-architect` → Schema
-     - `backend-specialist` → API
-     - `frontend-specialist` → UI
+     - `mobile-developer` → UI & Logic
+     - `debugger` → Error handling
+     - `test-engineer` → Verification
 
-4. **Preview**
-   - Start with `auto_preview.py` when complete
-   - Present URL to user
+5. **Verify Against Guards**
+   - Re-check `before-code.md` checklist
+   - Re-check `before-ui.md` checklist if UI created
+   - Ensure all imports use `@/` alias
+
 
 ---
 

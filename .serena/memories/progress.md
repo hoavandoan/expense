@@ -1,24 +1,5 @@
 # Project Progress
 
-## Status
-The project is currently in active development. Basic core functionalities like authentication, group management, and expense tracking are implemented.
+> **Related context**: `.agent/context/decisions.md` (architectural decisions)
+> This memory tracks implementation progress. Keep updated after major milestones.
 
-## Key Features Implemented
-- [x] **Authentication**: Supabase-based login and logout.
-- [x] **Groups**: Create, join (via invite code/QR), view details, and edit group settings.
-- [x] **Expenses**: View group expenses, add new expenses, and edit them.
-- [x] **Debts & Settlements**: Calculate debts within groups, request settlements, and confirm payments (VietQR support).
-- [x] **Notifications**: View activity notifications (expenses, settlements, debt assignments).
-- [x] **Activity History**: View recent activities within groups.
-
-## Recent Changes
-- Fixed `GroupCard` display and layout for better visual consistency.
-- Debugged missing context issues in modal components.
-- Implemented `ArticleList` dynamic fetching (wait, this might be from a different conversation context, but I'll stick to what I see in the files).
-
-## Pending Tasks (TODOs)
-- [ ] **Notifications**: Implement navigation to relevant screens based on notification type (`app/notifications/index.tsx`, Line 114).
-- [ ] **Group Settings**: Implement "Add Member" screen and navigation (`app/group/[id]/settings.tsx`, Line 279).
-- [ ] **Group Settings**: Implement "Remove Member" functionality (`app/group/[id]/settings.tsx`, Line 361).
-- [ ] **Search**: Refine search behavior and result filtering if needed.
-- [ ] **UI/UX**: Further refine animations and transitions using Reanimated spring configurations.

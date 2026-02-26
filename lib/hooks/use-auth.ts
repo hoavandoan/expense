@@ -33,11 +33,23 @@ export const useAuth = () => {
             if (profile) {
                 setUser(profile);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('[Auth] Error fetching profile:', error);
-            setLoading(false);
+
+            // If it's an auth error (401 or Invalid token message), 
+            // we should perform a clean logout to prevent infinite loop or broken state
+            const isAuthError = error.status === 401 ||
+                error.message?.includes('Invalid or expired token') ||
+                error.message?.includes('JWT expired');
+
+            if (isAuthError) {
+                console.warn('[Auth] Redirecting to login due to auth error');
+                logout();
+            } else {
+                setLoading(false);
+            }
         }
-    }, [setUser, setLoading]);
+    }, [setUser, setLoading, logout]);
 
     /**
      * Initialize session on app start
@@ -110,6 +122,7 @@ export const useAuth = () => {
 
     const signOut = async () => {
         const { error } = await supabase.auth.signOut();
+        console.log('signOut', error);
         if (error) throw error;
         logout();
     };

@@ -14,32 +14,45 @@ This command adds features or makes updates to existing application.
 
 ### Steps:
 
-1. **Understand Current State**
-   - Load project state with `python .agent/scripts/session_manager.py info`
-   - Understand existing features, tech stack
+1. **Load Guards & Context**
+   - Read `.agent/guards/before-code.md` — verify coding standards loaded
+   - If UI changes involved: also read `.agent/guards/before-ui.md`
+   - Read `.agent/context/architecture.md` — understand current architecture
+   - Read `.agent/context/app-flow.md` — understand current screen map
+   - Read `.agent/context/decisions.md` — check for relevant ADRs
 
-2. **Plan Changes**
+2. **Understand Current State**
+   - Read relevant files using Serena semantic tools (find_symbol, get_symbols_overview)
+   - Check `lib/types/index.ts` for relevant data models
+   - Check `lib/hooks/` for existing query/mutation hooks
+
+3. **Plan Changes**
    - Determine what will be added/changed
    - Detect affected files
    - Check dependencies
+   - Verify plan doesn't violate any ADRs in `decisions.md`
 
-3. **Present Plan to User** (for major changes)
+4. **Present Plan to User** (for major changes)
    ```
-   "To add admin panel:
-   - I'll create 15 new files
-   - Update 8 files
-   - Takes ~10 minutes
-   
+   "To add [feature]:
+   - I'll create X new files
+   - Update Y files
+   - Estimated effort: ~Z minutes
+
    Should I start?"
    ```
 
-4. **Apply**
-   - Call relevant agents
-   - Make changes
+5. **Apply**
+   - Follow coding standards from `02-coding-standards.md`
+   - Follow UI patterns from `03-ui-ux-patterns.md` if touching UI
+   - Make changes file by file
    - Test
 
-5. **Update Preview**
-   - Hot reload or restart
+6. **Verify Against Guards**
+   - Re-check `before-code.md` checklist
+   - Re-check `before-ui.md` checklist if UI changed
+   - Ensure all imports use `@/` alias
+   - Ensure no prohibited patterns introduced
 
 ---
 
@@ -51,7 +64,6 @@ This command adds features or makes updates to existing application.
 /enhance integrate payment system
 /enhance add search feature
 /enhance edit profile page
-/enhance make responsive
 ```
 
 ---
@@ -59,5 +71,5 @@ This command adds features or makes updates to existing application.
 ## Caution
 
 - Get approval for major changes
-- Warn on conflicting requests (e.g., "use Firebase" when project uses PostgreSQL)
-- Commit each change with git
+- Warn on conflicting requests (e.g., "use Firebase" when project uses Supabase)
+- Follow guard checklists strictly

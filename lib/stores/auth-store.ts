@@ -53,7 +53,8 @@ export const useAuthStore = create<AuthState>()(
 
             setLoginSheetOpen: (isLoginSheetOpen) => set({ isLoginSheetOpen }),
 
-            logout: () =>
+            logout: async () => {
+                await AsyncStorage.clear();
                 set({
                     user: null,
                     session: null,
@@ -61,7 +62,9 @@ export const useAuthStore = create<AuthState>()(
                     isLoading: false,
                     isLoginSheetOpen: false,
                     hasCompletedOnboarding: false,
-                }),
+                })
+            }
+
         }),
         {
             name: 'auth-storage',

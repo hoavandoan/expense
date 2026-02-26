@@ -48,7 +48,12 @@ export async function apiClient<T>(path: string, options: RequestOptions = {}): 
 
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `API Error: ${response.status} ${response.statusText}`);
+        const errorMessage = errorData.error || `API Error: ${response.status} ${response.statusText}`;
+
+        // Create an error object with status for better handling
+        const error = new Error(errorMessage) as any;
+        error.status = response.status;
+        throw error;
     }
 
     // For 204 No Content
