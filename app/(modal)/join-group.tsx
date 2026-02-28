@@ -8,8 +8,11 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import {
   Button,
-  Divider,
+  Description,
+  Input,
+  Label,
   PressableFeedback,
+  Separator,
   Spinner,
   TextField,
   useThemeColor,
@@ -160,7 +163,7 @@ export default function JoinGroupScreen() {
   if (!permission.granted) {
     return (
       <View className="flex-1 bg-background items-center justify-center p-6">
-        <View className="bg-surface p-8 rounded-3xl border border-divider/10 items-center w-full">
+        <View className="bg-surface p-8 rounded-3xl border border-border/10 items-center w-full">
           <View className="w-20 h-20 bg-accent/10 rounded-full items-center justify-center mb-6">
             <IconSymbol name="camera.fill" size={40} color={accent} />
           </View>
@@ -252,24 +255,24 @@ export default function JoinGroupScreen() {
         </View>
 
         <View className="flex-row items-center gap-4 mb-8">
-          <Divider className="flex-1 bg-divider/10" />
+          <Separator className="flex-1 bg-border/10" />
           <AppText className="text-muted font-bold text-xs tracking-widest uppercase">HOẶC</AppText>
-          <Divider className="flex-1 bg-divider/10" />
+          <Separator className="flex-1 bg-border/10" />
         </View>
 
         <View className="mb-8">
           <View className="flex-row gap-2">
             <TextField isRequired className="flex-1">
-              <TextField.Label className="mb-3 ml-1">
+              <Label className="mb-3 ml-1">
                 NHẬP MÃ HOẶC LIÊN KẾT
-              </TextField.Label>
-              <TextField.Description className="mb-3 ml-1">
+              </Label>
+              <Description className="mb-3 ml-1">
                 Sử dụng mã nhóm hoặc dán liên kết mời
-              </TextField.Description>
+              </Description>
               <View className="justify-center">
-                <TextField.Input
+                <Input
                   placeholder="Mã hoặc liên kết mời"
-                  className="bg-surface border border-divider/10 h-16 rounded-2xl pl-12 pr-20 text-foreground"
+                  className="bg-surface border border-border/10 h-16 rounded-2xl pl-12 pr-20 text-foreground"
                   placeholderTextColor="gray"
                   value={inviteCode}
                   onChangeText={(text) => setInviteCode(text.toUpperCase())}
@@ -280,7 +283,7 @@ export default function JoinGroupScreen() {
                 </View>
                 <View className="absolute right-4">
                   <PressableFeedback
-                    className="bg-surface-secondary px-4 py-2 rounded-xl border border-divider/10"
+                    className="bg-surface-secondary px-4 py-2 rounded-xl border border-border/10"
                     onPress={handlePaste}
                   >
                     <View className="flex-row items-center gap-1.5">

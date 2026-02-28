@@ -18,7 +18,7 @@ export const HomeNavbar = ({ user, isAuthenticated, unreadCount = 0 }: HomeNavba
   const surface = useThemeColor("surface");
 
   return (
-    <HeaderNavBar useBlur tint="light" intensity={80} className="border-b border-divider/10">
+    <HeaderNavBar useBlur tint="light" intensity={80} className="border-b border-border/10">
       <View className="flex-row items-center h-full w-full">
         <View className="flex-1 items-start">
           <PressableFeedback

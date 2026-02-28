@@ -112,19 +112,19 @@ export default function GroupStatsScreen() {
       <ScreenScrollView contentContainerStyle={{ padding: 20 }}>
         <View className="mb-8">
           <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">TỔNG QUAN CHI TIÊU</AppText>
-          <Card className="p-6 rounded-3xl border border-divider/10">
+          <Card className="p-6 rounded-3xl border border-border/10">
             <AppText className="text-muted text-xs uppercase font-bold mb-1">Tổng cộng đã chi</AppText>
             <AppText className="text-3xl font-bold mb-4">
               {formatCurrency(stats.totalAmount, group?.currency)}
             </AppText>
             <View className="flex-row gap-4">
-              <View className="flex-1 bg-surface-secondary p-4 rounded-2xl border border-divider/5">
+              <View className="flex-1 bg-surface-secondary p-4 rounded-2xl border border-border/5">
                 <AppText className="text-[10px] text-muted font-bold uppercase mb-1">Trung bình / người</AppText>
                 <AppText className="text-lg font-bold" numberOfLines={1} adjustsFontSizeToFit>
                   {formatCurrency(stats.averagePerPerson, group?.currency)}
                 </AppText>
               </View>
-              <View className="flex-1 bg-surface-secondary p-4 rounded-2xl border border-divider/5">
+              <View className="flex-1 bg-surface-secondary p-4 rounded-2xl border border-border/5">
                 <AppText className="text-[10px] text-muted font-bold uppercase mb-1">Số lượng chi tiêu</AppText>
                 <AppText className="text-lg font-bold">{stats.count}</AppText>
               </View>
@@ -134,7 +134,7 @@ export default function GroupStatsScreen() {
 
         <View className="mb-8">
           <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">PHÂN LOẠI CHI TIÊU</AppText>
-          <Card className="p-6 rounded-3xl border border-divider/10">
+          <Card className="p-6 rounded-3xl border border-border/10">
             <View className="items-center justify-center mb-6">
               <PieChart
                 data={stats.pieData}

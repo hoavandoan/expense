@@ -42,6 +42,7 @@ export type ExpenseCategory =
     | 'entertainment'
     | 'shopping'
     | 'utilities'
+    | 'gift'
     | 'other';
 
 // Expense entity

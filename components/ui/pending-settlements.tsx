@@ -160,7 +160,7 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
                   </Button>
                 </View>
               </View>
-              {idx < pendingSettlements.length - 1 && <View className="h-px bg-divider/10 mx-4" />}
+              {idx < pendingSettlements.length - 1 && <View className="h-px bg-border/10 mx-4" />}
             </View>
           );
         })}

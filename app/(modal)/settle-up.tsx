@@ -183,7 +183,7 @@ export default function SettleUpScreen() {
         <View className="mb-8">
           <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">CHI TIẾT CÁC KHOẢN</AppText>
           {debts.length === 0 ? (
-            <View className="p-6 bg-surface rounded-2xl border border-divider/10 items-center">
+            <View className="p-6 bg-surface rounded-2xl border border-border/10 items-center">
               <IconSymbol name="checkmark.circle.fill" size={40} color={accent} />
               <AppText className="text-foreground font-semibold mt-3">Không có khoản nợ</AppText>
               <AppText className="text-muted text-sm text-center mt-1">
@@ -191,7 +191,7 @@ export default function SettleUpScreen() {
               </AppText>
             </View>
           ) : (
-            <Card variant="default" className="rounded-2xl border border-divider/10 overflow-hidden">
+            <Card variant="default" className="rounded-2xl border border-border/10 overflow-hidden">
               {debts.map((debt, idx) => (
                 <PressableFeedback 
                   key={debt.id}
@@ -252,7 +252,7 @@ export default function SettleUpScreen() {
                         variant="default"
                         className={cn(
                           "p-4 rounded-2xl border flex-row items-center",
-                          isSelected ? "border-accent bg-accent/5" : "border-divider/5"
+                          isSelected ? "border-accent bg-accent/5" : "border-border/5"
                         )}
                       >
                         <View className={cn(
@@ -267,7 +267,7 @@ export default function SettleUpScreen() {
                         </View>
                         <View className={cn(
                           "w-6 h-6 rounded-full border-2 items-center justify-center",
-                          isSelected ? "border-accent bg-accent" : "border-divider"
+                          isSelected ? "border-accent bg-accent" : "border-border"
                         )}>
                           {isSelected && <View className="w-2 h-2 rounded-full bg-white" />}
                         </View>

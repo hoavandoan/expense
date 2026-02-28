@@ -10,14 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import {
-  Avatar,
-  Button,
-  PressableFeedback,
-  Select,
-  TextField,
-  useThemeColor
-} from "heroui-native";
+import { Avatar, Button, Input, PressableFeedback, Select, TextField, useThemeColor } from 'heroui-native';
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
@@ -138,11 +131,11 @@ export default function AddGroupScreen() {
                 control={control}
                 name="name"
                 render={({ field: { onChange, value } }) => (
-                  <TextField.Input
+                  <Input
                     placeholder="e.g. Du lịch Đà Lạt"
                     value={value}
                     onChangeText={onChange}
-                    className="bg-surface border border-divider/10 h-12 rounded-2xl px-4 text-base"
+                    className="bg-surface border border-border/10 h-12 rounded-2xl px-4 text-base"
                   />
                 )}
               />
@@ -158,11 +151,11 @@ export default function AddGroupScreen() {
                 control={control}
                 name="description"
                 render={({ field: { onChange, value } }) => (
-                  <TextField.Input
+                  <Input
                     placeholder="Mô tả ngắn gọn về nhóm..."
                     value={value}
                     onChangeText={onChange}
-                    className="bg-surface border border-divider/10 h-12 rounded-2xl px-4 text-base"
+                    className="bg-surface border border-border/10 h-12 rounded-2xl px-4 text-base"
                   />
                 )}
               />
@@ -184,7 +177,7 @@ export default function AddGroupScreen() {
                       value={GROUP_TYPES.find((t) => t.value === value) as any}
                       onValueChange={(opt: any) => opt && onChange(opt.value)}
                     >
-                      <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                      <Select.Trigger className="h-12 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                         <View className="flex-row items-center gap-3">
                           <IconSymbol
                             name={
@@ -209,9 +202,8 @@ export default function AddGroupScreen() {
                       <Select.Portal>
                         <Select.Overlay className="bg-black/20" />
                         <Select.Content
-                          placement="bottom"
-                          className="rounded-2xl bg-surface border border-divider/10"
-                          width={250}
+                        presentation="popover"
+                          className="rounded-2xl bg-surface border border-border/10"
                         >
                           {GROUP_TYPES.map((type) => (
                             <Select.Item
@@ -253,7 +245,7 @@ export default function AddGroupScreen() {
                       value={CURRENCIES.find((c) => c.value === value) as any}
                       onValueChange={(opt: any) => opt && onChange(opt.value)}
                     >
-                      <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                      <Select.Trigger className="h-12 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                         <View className="flex-row items-center gap-3">
                           <AppText className="font-bold text-accent text-lg">
                             {CURRENCIES.find((c) => c.value === value)?.symbol}
@@ -273,9 +265,8 @@ export default function AddGroupScreen() {
                       <Select.Portal>
                         <Select.Overlay className="bg-black/20" />
                         <Select.Content
-                          placement="bottom"
-                          className="rounded-2xl bg-surface border border-divider/10"
-                          width={250}
+                        presentation="popover"
+                          className="rounded-2xl bg-surface border border-border/10"
                         >
                           {CURRENCIES.map((curr) => (
                             <Select.Item

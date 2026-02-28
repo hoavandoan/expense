@@ -1,6 +1,6 @@
 import { useAuth } from '@/lib/hooks';
 import { Ionicons } from '@expo/vector-icons';
-import { BottomSheet, Button, Divider, useThemeColor } from 'heroui-native';
+import { BottomSheet, Button, Separator, useThemeColor } from 'heroui-native';
 import React from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -102,7 +102,7 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
 
           {/* Footer Info */}
           <View className="mt-10 items-center">
-            <Divider className="w-12 mb-6 opacity-30" />
+            <Separator className="w-12 mb-6 opacity-30" />
             <AppText className="text-[11px] text-muted/50 text-center px-10 leading-4">
               Bằng cách tiếp tục, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của chúng tôi.
             </AppText>

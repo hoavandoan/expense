@@ -35,7 +35,7 @@ import {
 } from "react-native-reanimated";
 import {
   SafeAreaProvider,
-  useSafeAreaInsets,
+  useSafeAreaInsets
 } from "react-native-safe-area-context";
 import "./global.css";
 
@@ -65,19 +65,19 @@ const queryClient = new QueryClient({
 
 function AuthListener() {
   const { initializeAuth, setupAuthListener } = useAuth();
-  
+
   useEffect(() => {
     // 1. Initial session check
     initializeAuth();
-    
+
     // 2. Setup real-time listener
     const subscription = setupAuthListener();
-    
+
     return () => {
       subscription.unsubscribe();
     };
   }, [initializeAuth, setupAuthListener]);
-  
+
   return null;
 }
 
@@ -151,13 +151,14 @@ export default function RootLayout() {
     IBMPlexSans_700Bold,
   });
 
+  useReactQueryDevTools(queryClient);
+
   if (!fonts) {
     return null;
   }
-useReactQueryDevTools(queryClient)
   return (
-    <SafeAreaProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+    <SafeAreaProvider style={{ flex: 1, backgroundColor: "#000000" }}>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#000000" }}>
         <ErrorBoundary>
           <QueryClientProvider client={queryClient}>
             <KeyboardProvider>

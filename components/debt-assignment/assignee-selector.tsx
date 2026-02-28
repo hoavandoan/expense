@@ -2,10 +2,10 @@ import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Image } from 'expo-image';
 import {
-  Avatar,
-  Button,
-  cn,
-  Dialog,
+    Avatar,
+    Button,
+    cn,
+    Dialog,
 } from 'heroui-native';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
@@ -76,7 +76,7 @@ export const AssigneeSelector: React.FC<AssigneeSelectorProps> = ({
                     "p-3 rounded-2xl border flex-row items-center justify-between h-auto",
                     selectedUserId === member.userId
                       ? "border-primary bg-primary/10"
-                      : "border-divider/10"
+                      : "border-border/10"
                   )}
                   onPress={() => setSelectedUserId(member.userId)}
                 >

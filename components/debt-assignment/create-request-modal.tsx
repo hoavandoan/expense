@@ -2,11 +2,13 @@ import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Image } from 'expo-image';
 import {
-    Avatar,
-    Button,
-    cn,
-    Dialog,
-    TextField,
+  Avatar,
+  Button,
+  cn,
+  Dialog,
+  Input,
+  Label,
+  TextField
 } from 'heroui-native';
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
@@ -59,10 +61,8 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
         <Dialog.Content className="max-w-md w-[90%] self-center">
           <View className="flex-row justify-between items-center mb-2">
             <Dialog.Title className="text-xl font-bold">Đề Xuất Người Gán Nợ</Dialog.Title>
-            <Dialog.Close asChild>
-              <Button isIconOnly variant="ghost" size="sm">
-                <IconSymbol name="xmark" size={24} color="gray" />
-              </Button>
+            <Dialog.Close variant="ghost" size="sm">
+              <IconSymbol name="xmark" size={24} color="gray" />
             </Dialog.Close>
           </View>
           
@@ -71,7 +71,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
           </Dialog.Description>
           
           <TextField isRequired className="mb-4">
-            <TextField.Label className="mb-3 ml-1">CHỌN THÀNH VIÊN</TextField.Label>
+            <Label className="mb-3 ml-1">CHỌN THÀNH VIÊN</Label>
             <ScrollView className="max-h-60" showsVerticalScrollIndicator={false}>
               <View className="gap-3">
                 {members.map((member) => (
@@ -82,7 +82,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                       "p-3 rounded-2xl border flex-row items-center justify-between h-auto",
                       selectedUserId === member.userId
                         ? "border-primary bg-primary/10"
-                        : "border-divider/10"
+                        : "border-border/10"
                     )}
                     onPress={() => setSelectedUserId(member.userId)}
                   >
@@ -118,8 +118,8 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
 
           <View className="mb-6">
             <TextField>
-              <TextField.Label className="mb-3 ml-1">LÝ DO (TÙY CHỌN)</TextField.Label>
-              <TextField.Input
+              <Label className="mb-3 ml-1">LÝ DO (TÙY CHỌN)</Label>
+              <Input
                 placeholder="Tại sao nên chọn người này?"
                 value={reason}
                 onChangeText={setReason}
@@ -131,10 +131,8 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
           </View>
 
           <View className="flex-row gap-3">
-            <Dialog.Close asChild>
-              <Button variant="ghost" className="flex-1">
-                <Button.Label>Hủy</Button.Label>
-              </Button>
+            <Dialog.Close variant="ghost" className="flex-1">
+              <Button.Label>Hủy</Button.Label>
             </Dialog.Close>
             <Button
               variant="primary"

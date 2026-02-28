@@ -31,7 +31,7 @@ export default function WelcomeScreen() {
           style={{ paddingTop: insets.top }} 
           className="w-full flex-row justify-between items-center"
         >
-          <View className="bg-surface px-4 py-2 rounded-full border border-divider/10 flex-row items-center gap-2">
+          <View className="bg-surface px-4 py-2 rounded-full border border-border/10 flex-row items-center gap-2">
             <IconSymbol name="person.3.fill" size={16} color="#10b981" />
             <AppText weight="bold" className="text-xs uppercase tracking-wider">SplitSmart</AppText>
           </View>
@@ -54,7 +54,7 @@ export default function WelcomeScreen() {
             />
             <View className="items-center">
               <IconSymbol name="doc.plaintext.fill" size={100} color="#10b981" />
-              <View className="flex-row gap-2 mt-8 bg-surface p-4 rounded-2xl border border-divider/10 shadow-lg items-center">
+              <View className="flex-row gap-2 mt-8 bg-surface p-4 rounded-2xl border border-border/10 shadow-lg items-center">
                 <View className="flex-row -space-x-3">
                   <Avatar size="sm" alt="User 1">
                     <Avatar.Image source={{ uri: "https://i.pravatar.cc/100?u=1" }} />
@@ -110,7 +110,7 @@ export default function WelcomeScreen() {
           </Button>
 
           <PressableFeedback onPress={handleSkipToLogin}>
-            <View className="h-16 rounded-2xl border border-divider/10 bg-surface/50 items-center justify-center">
+            <View className="h-16 rounded-2xl border border-border/10 bg-surface/50 items-center justify-center">
               <AppText weight="semibold" className="text-foreground">Đã có tài khoản? Đăng nhập</AppText>
             </View>
           </PressableFeedback>

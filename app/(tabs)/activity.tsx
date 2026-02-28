@@ -8,7 +8,7 @@ import { useRecentActivity } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatCurrency } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
-import { cn, Spinner, Tabs, TextField, useThemeColor } from "heroui-native";
+import { cn, Input, Spinner, Tabs, TextField, useThemeColor } from "heroui-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
@@ -264,7 +264,7 @@ export default function ActivityScreen() {
     setRefreshing(false);
   }, [refetch]);
 
-  const renderItem = useCallback(({ item, index }: { item: ActivityListItem }) => {
+  const renderItem = useCallback(({ item, index }: { item: ActivityListItem; index: number }) => {
     if (item.type === "header") {
       return (
         <Animated.View 
@@ -353,7 +353,7 @@ export default function ActivityScreen() {
         <View className="px-6 mb-6">
           <TextField className="bg-default/5 rounded-2xl overflow-hidden">
             <View className="justify-center">
-              <TextField.Input
+              <Input
                 placeholder="Tìm kiếm hoạt động, nhóm, bạn bè"
                 className="text-base pl-12 h-14"
                 value={searchQuery}
@@ -370,7 +370,7 @@ export default function ActivityScreen() {
           <Tabs
             value={activeFilter}
             onValueChange={setActiveFilter}
-            variant="pill"
+            variant="secondary"
           >
             <Tabs.List>
               <Tabs.Indicator className="bg-accent shadow-none" />
@@ -405,9 +405,9 @@ export default function ActivityScreen() {
         <FlashList
           data={flattenedActivities}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item: ActivityListItem) => item.id}
           estimatedItemSize={100}
-          getItemType={(item) => item.type}
+          getItemType={(item: ActivityListItem) => item.type}
           onRefresh={onRefresh}
           refreshing={refreshing}
           className="px-6"

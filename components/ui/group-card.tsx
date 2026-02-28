@@ -109,7 +109,7 @@ export const GroupCard: FC<GroupCardProps> = ({
           <Card
             variant="default"
             className={cn(
-              "flex-1 relative p-0 rounded-[] border border-divider/10 overflow-hidden shadow-lg",
+              "flex-1 relative p-0 rounded-[] border border-border/10 overflow-hidden shadow-lg",
               className
             )}
             style={{
@@ -210,7 +210,7 @@ export const GroupCard: FC<GroupCardProps> = ({
     <Animated.View style={animatedStyle}>
       <Card
         variant="default"
-        className={cn("mb-4 p-5 rounded-3xl border border-divider/10 bg-surface", className)}
+        className={cn("mb-4 p-5 rounded-3xl border border-border/10 bg-surface", className)}
       >
         <Pressable
           onPress={onPress}

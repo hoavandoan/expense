@@ -1,0 +1,128 @@
+$ expo lint
+env: load .env
+env: export EXPO_PUBLIC_GEMINI_API_KEY EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY
+
+/Users/doanhv/Documents/doanhv/expense/app/(modal)/add-expense.tsx
+  61:11  warning  'GroupOption' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/app/(modal)/add-group.tsx
+  49:5   warning  'setValue' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  95:14  warning  'error' is defined but never used              @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/app/(modal)/join-group.tsx
+  42:6   warning  React Hook useEffect has a missing dependency: 'scanLineValue'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  87:14  warning  'error' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/app/(modal)/payment-confirm.tsx
+  11:9  warning  'accent' is assigned a value but never used                                                                               @typescript-eslint/no-unused-vars
+  19:6  warning  React Hook useEffect has missing dependencies: 'opacity' and 'scale'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/doanhv/Documents/doanhv/expense/app/(modal)/settle-up.tsx
+  112:6  warning  React Hook useMemo has a missing dependency: 'activeAssignment'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/doanhv/Documents/doanhv/expense/app/(onboarding)/login.tsx
+  27:10  warning  'isSocialLoading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/app/(onboarding)/tutorial.tsx
+  10:8  warning  'PagerView' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/app/(tabs)/_layout.tsx
+  16:9  warning  'surface' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  17:9  warning  'insets' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/app/(tabs)/activity.tsx
+  140:7  warning  'formatTimeAgo' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/app/+not-found.tsx
+  14:28  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/doanhv/Documents/doanhv/expense/app/_layout.tsx
+  157:1  error  React Hook "useReactQueryDevTools" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+
+/Users/doanhv/Documents/doanhv/expense/app/expense/[id]/edit.tsx
+  103:9  warning  The 'participantIds' logical expression could make the dependencies of useMemo Hook (at line 147) change on every render. To fix this, wrap the initialization of 'participantIds' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  104:9  warning  'paidById' is assigned a value but never used                                                                                                                                                                 @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/app/group/[id]/expenses.tsx
+  62:9  warning  'members' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/app/group/[id]/history.tsx
+  18:9  warning  'accent' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/app/group/[id]/index.tsx
+   44:11  warning  'MemberWithBalance' is defined but never used                                                                                                                                                                               @typescript-eslint/no-unused-vars
+   55:9   warning  'accent' is assigned a value but never used                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   80:9   warning  The 'membersWithBalanceRaw' logical expression could make the dependencies of useMemo Hook (at line 90) change on every render. To fix this, wrap the initialization of 'membersWithBalanceRaw' in its own useMemo() Hook   react-hooks/exhaustive-deps
+   80:9   warning  The 'membersWithBalanceRaw' logical expression could make the dependencies of useMemo Hook (at line 102) change on every render. To fix this, wrap the initialization of 'membersWithBalanceRaw' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  125:13  warning  'payer' is assigned a value but never used                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/app/group/[id]/members.tsx
+   60:9  warning  The 'handleShareInvite' function makes the dependencies of useMemo Hook (at line 205) change on every render. To fix this, wrap the definition of 'handleShareInvite' in its own useCallback() Hook  react-hooks/exhaustive-deps
+  186:6  warning  React Hook useMemo has missing dependencies: 'handleCopyInviteCode' and 'handleShareInvite'. Either include them or remove the dependency array                                                      react-hooks/exhaustive-deps
+
+/Users/doanhv/Documents/doanhv/expense/app/group/[id]/settings.tsx
+  389:70  error  React Hook "useThemeColor" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+
+/Users/doanhv/Documents/doanhv/expense/app/profile/edit.tsx
+   9:9  warning  'accent' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  10:9  warning  'foreground' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/components/activity-item.tsx
+  22:29  error    Component definition is missing display name  react/display-name
+  36:9   warning  'accent' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/components/auth/LoginBottomSheet.tsx
+  21:9  warning  'background' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/components/debt-assignment/assignment-request-card.tsx
+  82:65  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  82:82  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/doanhv/Documents/doanhv/expense/components/home/groups-section.tsx
+  20:9  warning  'accent' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/components/home/home-navbar.tsx
+  18:9  warning  'surface' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/components/parallax-header/AnimatedScrollView.tsx
+  9:35  error  Component definition is missing display name  react/display-name
+
+/Users/doanhv/Documents/doanhv/expense/components/ui/empty-state.tsx
+  24:9  warning  'accent' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/components/ui/error-state.tsx
+  22:9  warning  'accent' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/components/ui/group-card.tsx
+  51:11  warning  'width' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/components/ui/icon-symbol.tsx
+  8:6  warning  'IconMapping' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/doanhv/Documents/doanhv/expense/components/ui/share-qr-sheet.tsx
+   34:8   warning  'accent' is assigned a value but never used                      @typescript-eslint/no-unused-vars
+   78:12  warning  'error' is defined but never used                                @typescript-eslint/no-unused-vars
+   99:14  warning  'innerError' is defined but never used                           @typescript-eslint/no-unused-vars
+  107:12  warning  'error' is defined but never used                                @typescript-eslint/no-unused-vars
+  133:55  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  133:67  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/doanhv/Documents/doanhv/expense/components/ui/skia-onboarding-background.tsx
+  55:6  warning  React Hook useEffect has missing dependencies: 'blob1X', 'blob1Y', 'blob2X', and 'blob2Y'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/doanhv/Documents/doanhv/expense/components/ui/timeline.tsx
+   62:6   warning  React Hook useEffect has a missing dependency: 'items'. Either include it or remove the dependency array                                                                                                                                                                                                                      react-hooks/exhaustive-deps
+   80:26  error    React Hook "useSharedValue" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                                                                                                      react-hooks/rules-of-hooks
+   81:34  error    React Hook "useSharedValue" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                                                                                                      react-hooks/rules-of-hooks
+   82:30  error    React Hook "useSharedValue" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                                                                                                      react-hooks/rules-of-hooks
+   83:28  error    React Hook "useSharedValue" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                                                                                                      react-hooks/rules-of-hooks
+   85:9   error    React Hook "useEffect" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                                                                                                           react-hooks/rules-of-hooks
+  116:12  warning  React Hook useEffect has missing dependencies: 'dotColorAnimated', 'dotScale', 'iconRotate', 'lineProgress', 'statusChanged', and 'wasComplete'. Either include them or remove the dependency array. Outer scope values like 'animationType' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+  118:34  error    React Hook "useAnimatedStyle" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                                                                                                    react-hooks/rules-of-hooks
+  127:35  error    React Hook "useAnimatedStyle" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                                                                                                    react-hooks/rules-of-hooks
+  141:35  error    React Hook "useAnimatedStyle" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                                                                                                    react-hooks/rules-of-hooks
+
+✖ 58 problems (17 errors, 41 warnings)
+
+error: "eslint" exited with code 1
+error: script "lint" exited with code 1

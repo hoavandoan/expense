@@ -10,7 +10,7 @@
   @variant light {
     --accent: oklch(0.65 0.25 150);
     --accent-gradient: linear-gradient(135deg, #17C964 0%, #17AD56 100%);
-    --divider: oklch(0.922 0 0);
+    --border: oklch(0.922 0 0);
     --background: oklch(0.98 0.005 240);
     --surface: oklch(1 0 0);
     --muted: oklch(0.55 0.01 240);
@@ -26,7 +26,7 @@
   @variant dark {
     --accent: oklch(0.65 0.25 150);
     --accent-gradient: linear-gradient(135deg, #17C964 0%, #17AD56 100%);
-    --divider: oklch(1 0 0 / 10%);
+    --border: oklch(1 0 0 / 10%);
     --background: oklch(0.12 0.01 240);
     --surface: oklch(0.18 0.01 240);
     --muted: oklch(0.6 0.01 240);

@@ -1,4 +1,5 @@
 import { AppText } from '@/components/app-text';
+import { CrossPagerView, type CrossPagerViewRef } from '@/components/ui/cross-pager-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { SkiaOnboardingBackground } from '@/components/ui/skia-onboarding-background';
 import { useAuthStore } from '@/lib/stores/auth-store';
@@ -7,10 +8,8 @@ import { useRouter } from 'expo-router';
 import { Avatar, Button, PressableFeedback, useThemeColor } from 'heroui-native';
 import React, { useRef, useState } from 'react';
 import { Dimensions, View } from 'react-native';
-import PagerView from 'react-native-pager-view';
 import Animated, { FadeInUp, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CrossPagerView, type CrossPagerViewRef } from '@/components/ui/cross-pager-view';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -31,7 +30,7 @@ const SLIDES: Slide[] = [
     description: 'Lên kế hoạch cho chuyến đi hoặc chia tiền nhà chỉ trong vài giây.',
     image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=600',
     renderOverlay: (accent) => (
-      <View className="absolute bottom-10 left-6 right-6 bg-surface p-4 rounded-2xl flex-row items-center gap-3 border border-divider/10 shadow-lg">
+      <View className="absolute bottom-10 left-6 right-6 bg-surface p-4 rounded-2xl flex-row items-center gap-3 border border-border/10 shadow-lg">
         <View className="w-10 h-10 rounded-2xl bg-accent items-center justify-center">
           <IconSymbol name="house.fill" size={20} color="white" />
         </View>
@@ -60,7 +59,7 @@ const SLIDES: Slide[] = [
     description: 'Dễ dàng mời thành viên mới và kiểm soát ngân sách nhóm mọi lúc, mọi nơi.',
     image: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?q=80&w=600',
     renderOverlay: (accent) => (
-      <View className="absolute inset-x-8 top-1/4 bg-surface p-4 rounded-2xl shadow-2xl border border-divider/10">
+      <View className="absolute inset-x-8 top-1/4 bg-surface p-4 rounded-2xl shadow-2xl border border-border/10">
         <View className="flex-row items-center justify-between mb-4">
           <View>
             <AppText weight="bold" className="text-[10px] text-muted uppercase">Chi tiêu nhóm</AppText>
@@ -107,7 +106,7 @@ const SLIDES: Slide[] = [
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600',
     renderOverlay: (accent) => (
       <View className="absolute inset-x-6 bottom-1/4 gap-4">
-        <View className="bg-surface p-4 rounded-2xl border border-divider/10 shadow-lg">
+        <View className="bg-surface p-4 rounded-2xl border border-border/10 shadow-lg">
           <View className="flex-row items-center justify-between mb-2">
             <View className="flex-row items-center gap-2">
               <View className="w-8 h-8 rounded-xl bg-accent-soft items-center justify-center">
@@ -122,7 +121,7 @@ const SLIDES: Slide[] = [
           </View>
         </View>
 
-        <View className="bg-surface p-4 rounded-2xl border border-divider/10 shadow-xl flex-row items-center gap-4">
+        <View className="bg-surface p-4 rounded-2xl border border-border/10 shadow-xl flex-row items-center gap-4">
           <View className="w-12 h-12 rounded-2xl bg-accent items-center justify-center">
             <IconSymbol name="chart.bar.fill" size={24} color="white" />
           </View>
@@ -152,7 +151,7 @@ const SLIDES: Slide[] = [
              <IconSymbol name="checkmark" size={16} color="white" />
           </View>
         </View>
-        <View className="bg-surface px-6 py-3 rounded-2xl border border-divider/10 shadow-lg flex-row gap-4 items-center">
+        <View className="bg-surface px-6 py-3 rounded-2xl border border-border/10 shadow-lg flex-row gap-4 items-center">
           <View className="items-center">
             <AppText weight="bold" className="text-[10px] text-muted">ĂN UỐNG</AppText>
             <AppText weight="bold">45%</AppText>

@@ -6,20 +6,22 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
 import { useSearch } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
-import { FlashList } from "@shopify/flash-list";
+import { FlashList as OriginalFlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import {
-    Avatar,
-    Card,
-    PressableFeedback,
-    Spinner,
-    TextField,
-    useThemeColor
+  Avatar,
+  Card,
+  Input,
+  PressableFeedback,
+  Spinner,
+  TextField,
+  useThemeColor
 } from "heroui-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+const FlashList = OriginalFlashList as any;
 
 type SearchListItem = 
   | { type: "header"; title: string; id: string }
@@ -133,7 +135,7 @@ export default function SearchScreen() {
         const user = item.data;
         return (
           <View className="mb-2">
-            <Card className="rounded-2xl border border-divider/10 bg-surface p-4">
+            <Card className="rounded-2xl border border-border/10 bg-surface p-4">
               <View className="flex-row items-center gap-3">
                 {user.avatar_url ? (
                   <Avatar size="md" alt={user.name}>
@@ -178,7 +180,7 @@ export default function SearchScreen() {
               <PressableFeedback
                 key={idx}
                 onPress={() => setSearchQuery(item)}
-                className="flex-row items-center justify-between py-4 border-b border-divider/10"
+                className="flex-row items-center justify-between py-4 border-b border-border/10"
               >
                 <View className="flex-row items-center gap-3">
                   <IconSymbol name="clock" size={16} color={muted} />
@@ -209,12 +211,12 @@ export default function SearchScreen() {
       <View className="px-6 py-4">
         <TextField>
           <View className="justify-center">
-            <TextField.Input
+            <Input
               placeholder="Tìm nhóm, bạn bè, khoản chi..."
               placeholderTextColor={muted}
               value={searchQuery}
               onChangeText={setSearchQuery}
-              className="bg-surface border border-divider/10 rounded-2xl pl-12 h-16 text-foreground"
+              className="bg-surface border border-border/10 rounded-2xl pl-12 h-16 text-foreground"
               autoFocus
             />
             <View className="absolute left-4" pointerEvents="none">
@@ -264,9 +266,9 @@ export default function SearchScreen() {
           <FlashList
             data={flattenedResults}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item: SearchListItem) => item.id}
             estimatedItemSize={100}
-            getItemType={(item) => item.type}
+            getItemType={(item: SearchListItem) => item.type}
             contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: insets.bottom + 40 }}
             keyboardShouldPersistTaps="handled"
           />

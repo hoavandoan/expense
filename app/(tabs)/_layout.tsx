@@ -16,7 +16,7 @@ export default function TabLayout() {
   const surface = useThemeColor('surface');
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const divider = useThemeColor('divider');
+  const divider = useThemeColor('border');
 
   if (isLoading) {
     return null;

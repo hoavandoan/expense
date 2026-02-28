@@ -47,7 +47,7 @@ export default function TransactionHistoryScreen() {
         <View className="mb-8">
           <AppText className="text-muted text-xs font-bold mb-4 ml-1">HÔM NAY</AppText>
           <View className="gap-3">
-            <Card variant="default" className="p-4 rounded-[28px] border border-divider/5">
+            <Card variant="default" className="p-4 rounded-[28px] border border-border/5">
               <View className="flex-row items-center gap-3">
                 <View className="w-12 h-12 bg-orange-100 rounded-2xl items-center justify-center">
                   <IconSymbol name="creditcard" size={24} color="#F5A623" />
@@ -65,7 +65,7 @@ export default function TransactionHistoryScreen() {
         <View className="mb-8">
           <AppText className="text-muted text-xs font-bold mb-4 ml-1">HÔM QUA</AppText>
           <View className="gap-3">
-            <Card variant="default" className="p-4 rounded-[28px] border border-divider/5">
+            <Card variant="default" className="p-4 rounded-[28px] border border-border/5">
               <View className="flex-row items-center gap-3">
                 <View className="w-12 h-12 bg-blue-100 rounded-2xl items-center justify-center">
                   <IconSymbol name="house.fill" size={24} color="#0070F3" />
@@ -84,7 +84,7 @@ export default function TransactionHistoryScreen() {
           <AppText className="text-muted text-xs font-bold mb-4 ml-1">24 THÁNG 12</AppText>
           <View className="gap-3">
             {MOCK_HISTORY.slice(2).map((item) => (
-              <Card key={item.id} variant="default" className="p-4 rounded-[28px] border border-divider/5">
+              <Card key={item.id} variant="default" className="p-4 rounded-[28px] border border-border/5">
                 <View className="flex-row items-center gap-3">
                   <View className="w-12 h-12 bg-gray-100 rounded-2xl items-center justify-center">
                     <IconSymbol name="paperplane.fill" size={24} color="#71717A" />

@@ -10,15 +10,7 @@ import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatDate } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  PressableFeedback,
-  Select,
-  Spinner,
-  Tabs,
-  TextField,
-  cn,
-  useThemeColor
-} from "heroui-native";
+import { Input, PressableFeedback, Select, Spinner, Tabs, TextField, cn, useThemeColor } from 'heroui-native';
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
@@ -187,15 +179,15 @@ export default function GroupExpensesScreen() {
       <StickyHeader title="Khoản chi" />
 
       {/* Filters */}
-      <View className="px-6 py-4 bg-surface border-b border-divider/10 gap-4">
+      <View className="px-6 py-4 bg-surface border-b border-border/10 gap-4">
         {/* Search */}
-        <TextField className="bg-surface-secondary border border-divider/10 rounded-xl">
+        <TextField className="bg-surface-secondary border border-border/10 rounded-xl">
           <View className="justify-center">
-            <TextField.Input
+            <Input
               placeholder="Tìm kiếm khoản chi..."
+              className="text-base h-12 pl-10"
               value={searchQuery}
               onChangeText={setSearchQuery}
-              className="h-12 pl-10"
             />
             <View className="absolute left-3" pointerEvents="none">
               <IconSymbol name="magnifyingglass" size={18} color={muted} />
@@ -226,12 +218,12 @@ export default function GroupExpensesScreen() {
             }
             className="flex-1"
           >
-            <Select.Trigger className="h-12 border border-divider/10 bg-surface-secondary rounded-xl px-4">
+            <Select.Trigger className="h-12 border border-border/10 bg-surface-secondary rounded-xl px-4">
               <Select.Value placeholder="Danh mục" />
             </Select.Trigger>
             <Select.Portal>
               <Select.Overlay />
-              <Select.Content placement="bottom" width={200} className="rounded-xl bg-surface border border-divider/10">
+              <Select.Content presentation="popover" className="bg-surface">
                 <Select.Item value={null} label="Tất cả danh mục" className="p-4">
                   <Select.ItemLabel />
                   <Select.ItemIndicator />
@@ -262,12 +254,12 @@ export default function GroupExpensesScreen() {
             }
             className="flex-1"
           >
-            <Select.Trigger className="h-12 border border-divider/10 bg-surface-secondary rounded-xl px-4">
+            <Select.Trigger className="h-12 border border-border/10 bg-surface-secondary rounded-xl px-4">
               <Select.Value placeholder="Thành viên" />
             </Select.Trigger>
             <Select.Portal>
               <Select.Overlay />
-              <Select.Content placement="bottom" width={200} className="rounded-xl bg-surface border border-divider/10">
+              <Select.Content presentation="bottom-sheet" className="bg-surface">
                 <Select.Item value={null} label="Tất cả thành viên" className="p-4">
                   <Select.ItemLabel />
                   <Select.ItemIndicator />
@@ -293,7 +285,7 @@ export default function GroupExpensesScreen() {
           <Tabs
             value={sortBy}
             onValueChange={(v) => setSortBy(v as "date" | "amount")}
-            variant="pill"
+            variant="secondary"
           >
             <Tabs.List>
               <Tabs.Indicator className="bg-accent shadow-none" />

@@ -5,7 +5,7 @@ import { signInWithApple, signInWithGoogle } from '@/lib/auth/oauth';
 import { useAuth } from '@/lib/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Button, PressableFeedback, TextField, useThemeColor, useToast } from 'heroui-native';
+import { Button, Input, Label, PressableFeedback, TextField, useThemeColor, useToast } from 'heroui-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 
@@ -150,8 +150,8 @@ export default function LoginScreen() {
         <View className="gap-4 my-6">
           {isSignUp && (
             <TextField isRequired className="mb-4">
-              <TextField.Label className="mb-2 ml-1">Họ và tên</TextField.Label>
-              <TextField.Input
+              <Label className="mb-2 ml-1">Họ và tên</Label>
+              <Input
                 value={name}
                 onChangeText={setName}
                 placeholder="Nguyễn Văn A"
@@ -161,8 +161,8 @@ export default function LoginScreen() {
           )}
 
           <TextField isRequired className="mb-4">
-            <TextField.Label className="mb-2 ml-1">Email</TextField.Label>
-            <TextField.Input
+            <Label className="mb-2 ml-1">Email</Label>
+            <Input
               value={email}
               onChangeText={setEmail}
               placeholder="name@example.com"
@@ -172,8 +172,8 @@ export default function LoginScreen() {
           </TextField>
 
           <TextField isRequired className="mb-6">
-            <TextField.Label className="mb-2 ml-1">Mật khẩu</TextField.Label>
-            <TextField.Input
+            <Label className="mb-2 ml-1">Mật khẩu</Label>
+            <Input
               value={password}
               onChangeText={setPassword}
               placeholder="••••••••"
@@ -224,7 +224,7 @@ export default function LoginScreen() {
 
           <Button
             variant="secondary"
-            className="h-14 rounded-2xl border border-divider/10"
+            className="h-14 rounded-2xl border border-border/10"
             onPress={handleGoogleLogin}
           >
             <View className="flex-row items-center gap-3">

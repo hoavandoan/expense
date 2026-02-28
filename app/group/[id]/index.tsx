@@ -5,22 +5,22 @@ import { AssigneeSelector } from "@/components/debt-assignment/assignee-selector
 import { CreateRequestModal } from "@/components/debt-assignment/create-request-modal";
 import { PendingRequestsList } from "@/components/debt-assignment/pending-requests-list";
 import {
-    AnimatedScrollView,
-    AnimatedScrollViewTitle,
-    AnimatedScrollViewTitleWrapper,
-    HeaderComponentWrapper,
-    HeaderNavBar,
+  AnimatedScrollView,
+  AnimatedScrollViewTitle,
+  AnimatedScrollViewTitleWrapper,
+  HeaderComponentWrapper,
+  HeaderNavBar,
 } from "@/components/parallax-header";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ExpenseCard } from "@/components/ui/expense-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { PendingSettlements } from "@/components/ui/pending-settlements";
 import {
-    useDebtAssignment,
-    useDisableDebtAssignment,
-    useGroup,
-    useMembersBalance,
-    useUserBalanceInGroup,
+  useDebtAssignment,
+  useDisableDebtAssignment,
+  useGroup,
+  useMembersBalance,
+  useUserBalanceInGroup,
 } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { assignDebtsOptimized } from "@/lib/utils/debt-calculator";
@@ -28,15 +28,15 @@ import { formatCurrency } from "@/lib/utils/format";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    Avatar,
-    Button,
-    Card,
-    cn,
-    Divider,
-    PressableFeedback,
-    Skeleton,
-    Tabs,
-    useThemeColor,
+  Avatar,
+  Button,
+  Card,
+  cn,
+  PressableFeedback,
+  Separator,
+  Skeleton,
+  Tabs,
+  useThemeColor,
 } from "heroui-native";
 import React, { useMemo, useState } from "react";
 import { RefreshControl, View } from "react-native";
@@ -291,7 +291,7 @@ export default function GroupDetailScreen() {
         <View className="px-6 pt-4 bg-background">
           {/* Info Badges */}
           <View className="flex-row gap-3 mb-8">
-            <View className="bg-surface-secondary px-4 py-2 rounded-full border border-divider/10">
+            <View className="bg-surface-secondary px-4 py-2 rounded-full border border-border/10">
               <AppText className="text-muted text-[10px] font-bold uppercase tracking-widest">
                 THÀNH VIÊN: {groupData?.group_members?.length || 0}
               </AppText>
@@ -356,7 +356,7 @@ export default function GroupDetailScreen() {
                     )}
                   </AppText>
                 </View>
-                <Divider orientation="vertical" className="bg-white/20" />
+                <Separator orientation="vertical" className="bg-white/20" />
                 <View className="flex-1">
                   <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">
                     {userStats.balance >= 0 ? "BẠN NHẬN LẠI" : "BẠN NỢ"}
@@ -442,7 +442,7 @@ export default function GroupDetailScreen() {
                  )}
                </View>
 
-               <Card className="p-4 rounded-2xl bg-surface border border-divider/10">
+               <Card className="p-4 rounded-2xl bg-surface border border-border/10">
                  {activeAssignment?.status === 'active' ? (
                    <View className="flex-row items-center">
                      <Avatar size="md" className="mr-3" alt={assigneeUser?.name || 'Assignee'}>
@@ -501,7 +501,7 @@ export default function GroupDetailScreen() {
 
           {/* Tabs Navigation */}
           <View className="mb-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab} variant="pill">
+            <Tabs value={activeTab} onValueChange={setActiveTab} variant="secondary">
               <Tabs.List className="bg-surface-secondary/50 p-1 rounded-2xl">
                 <Tabs.ScrollView>
                   <Tabs.Indicator className="bg-background shadow-sm" />
@@ -541,7 +541,7 @@ export default function GroupDetailScreen() {
 
                 <View className="gap-4">
                   {groupData?.expenses?.length === 0 ? (
-                    <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                    <View className="p-6 rounded-2xl bg-surface border border-border/10 items-center">
                       <AppText className="text-muted">Chưa có khoản chi nào</AppText>
                     </View>
                   ) : (
@@ -581,7 +581,7 @@ export default function GroupDetailScreen() {
                   <View className="gap-4">
                     {showDetailedDebts ? (
                       individualDebts.length === 0 ? (
-                        <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                        <View className="p-6 rounded-2xl bg-surface border border-border/10 items-center">
                           <AppText className="text-muted">Không có khoản nợ nào</AppText>
                         </View>
                       ) : (
@@ -593,7 +593,7 @@ export default function GroupDetailScreen() {
                             <Card
                               key={debt.id}
                               variant="default"
-                              className="p-4 rounded-2xl bg-surface border border-divider/10"
+                              className="p-4 rounded-2xl bg-surface border border-border/10"
                             >
                               <View className="flex-row items-center justify-between mb-2">
                                 <View className="flex-row items-center flex-1">
@@ -631,7 +631,7 @@ export default function GroupDetailScreen() {
                       )
                     ) : (
                       optimizedDebts.length === 0 ? (
-                        <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                        <View className="p-6 rounded-2xl bg-surface border border-border/10 items-center">
                           <AppText className="text-muted">Tất cả nợ đã được tất toán!</AppText>
                         </View>
                       ) : (
@@ -643,7 +643,7 @@ export default function GroupDetailScreen() {
                             <Card
                               key={index}
                               variant="default"
-                              className="p-4 rounded-2xl bg-surface border border-divider/10"
+                              className="p-4 rounded-2xl bg-surface border border-border/10"
                             >
                               <View className="flex-row items-center justify-between">
                                 <View className="flex-row items-center flex-1">

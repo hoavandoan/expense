@@ -23,7 +23,7 @@ export function ModalHeader({ title, rightElement, onClose, variant = 'close' }:
   return (
     <View
       style={{ paddingTop: insets.top }}
-      className="bg-background border-b border-divider/10"
+      className="bg-background border-b border-border/10"
     >
       <View className="h-16 px-6 flex-row items-center justify-between">
         <View className="flex-row items-center flex-1">
