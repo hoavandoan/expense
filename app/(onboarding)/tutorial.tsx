@@ -1,16 +1,16 @@
 import { AppText } from '@/components/app-text';
+import { CrossPagerView, type CrossPagerViewRef } from '@/components/ui/cross-pager-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { SkiaOnboardingBackground } from '@/components/ui/skia-onboarding-background';
+import { useTranslation } from '@/lib/hooks';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Avatar, Button, PressableFeedback, useThemeColor } from 'heroui-native';
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Dimensions, View } from 'react-native';
-import PagerView from 'react-native-pager-view';
 import Animated, { FadeInUp, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CrossPagerView, type CrossPagerViewRef } from '@/components/ui/cross-pager-view';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -23,12 +23,12 @@ interface Slide {
   renderOverlay: (accent: string) => React.ReactNode;
 }
 
-const SLIDES: Slide[] = [
+const getSlides = (t: any): Slide[] => [
   {
     id: 1,
-    title: 'Tạo nhóm ',
-    accent: 'dễ dàng',
-    description: 'Lên kế hoạch cho chuyến đi hoặc chia tiền nhà chỉ trong vài giây.',
+    title: t('onboarding.tutorial.slide1.title'),
+    accent: t('onboarding.tutorial.slide1.accent'),
+    description: t('onboarding.tutorial.slide1.description'),
     image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=600',
     renderOverlay: (accent) => (
       <View className="absolute bottom-10 left-6 right-6 bg-surface p-4 rounded-2xl flex-row items-center gap-3 border border-divider/10 shadow-lg">
@@ -36,8 +36,8 @@ const SLIDES: Slide[] = [
           <IconSymbol name="house.fill" size={20} color="white" />
         </View>
         <View className="flex-1">
-          <AppText weight="bold" className="text-sm">Nhà trọ Happy</AppText>
-          <AppText className="text-xs text-muted">5 thành viên</AppText>
+          <AppText weight="bold" className="text-sm">{t('onboarding.tutorial.slide1.overlay_title')}</AppText>
+          <AppText className="text-xs text-muted">{t('onboarding.tutorial.slide1.overlay_desc')}</AppText>
         </View>
         <View className="flex-row -space-x-3">
           <Avatar size="sm" alt="User A">
@@ -55,16 +55,16 @@ const SLIDES: Slide[] = [
   },
   {
     id: 2,
-    title: 'Thêm bạn & ',
-    accent: 'Quản lý chi',
-    description: 'Dễ dàng mời thành viên mới và kiểm soát ngân sách nhóm mọi lúc, mọi nơi.',
+    title: t('onboarding.tutorial.slide2.title'),
+    accent: t('onboarding.tutorial.slide2.accent'),
+    description: t('onboarding.tutorial.slide2.description'),
     image: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?q=80&w=600',
     renderOverlay: (accent) => (
       <View className="absolute inset-x-8 top-1/4 bg-surface p-4 rounded-2xl shadow-2xl border border-divider/10">
         <View className="flex-row items-center justify-between mb-4">
           <View>
-            <AppText weight="bold" className="text-[10px] text-muted uppercase">Chi tiêu nhóm</AppText>
-            <AppText weight="bold" className="text-base">Đà Lạt 2024 🍓</AppText>
+            <AppText weight="bold" className="text-[10px] text-muted uppercase">{t('onboarding.tutorial.slide2.overlay_group_title')}</AppText>
+            <AppText weight="bold" className="text-base">{t('onboarding.tutorial.slide2.overlay_group_name')}</AppText>
           </View>
           <View className="flex-row items-center gap-1 bg-surface-secondary p-1 rounded-full px-2">
             <Avatar size="sm" alt="User L">
@@ -78,9 +78,9 @@ const SLIDES: Slide[] = [
 
         <View className="gap-3">
           {[
-            { icon: 'fork.knife', label: 'Ăn trưa Gà nướng', amount: '-300k', color: 'text-danger' },
-            { icon: 'cup.and.saucer.fill', label: 'Cafe Tùng', amount: '+100k', color: 'text-accent' },
-            { icon: 'house.fill', label: 'Homestay', amount: '-500k', color: 'text-danger' },
+            { icon: 'fork.knife', label: t('onboarding.tutorial.slide2.overlay_item1'), amount: '-300k', color: 'text-danger' },
+            { icon: 'cup.and.saucer.fill', label: t('onboarding.tutorial.slide2.overlay_item2'), amount: '+100k', color: 'text-accent' },
+            { icon: 'house.fill', label: t('onboarding.tutorial.slide2.overlay_item3'), amount: '-500k', color: 'text-danger' },
           ].map((item, idx) => (
             <View key={idx} className="flex-row items-center gap-3">
               <View className="w-8 h-8 rounded-xl bg-accent-soft items-center justify-center">
@@ -101,9 +101,9 @@ const SLIDES: Slide[] = [
   },
   {
     id: 3,
-    title: 'Quản lý nợ ',
-    accent: 'minh bạch',
-    description: 'Theo dõi ai nợ ai và xem báo cáo thống kê chi tiêu trực quan theo từng tháng.',
+    title: t('onboarding.tutorial.slide3.title'),
+    accent: t('onboarding.tutorial.slide3.accent'),
+    description: t('onboarding.tutorial.slide3.description'),
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600',
     renderOverlay: (accent) => (
       <View className="absolute inset-x-6 bottom-1/4 gap-4">
@@ -113,7 +113,7 @@ const SLIDES: Slide[] = [
               <View className="w-8 h-8 rounded-xl bg-accent-soft items-center justify-center">
                 <IconSymbol name="creditcard.fill" size={14} color={accent} />
               </View>
-              <AppText weight="bold" className="text-xs text-muted uppercase">Đã thu nợ</AppText>
+              <AppText weight="bold" className="text-xs text-muted uppercase">{t('onboarding.tutorial.slide3.overlay_collected')}</AppText>
             </View>
             <AppText weight="bold" className="text-xs">85%</AppText>
           </View>
@@ -127,7 +127,7 @@ const SLIDES: Slide[] = [
             <IconSymbol name="chart.bar.fill" size={24} color="white" />
           </View>
           <View className="flex-1">
-            <AppText weight="bold" className="text-[10px] text-muted uppercase">Chi tiêu tháng</AppText>
+            <AppText weight="bold" className="text-[10px] text-muted uppercase">{t('onboarding.tutorial.slide3.overlay_monthly')}</AppText>
             <AppText weight="bold" className="text-xl">4.250.000đ</AppText>
           </View>
           <View className="bg-accent-soft px-2 py-1 rounded-full flex-row items-center gap-1">
@@ -140,9 +140,9 @@ const SLIDES: Slide[] = [
   },
   {
     id: 4,
-    title: 'Phân tích ',
-    accent: 'thông minh',
-    description: 'Dễ dàng nắm bắt thói quen chi tiêu thông qua các biểu đồ phân tích hàng tháng.',
+    title: t('onboarding.tutorial.slide4.title'),
+    accent: t('onboarding.tutorial.slide4.accent'),
+    description: t('onboarding.tutorial.slide4.description'),
     image: 'https://images.unsplash.com/photo-1551288049-bbbda536339a?q=80&w=600',
     renderOverlay: (accent) => (
       <View className="absolute inset-x-10 bottom-1/4 items-center gap-6">
@@ -154,17 +154,17 @@ const SLIDES: Slide[] = [
         </View>
         <View className="bg-surface px-6 py-3 rounded-2xl border border-divider/10 shadow-lg flex-row gap-4 items-center">
           <View className="items-center">
-            <AppText weight="bold" className="text-[10px] text-muted">ĂN UỐNG</AppText>
+            <AppText weight="bold" className="text-[10px] text-muted">{t('onboarding.tutorial.slide4.overlay_food')}</AppText>
             <AppText weight="bold">45%</AppText>
           </View>
           <View className="w-px h-6 bg-divider/20" />
           <View className="items-center">
-            <AppText weight="bold" className="text-[10px] text-muted">DU LỊCH</AppText>
+            <AppText weight="bold" className="text-[10px] text-muted">{t('onboarding.tutorial.slide4.overlay_travel')}</AppText>
             <AppText weight="bold">30%</AppText>
           </View>
           <View className="w-px h-6 bg-divider/20" />
           <View className="items-center">
-            <AppText weight="bold" className="text-[10px] text-muted">KHÁC</AppText>
+            <AppText weight="bold" className="text-[10px] text-muted">{t('onboarding.tutorial.slide4.overlay_other')}</AppText>
             <AppText weight="bold">25%</AppText>
           </View>
         </View>
@@ -173,9 +173,9 @@ const SLIDES: Slide[] = [
   },
   {
     id: 5,
-    title: 'An toàn & ',
-    accent: 'Bảo mật',
-    description: 'Dữ liệu của bạn luôn được mã hóa và bảo mật tuyệt đối theo tiêu chuẩn cao nhất.',
+    title: t('onboarding.tutorial.slide5.title'),
+    accent: t('onboarding.tutorial.slide5.accent'),
+    description: t('onboarding.tutorial.slide5.description'),
     image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=600',
     renderOverlay: (accent) => (
       <View className="absolute inset-0 items-center justify-center p-8">
@@ -183,13 +183,13 @@ const SLIDES: Slide[] = [
           <View className="w-24 h-24 bg-accent/10 rounded-full items-center justify-center mb-6">
             <IconSymbol name="shield" size={48} color={accent} />
           </View>
-          <AppText weight="bold" className="text-xl mb-2">Đã được mã hóa</AppText>
+          <AppText weight="bold" className="text-xl mb-2">{t('onboarding.tutorial.slide5.overlay_encrypted')}</AppText>
           <AppText className="text-sm text-muted text-center leading-5">
-            Tất cả các giao dịch và dữ liệu cá nhân của bạn được bảo mật 256-bit.
+            {t('onboarding.tutorial.slide5.overlay_desc')}
           </AppText>
           <View className="mt-8 flex-row items-center gap-2 bg-success-soft px-4 py-2 rounded-full">
             <IconSymbol name="checkmark.circle.fill" size={16} color="#10b981" />
-            <AppText weight="bold" className="text-[#10b981] text-xs">Verify by SplitSmart</AppText>
+            <AppText weight="bold" className="text-[#10b981] text-xs">{t('onboarding.tutorial.slide5.overlay_verify')}</AppText>
           </View>
         </View>
       </View>
@@ -198,12 +198,14 @@ const SLIDES: Slide[] = [
 ];
 
 export default function TutorialScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [currentSlide, setCurrentSlide] = useState(0);
   const accent = useThemeColor('accent');
   const pagerRef = useRef<CrossPagerViewRef>(null);
   const setOnboardingComplete = useAuthStore((state) => state.setOnboardingComplete);
+  const slides = useMemo(() => getSlides(t), [t]);
 
   const handleComplete = () => {
     setOnboardingComplete();
@@ -211,7 +213,7 @@ export default function TutorialScreen() {
   };
 
   const nextSlide = () => {
-    if (currentSlide < SLIDES.length - 1) {
+    if (currentSlide < slides.length - 1) {
       pagerRef.current?.setPage(currentSlide + 1);
       return;
     }
@@ -222,7 +224,7 @@ export default function TutorialScreen() {
     handleComplete();
   };
 
-  const slide = SLIDES[currentSlide];
+  const slide = slides[currentSlide];
 
   return (
     <View className="flex-1 bg-background">
@@ -231,7 +233,7 @@ export default function TutorialScreen() {
       <View className="flex-1 justify-between py-12 px-6">
         <View style={{ paddingTop: insets.top }} className="flex-row justify-end">
           <PressableFeedback onPress={handleSkip}>
-            <AppText weight="bold" className="text-muted">Bỏ qua</AppText>
+            <AppText weight="bold" className="text-muted">{t('onboarding.tutorial.skip')}</AppText>
           </PressableFeedback>
         </View>
 
@@ -242,7 +244,7 @@ export default function TutorialScreen() {
             initialPage={0}
             onPageSelected={(e) => setCurrentSlide(e.nativeEvent.position)}
           >
-            {SLIDES.map((slideItem) => (
+            {slides.map((slideItem) => (
               <View key={slideItem.id} className="flex-1">
                 <View className="w-full h-full bg-surface/30 rounded-[40px] overflow-hidden shadow-2xl relative border border-white/20">
                   <Image
@@ -271,7 +273,7 @@ export default function TutorialScreen() {
 
         <View className="w-full gap-8" style={{ marginBottom: insets.bottom }}>
           <View className="flex-row justify-center gap-2">
-            {SLIDES.map((_, idx) => (
+            {slides.map((_, idx) => (
               <View
                 key={idx}
                 className={`h-2 rounded-full transition-all duration-300 ${currentSlide === idx ? 'w-8 bg-accent' : 'w-2 bg-divider'}`}
@@ -286,9 +288,9 @@ export default function TutorialScreen() {
           >
             <View className="flex-row items-center gap-2">
               <AppText weight="bold" className="text-lg text-white">
-                {currentSlide === SLIDES.length - 1 ? 'Bắt đầu ngay' : 'Tiếp tục'}
+                {currentSlide === slides.length - 1 ? t('onboarding.tutorial.start_now') : t('onboarding.tutorial.continue')}
               </AppText>
-              {currentSlide === SLIDES.length - 1 ? (
+              {currentSlide === slides.length - 1 ? (
                 <IconSymbol name="rocket.fill" size={20} color="white" />
               ) : (
                 <IconSymbol name="arrow.right" size={20} color="white" />

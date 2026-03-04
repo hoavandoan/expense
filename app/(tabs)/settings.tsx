@@ -9,7 +9,8 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { SettingsItem } from "@/components/ui/settings-item";
 import { SkiaOnboardingBackground } from "@/components/ui/skia-onboarding-background";
 import { useAppTheme } from "@/contexts/app-theme-context";
-import { useAuth } from "@/lib/hooks";
+import { useAuth, useTranslation } from "@/lib/hooks";
+import { useSettingsStore } from "@/lib/stores";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import {
@@ -22,18 +23,32 @@ import {
   useThemeColor,
 } from "heroui-native";
 import React, { useState } from "react";
-import { View } from "react-native";
+import { Alert, View } from "react-native";
 import Animated, { ZoomIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
   const { user, isAuthenticated, signOut, setLoginSheetOpen } = useAuth();
+  const { t, locale } = useTranslation();
+  const { language, setLanguage } = useSettingsStore();
   const { isDark, toggleTheme } = useAppTheme();
   const foreground = useThemeColor("foreground");
   const accent = useThemeColor("accent");
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  const handleLanguageChange = () => {
+    Alert.alert(
+      t('settings.language'),
+      '',
+      [
+        { text: t('settings.language_english'), onPress: () => setLanguage('en') },
+        { text: t('settings.language_vietnamese'), onPress: () => setLanguage('vi') },
+        { text: t('common.cancel'), style: 'cancel' }
+      ]
+    );
+  };
 
   const SETTINGS_HEADER_HEIGHT = 360;
 
@@ -52,7 +67,7 @@ export default function SettingsScreen() {
         </View>
         <View className="flex-2 items-center">
           <AppText className="text-lg font-bold text-foreground">
-            Cài đặt
+            {t("settings.title")}
           </AppText>
         </View>
         <View className="flex-1 items-end" />
@@ -74,7 +89,7 @@ export default function SettingsScreen() {
         >
           <IconSymbol name="chevron.left" size={20} color={foreground} />
         </Button>
-        <AppText className="text-lg font-bold">Cài đặt</AppText>
+        <AppText className="text-lg font-bold">{t("settings.title")}</AppText>
         <View className="w-10" />
       </View>
 
@@ -106,7 +121,7 @@ export default function SettingsScreen() {
           )}
         </View>
         <AppText className="text-xl font-bold mt-4">
-          {isAuthenticated ? user?.name : "Chưa đăng nhập"}
+          {isAuthenticated ? user?.name : t('settings.not_logged_in')}
         </AppText>
         {isAuthenticated ? (
           <View className="bg-surface px-4 py-1 rounded-full mt-2 border border-divider/10">
@@ -120,7 +135,7 @@ export default function SettingsScreen() {
             className="mt-2"
           >
             <AppText className="text-accent font-medium">
-              Đăng nhập ngay để trải nghiệm
+              {t('settings.login_prompt')}
             </AppText>
           </PressableFeedback>
         )}
@@ -147,14 +162,14 @@ export default function SettingsScreen() {
               <View className="flex-1">
                 <View className="bg-white/20 px-2 py-0.5 rounded-full self-start mb-2">
                   <AppText className="text-white text-[10px] font-bold">
-                    PREMIUM
+                    {t('settings.premium.badge')}
                   </AppText>
                 </View>
                 <AppText className="text-white text-lg font-bold">
-                  Nâng cấp lên Pro
+                  {t('settings.premium.title')}
                 </AppText>
                 <AppText className="text-white/80 text-xs mt-1">
-                  Sử dụng không giới hạn nhóm và tính năng cao cấp
+                  {t('settings.premium.description')}
                 </AppText>
               </View>
               <View className="w-12 h-12 bg-white/20 rounded-2xl items-center justify-center">
@@ -171,7 +186,7 @@ export default function SettingsScreen() {
           {/* Account Section */}
           <View>
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-              TÀI KHOẢN
+              {t('settings.section.account')}
             </AppText>
             <Card
               variant="default"
@@ -180,19 +195,19 @@ export default function SettingsScreen() {
               <SettingsItem
                 icon="creditcard"
                 iconBgColor="#17C964"
-                label="Phương thức thanh toán"
+                label={t('settings.account.payment_method')}
               />
               <Divider className="my-3" />
               <SettingsItem
                 icon="lock"
                 iconBgColor="#F5A623"
-                label="Đổi mật khẩu"
+                label={t('settings.account.change_password')}
               />
               <Divider className="my-3" />
               <SettingsItem
                 icon="shield"
                 iconBgColor="#0070F3"
-                label="Quyền riêng tư"
+                label={t('settings.account.privacy')}
               />
             </Card>
           </View>
@@ -200,7 +215,7 @@ export default function SettingsScreen() {
           {/* General Settings Section */}
           <View>
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-              CÀI ĐẶT CHUNG
+              {t('settings.section.general')}
             </AppText>
             <Card
               variant="default"
@@ -209,7 +224,7 @@ export default function SettingsScreen() {
               <SettingsItem
                 icon="moon.fill"
                 iconBgColor="#3F3F46"
-                label="Chế độ tối"
+                label={t('settings.general.dark_mode')}
                 showChevron={false}
                 onPress={toggleTheme}
                 rightElement={
@@ -260,7 +275,7 @@ export default function SettingsScreen() {
               <SettingsItem
                 icon="bell"
                 iconBgColor="#9455D3"
-                label="Thông báo"
+                label={t('settings.general.notifications')}
                 showChevron={false}
                 rightElement={
                   <Switch
@@ -275,10 +290,11 @@ export default function SettingsScreen() {
               <SettingsItem
                 icon="globe"
                 iconBgColor="#17C964"
-                label="Ngôn ngữ"
+                label={t("settings.language")}
+                onPress={handleLanguageChange}
                 rightElement={
                   <AppText className="text-muted text-sm font-medium">
-                    Tiếng Việt
+                    {locale.includes('vi') ? t('settings.language_vietnamese') : t('settings.language_english')}
                   </AppText>
                 }
               />
@@ -286,7 +302,7 @@ export default function SettingsScreen() {
               <SettingsItem
                 icon="dongsign"
                 iconBgColor="#F5A623"
-                label="Tiền tệ"
+                label={t('settings.general.currency')}
                 rightElement={
                   <AppText className="text-muted text-sm font-medium">
                     VNĐ (₫)
@@ -299,7 +315,7 @@ export default function SettingsScreen() {
           {/* Support Section */}
           <View>
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-              HỖ TRỢ & KHÁC
+              {t('settings.section.support')}
             </AppText>
             <Card
               variant="default"
@@ -308,19 +324,19 @@ export default function SettingsScreen() {
               <SettingsItem
                 icon="heart"
                 iconBgColor="#F31260"
-                label="Mời bạn bè"
+                label={t('settings.support.invite_friends')}
               />
               <Divider className="my-3" />
               <SettingsItem
                 icon="questionmark.circle"
                 iconBgColor="#0070F3"
-                label="Trợ giúp"
+                label={t('settings.support.help')}
               />
               <Divider className="my-3" />
               <SettingsItem
                 icon="info.circle"
                 iconBgColor="#06B6D4"
-                label="Về chúng tôi"
+                label={t('settings.support.about_us')}
               />
             </Card>
           </View>
@@ -336,7 +352,7 @@ export default function SettingsScreen() {
               >
                 <View className="flex-row items-center gap-2">
                   <IconSymbol name="person" size={20} color="white" />
-                  <Button.Label className="font-bold">Đăng nhập</Button.Label>
+                  <Button.Label className="font-bold">{t('settings.button.login')}</Button.Label>
                 </View>
               </Button>
             ) : (
@@ -348,12 +364,12 @@ export default function SettingsScreen() {
               >
                 <View className="flex-row items-center gap-2">
                   <IconSymbol name="logout" size={20} color="#F31260" />
-                  <Button.Label className="font-bold">Đăng xuất</Button.Label>
+                  <Button.Label className="font-bold">{t("settings.logout")}</Button.Label>
                 </View>
               </Button>
             )}
             <AppText className="text-muted text-xs font-medium opacity-60">
-              Phiên bản 1.0.2 (Build 2024)
+              {t('settings.version')}
             </AppText>
           </View>
         </View>

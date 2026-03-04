@@ -3,7 +3,7 @@ import { ScreenScrollView } from "@/components/screen-scroll-view";
 import { FormSection } from "@/components/ui/form-section";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { CURRENCIES, GROUP_TYPES } from "@/constants";
-import { useCreateGroup } from "@/lib/hooks";
+import { useCreateGroup, useTranslation } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { uploadImage } from "@/lib/utils/storage";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,23 +18,24 @@ import {
   TextField,
   useThemeColor
 } from "heroui-native";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
 import * as z from "zod";
 
-const groupSchema = z.object({
-  name: z.string().min(1, "Vui lòng nhập tên nhóm"),
+const getGroupSchema = (t: any) => z.object({
+  name: z.string().min(1, t("modal.add_group.errors.name_required")),
   description: z.string().optional(),
   groupType: z.enum(["trip", "home", "couple", "other"]),
-  currency: z.string().min(1, "Vui lòng chọn tiền tệ"),
+  currency: z.string().min(1, t("modal.add_group.errors.currency_required")),
   coverImageUrl: z.string().optional(),
 });
 
-type GroupFormValues = z.infer<typeof groupSchema>;
+type GroupFormValues = z.infer<ReturnType<typeof getGroupSchema>>;
 
 export default function AddGroupScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
   const { user } = useAuthStore();
@@ -42,6 +43,8 @@ export default function AddGroupScreen() {
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+
+  const groupSchema = useMemo(() => getGroupSchema(t), [t]);
 
   const {
     control,
@@ -123,13 +126,13 @@ export default function AddGroupScreen() {
             </View>
           </PressableFeedback>
           <AppText className="text-muted text-xs mt-3 font-bold tracking-widest">
-            Ảnh đại diện nhóm
+            {t("modal.add_group.cover_image")}
           </AppText>
         </View>
 
         <View className="gap-2 px-4">
           <FormSection
-            label="Tên nhóm"
+            label={t("modal.add_group.name_label")}
             isRequired
             error={errors.name?.message}
           >
@@ -139,7 +142,7 @@ export default function AddGroupScreen() {
                 name="name"
                 render={({ field: { onChange, value } }) => (
                   <TextField.Input
-                    placeholder="e.g. Du lịch Đà Lạt"
+                    placeholder={t("modal.add_group.name_placeholder")}
                     value={value}
                     onChangeText={onChange}
                     className="bg-surface border border-divider/10 h-12 rounded-2xl px-4 text-base"
@@ -150,7 +153,7 @@ export default function AddGroupScreen() {
           </FormSection>
 
           <FormSection
-            label="Mô tả"
+            label={t("modal.add_group.desc_label")}
             error={errors.description?.message}
           >
             <TextField isInvalid={!!errors.description}>
@@ -159,7 +162,7 @@ export default function AddGroupScreen() {
                 name="description"
                 render={({ field: { onChange, value } }) => (
                   <TextField.Input
-                    placeholder="Mô tả ngắn gọn về nhóm..."
+                    placeholder={t("modal.add_group.desc_placeholder")}
                     value={value}
                     onChangeText={onChange}
                     className="bg-surface border border-divider/10 h-12 rounded-2xl px-4 text-base"
@@ -172,7 +175,7 @@ export default function AddGroupScreen() {
           <View className="flex-row gap-4">
             <View className="flex-1">
               <FormSection
-                label="Loại nhóm"
+                label={t("modal.add_group.type_label")}
                 isRequired
                 error={errors.groupType?.message}
               >
@@ -196,7 +199,7 @@ export default function AddGroupScreen() {
                           />
                           <Select.Value
                             className="text-[15px] font-medium"
-                            placeholder="Loại nhóm"
+                            placeholder={t("modal.add_group.type_label")}
                           />
                         </View>
                         <IconSymbol
@@ -217,7 +220,7 @@ export default function AddGroupScreen() {
                             <Select.Item
                               key={type.value}
                               value={type.value}
-                              label={type.label}
+                              label={t(`group_types.${type.value}`)}
                               className="p-4"
                             >
                               <View className="flex-row items-center gap-3">
@@ -241,7 +244,7 @@ export default function AddGroupScreen() {
 
             <View className="flex-1">
               <FormSection
-                label="Tiền tệ"
+                label={t("modal.add_group.currency_label")}
                 isRequired
                 error={errors.currency?.message}
               >
@@ -260,7 +263,7 @@ export default function AddGroupScreen() {
                           </AppText>
                           <Select.Value
                             className="text-[15px] font-medium"
-                            placeholder="Tiền tệ"
+                            placeholder={t("modal.add_group.currency_label")}
                           />
                         </View>
                         <IconSymbol
@@ -313,8 +316,8 @@ export default function AddGroupScreen() {
               <IconSymbol name="plus" size={20} color="white" />
               <Button.Label className="text-white font-bold text-lg">
                 {createGroup.isPending || isUploading
-                  ? "Đang tạo..."
-                  : "Tạo nhóm và bắt đầu"}
+                  ? t("modal.add_group.creating")
+                  : t("modal.add_group.submit")}
               </Button.Label>
             </View>
           </Button>

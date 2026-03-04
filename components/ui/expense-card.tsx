@@ -1,5 +1,6 @@
 import { AppText } from "@/components/app-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTranslation } from "@/lib/hooks/use-translation";
 import { formatCurrency } from "@/lib/utils";
 import { getCategoryIcon } from "@/lib/utils/expense";
 import { Image } from "expo-image";
@@ -31,6 +32,7 @@ export const ExpenseCard: FC<ExpenseCardProps> = ({
   onPress,
   className,
 }) => {
+  const { t, locale } = useTranslation();
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -81,7 +83,7 @@ export const ExpenseCard: FC<ExpenseCardProps> = ({
               <AppText className="text-muted text-[10px] uppercase font-bold mt-0.5">
                 {new Date(
                   expense.expense_date || expense.created_at
-                ).toLocaleDateString("vi-VN")}
+                ).toLocaleDateString(locale === "vi" ? "vi-VN" : "en-US")}
               </AppText>
             </View>
           </View>
@@ -113,11 +115,11 @@ export const ExpenseCard: FC<ExpenseCardProps> = ({
               )}
             </Avatar>
             <AppText className="text-xs text-muted">
-              Trả bởi{" "}
+              {t("expense_card.paid_by")}{" "}
               <AppText className="text-foreground font-semibold">
                 {expense.paid_by === currentUserId
-                  ? "Bạn"
-                  : payer?.name || "Ai đó"}
+                  ? t("expense_card.you")
+                  : payer?.name || t("expense_card.someone")}
               </AppText>
             </AppText>
           </View>

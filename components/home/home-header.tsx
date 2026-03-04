@@ -1,6 +1,7 @@
 import { AppText } from "@/components/app-text";
 import { HeaderComponentWrapper } from "@/components/parallax-header";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTranslation } from "@/lib/hooks";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Avatar, Button, PressableFeedback, useThemeColor } from "heroui-native";
@@ -15,6 +16,7 @@ interface HomeHeaderProps {
 
 export const HomeHeader = ({ user, isAuthenticated, unreadCount = 0 }: HomeHeaderProps) => {
   const router = useRouter();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const accent = useThemeColor("accent");
   const foreground = useThemeColor("foreground");
@@ -50,9 +52,9 @@ export const HomeHeader = ({ user, isAuthenticated, unreadCount = 0 }: HomeHeade
             </Avatar>
           </PressableFeedback>
           <View className="flex-1">
-            <AppText className="text-muted text-[13px]">Xin chào,</AppText>
+            <AppText className="text-muted text-[13px]">{t('home.greeting')}</AppText>
             <AppText className="text-lg font-bold text-foreground">
-              {user?.name || "Bạn"}
+              {user?.name || t('home.you')}
             </AppText>
           </View>
         </View>

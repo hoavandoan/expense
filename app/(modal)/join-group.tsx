@@ -1,19 +1,18 @@
 import { AppText } from "@/components/app-text";
 import { ScreenScrollView } from "@/components/screen-scroll-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useJoinGroup } from "@/lib/hooks";
+import { useJoinGroup, useTranslation } from "@/lib/hooks";
 import { CameraView, scanFromURLAsync, useCameraPermissions } from "expo-camera";
 import * as Clipboard from "expo-clipboard";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import {
-  Button,
-  Divider,
-  PressableFeedback,
-  Spinner,
-  TextField,
-  useThemeColor,
-  useToast,
+    Button,
+    PressableFeedback,
+    Spinner,
+    TextField,
+    useThemeColor,
+    useToast
 } from "heroui-native";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
@@ -26,6 +25,7 @@ export default function JoinGroupScreen() {
   const [isScanning, setIsScanning] = useState(true);
   const [torch, setTorch] = useState(false);
   const joinGroup = useJoinGroup();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const accent = useThemeColor("accent");
   const success = useThemeColor("success");
@@ -79,15 +79,15 @@ export default function JoinGroupScreen() {
         handleJoinGroup(code);
       } else {
         toast.show({
-          label: "Không tìm thấy mã",
-          description: "Vui lòng chọn ảnh chứa mã QR nhóm hợp lệ",
+          label: t('modal.join_group.errors.no_code_title'),
+          description: t('modal.join_group.errors.no_code_desc'),
           variant: "warning",
         });
       }
     } catch (error) {
       toast.show({
-        label: "Lỗi",
-        description: "Không thể quét mã từ ảnh này",
+        label: t('modal.join_group.errors.scan_error_title'),
+        description: t('modal.join_group.errors.scan_error_desc'),
         variant: "danger",
       });
     }
@@ -107,11 +107,11 @@ export default function JoinGroupScreen() {
 
     if (!finalCode) {
       toast.show({
-        label: 'Mục nhập trống',
-        description: 'Vui lòng nhập mã mời hoặc dán liên kết mời để tiếp tục',
+        label: t('modal.join_group.errors.empty_input_title'),
+        description: t('modal.join_group.errors.empty_input_desc'),
         variant: 'danger',
         icon: <IconSymbol name="exclamationmark.triangle.fill" size={20} color={danger} />,
-        actionLabel: 'Đóng',
+        actionLabel: t('common.close'),
         onActionPress: ({ hide }) => hide(),
       });
       return;
@@ -120,8 +120,8 @@ export default function JoinGroupScreen() {
     try {
       const groupId = await joinGroup.mutateAsync(finalCode);
       toast.show({
-        label: 'Tham gia thành công',
-        description: 'Bạn đã trở thành thành viên của nhóm mới',
+        label: t('modal.join_group.success.title'),
+        description: t('modal.join_group.success.desc'),
         variant: 'success',
         icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
         actionLabel: 'OK',
@@ -130,8 +130,8 @@ export default function JoinGroupScreen() {
       router.replace(`/group/${groupId}` as any);
     } catch (error: any) {
       toast.show({
-        label: "Không thể tham gia",
-        description: error.message || "Mã mời không chính xác hoặc đã hết hạn",
+        label: t('modal.join_group.errors.join_error_title'),
+        description: error.message || t('modal.join_group.errors.join_error_desc'),
         variant: "danger",
         icon: (
           <IconSymbol
@@ -140,7 +140,7 @@ export default function JoinGroupScreen() {
             color={danger}
           />
         ),
-        actionLabel: "Thử lại",
+        actionLabel: t('common.retry'),
         onActionPress: ({ hide }) => {
           hide();
           setIsScanning(true);
@@ -165,18 +165,17 @@ export default function JoinGroupScreen() {
             <IconSymbol name="camera.fill" size={40} color={accent} />
           </View>
           <AppText className="text-2xl font-bold mb-3 text-center">
-            Quyền Truy Cập Camera
+            {t('modal.join_group.camera_permission_title')}
           </AppText>
           <AppText className="text-muted text-center mb-8 leading-relaxed">
-            Chúng tôi cần quyền truy cập camera để bạn có thể quét mã QR tham gia
-            nhóm nhanh chóng.
+            {t('modal.join_group.camera_permission_desc')}
           </AppText>
           <Button
             size="lg"
             className="w-full h-14 rounded-2xl bg-accent"
             onPress={requestPermission}
           >
-            <Button.Label className="font-bold">Cấp quyền camera</Button.Label>
+            <Button.Label className="font-bold">{t('modal.join_group.grant_permission')}</Button.Label>
           </Button>
         </View>
       </View>
@@ -187,9 +186,9 @@ export default function JoinGroupScreen() {
     <View className="flex-1 bg-background">
       <ScreenScrollView withKeyboardAvoidingView>
         <View className="items-center mb-10 mt-6">
-          <AppText className="text-3xl font-bold mb-3">Quét mã QR</AppText>
+          <AppText className="text-3xl font-bold mb-3">{t('modal.join_group.title')}</AppText>
           <AppText className="text-muted text-center leading-relaxed text-base">
-            Di chuyển camera đến mã QR của nhóm để{"\n"}tham gia ngay lập tức.
+            {t('modal.join_group.subtitle')}
           </AppText>
         </View>
 
@@ -229,7 +228,7 @@ export default function JoinGroupScreen() {
                 <IconSymbol name="photo.on.rectangle" size={24} color="white" />
               </TouchableOpacity>
               <AppText className="text-white text-[10px] text-center mt-2 font-bold uppercase">
-                Thư viện
+                {t('modal.join_group.gallery')}
               </AppText>
             </View>
             <View className="items-center">
@@ -245,34 +244,34 @@ export default function JoinGroupScreen() {
                 />
               </TouchableOpacity>
               <AppText className="text-white text-[10px] text-center mt-2 font-bold uppercase">
-                Đèn flash
+                {t('modal.join_group.flash')}
               </AppText>
             </View>
           </View>
         </View>
 
         <View className="flex-row items-center gap-4 mb-8">
-          <Divider className="flex-1 bg-divider/10" />
-          <AppText className="text-muted font-bold text-xs tracking-widest uppercase">HOẶC</AppText>
-          <Divider className="flex-1 bg-divider/10" />
+          <View className="flex-1 h-[1px] bg-divider/10" />
+          <AppText className="text-muted font-bold text-xs tracking-widest uppercase">{t('modal.join_group.or')}</AppText>
+          <View className="flex-1 h-[1px] bg-divider/10" />
         </View>
 
         <View className="mb-8">
           <View className="flex-row gap-2">
             <TextField isRequired className="flex-1">
-              <TextField.Label className="mb-3 ml-1">
-                NHẬP MÃ HOẶC LIÊN KẾT
-              </TextField.Label>
-              <TextField.Description className="mb-3 ml-1">
-                Sử dụng mã nhóm hoặc dán liên kết mời
-              </TextField.Description>
+              <AppText className="mb-3 ml-1 text-sm font-medium">
+                {t('modal.join_group.enter_code_label')}
+              </AppText>
+              <AppText className="mb-3 ml-1 text-xs text-muted">
+                {t('modal.join_group.enter_code_desc')}
+              </AppText>
               <View className="justify-center">
                 <TextField.Input
-                  placeholder="Mã hoặc liên kết mời"
+                  placeholder={t('modal.join_group.code_placeholder')}
                   className="bg-surface border border-divider/10 h-16 rounded-2xl pl-12 pr-20 text-foreground"
                   placeholderTextColor="gray"
                   value={inviteCode}
-                  onChangeText={(text) => setInviteCode(text.toUpperCase())}
+                  onChangeText={(text: string) => setInviteCode(text.toUpperCase())}
                   autoCapitalize="characters"
                 />
                 <View className="absolute left-4" pointerEvents="none">
@@ -285,7 +284,7 @@ export default function JoinGroupScreen() {
                   >
                     <View className="flex-row items-center gap-1.5">
                       <IconSymbol name="doc.on.clipboard" size={14} color="gray" />
-                      <AppText className="text-xs font-bold">Dán</AppText>
+                      <AppText className="text-xs font-bold">{t('modal_layout.paste', { defaultValue: 'Dán' })}</AppText>
                     </View>
                   </PressableFeedback>
                 </View>
@@ -302,7 +301,7 @@ export default function JoinGroupScreen() {
         >
           <View className="flex-row items-center gap-2">
             <AppText className="font-bold text-lg text-white">
-              {joinGroup.isPending ? 'Đang tham gia...' : 'Tham gia nhóm'}
+              {joinGroup.isPending ? t('modal.join_group.joining') : t('modal.join_group.join_btn')}
             </AppText>
             <IconSymbol name="arrow.right.to.line" size={20} color="white" />
           </View>
@@ -311,7 +310,7 @@ export default function JoinGroupScreen() {
         <PressableFeedback className="mt-8 self-center">
           <View className="flex-row items-center gap-2">
             <IconSymbol name="questionmark.circle" size={18} color="gray" />
-            <AppText className="text-muted font-medium">Làm thế nào để tìm mã QR?</AppText>
+            <AppText className="text-muted font-medium">{t('modal.join_group.how_to_find')}</AppText>
           </View>
         </PressableFeedback>
       </ScreenScrollView>

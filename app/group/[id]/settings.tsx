@@ -7,26 +7,28 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ModalHeader } from "@/components/ui/modal-header";
 import { ShareQRSheet } from "@/components/ui/share-qr-sheet";
 import { useGroup, useLeaveGroup, useUpdateGroup } from "@/lib/hooks";
+import { useTranslation } from "@/lib/hooks/use-translation";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  Avatar,
-  Button,
-  Card,
-  Divider,
-  PressableFeedback,
-  Skeleton,
-  Spinner,
-  TextField,
-  useThemeColor,
-  useToast,
+    Avatar,
+    Button,
+    Card,
+    Divider,
+    PressableFeedback,
+    Skeleton,
+    Spinner,
+    TextField,
+    useThemeColor,
+    useToast,
 } from "heroui-native";
 import React, { useState } from "react";
 import { View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 
 export default function GroupSettingsScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const accent = useThemeColor("accent");
@@ -58,21 +60,21 @@ export default function GroupSettingsScreen() {
     try {
       await leaveGroup.mutateAsync(group.id);
       toast.show({
-        label: "Đã rời nhóm",
-        description: "Bạn không còn là thành viên của nhóm này nữa",
+        label: t("group_settings.leave_success_title"),
+        description: t("group_settings.leave_success_desc"),
         variant: "success",
         icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
-        actionLabel: "OK",
+        actionLabel: t("ok"),
         onActionPress: ({ hide }) => hide(),
       });
       router.replace("/(tabs)");
     } catch (error: any) {
       toast.show({
-        label: "Lỗi rời nhóm",
-        description: error.message || "Đã có lỗi xảy ra khi thực hiện yêu cầu",
+        label: t("group_settings.leave_error_title"),
+        description: error.message || t("error_processing_request"),
         variant: "danger",
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: "Thử lại",
+        actionLabel: t("retry"),
         onActionPress: ({ hide }) => hide(),
       });
     }
@@ -88,20 +90,20 @@ export default function GroupSettingsScreen() {
       });
       setIsEditingName(false);
       toast.show({
-        label: "Thành công",
-        description: "Tên nhóm đã được cập nhật mới",
+        label: t("success"),
+        description: t("group_settings.update_name_success"),
         variant: "success",
         icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
-        actionLabel: "OK",
+        actionLabel: t("ok"),
         onActionPress: ({ hide }) => hide(),
       });
     } catch (error: any) {
       toast.show({
-        label: "Lỗi cập nhật",
-        description: error.message || "Không thể đổi tên nhóm lúc này",
+        label: t("group_settings.update_error_title"),
+        description: error.message || t("group_settings.update_error_desc"),
         variant: "danger",
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: "Thử lại",
+        actionLabel: t("retry"),
         onActionPress: ({ hide }) => hide(),
       });
     }
@@ -121,11 +123,11 @@ export default function GroupSettingsScreen() {
   if (error || !group) {
     return (
       <View className="flex-1 bg-background">
-        <ModalHeader title="Cài đặt nhóm" variant="back" />
+        <ModalHeader title={t("group_settings.title")} variant="back" />
         <ErrorState
-          title="Không thể tải cài đặt"
+          title={t("group_settings.load_error")}
           message={
-            error instanceof Error ? error.message : "Nhóm không tồn tại"
+            error instanceof Error ? error.message : t("group_detail.not_found_title")
           }
           onRetry={() => refetch()}
         />
@@ -137,14 +139,14 @@ export default function GroupSettingsScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ModalHeader title="Cài đặt nhóm" variant="back" />
+      <ModalHeader title={t("group_settings.title")} variant="back" />
 
       <ScreenScrollView withKeyboardAvoidingView>
         <View className="gap-8">
           {/* Group Info */}
           <View>
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
-              THÔNG TIN NHÓM
+              {t("group_settings.info_label")}
             </AppText>
             <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
               <View className="p-4">
@@ -154,7 +156,7 @@ export default function GroupSettingsScreen() {
                       <TextField.Input
                         value={editedName}
                         onChangeText={setEditedName}
-                        placeholder="Tên nhóm"
+                        placeholder={t("group_settings.name_label")}
                         className="h-12"
                         autoFocus
                       />
@@ -169,7 +171,7 @@ export default function GroupSettingsScreen() {
                         }}
                       >
                         <Button.Label className="font-semibold">
-                          Hủy
+                          {t("cancel")}
                         </Button.Label>
                       </Button>
                       <Button
@@ -181,7 +183,7 @@ export default function GroupSettingsScreen() {
                         {updateGroup.isPending ? (
                           <Spinner size="sm" color="white" />
                         ) : (
-                          <Button.Label className="font-bold">Lưu</Button.Label>
+                          <Button.Label className="font-bold">{t("save")}</Button.Label>
                         )}
                       </Button>
                     </View>
@@ -190,7 +192,7 @@ export default function GroupSettingsScreen() {
                   <View className="flex-row items-center justify-between">
                     <View className="flex-1">
                       <AppText className="text-muted text-xs mb-1">
-                        Tên nhóm
+                        {t("group_settings.name_display_label")}
                       </AppText>
                       <AppText className="text-lg font-bold">
                         {group.name}
@@ -214,7 +216,7 @@ export default function GroupSettingsScreen() {
               </View>
               <Divider className="bg-divider/10" />
               <View className="p-4">
-                <AppText className="text-muted text-xs mb-1">Mã mời</AppText>
+                <AppText className="text-muted text-xs mb-1">{t("group_settings.invite_code_label")}</AppText>
                 <View className="flex-row items-center justify-between">
                   <AppText className="text-base font-semibold font-mono">
                     {groupData.invite_code || "N/A"}
@@ -224,11 +226,11 @@ export default function GroupSettingsScreen() {
                       if (!groupData.invite_code) return;
                       await Clipboard.setStringAsync(groupData.invite_code);
                       toast.show({
-                        label: "Đã sao chép",
-                        description: "Mã mời đã được lưu vào bộ nhớ tạm",
+                        label: t("copied"),
+                        description: t("group_members.copy_success"),
                         variant: "success",
                         icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
-                        actionLabel: "Đóng",
+                        actionLabel: t("close"),
                         onActionPress: ({ hide }) => hide(),
                       });
                     }}
@@ -246,7 +248,7 @@ export default function GroupSettingsScreen() {
           {/* QR Share Section */}
           <View>
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
-              CHIA SẺ NHÓM
+              {t("group_settings.share_label")}
             </AppText>
             <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
               <PressableFeedback onPress={() => setIsShareSheetOpen(true)}>
@@ -258,8 +260,8 @@ export default function GroupSettingsScreen() {
                     />
                   </View>
                   <View className="flex-1">
-                    <AppText className="font-bold text-base mb-0.5">Mã QR nhóm</AppText>
-                    <AppText className="text-muted text-xs">Chia sẻ hoặc quét để tham gia nhóm</AppText>
+                    <AppText className="font-bold text-base mb-0.5">{t("group_settings.qr_title")}</AppText>
+                    <AppText className="text-muted text-xs">{t("group_settings.qr_desc")}</AppText>
                   </View>
                   <IconSymbol name="chevron.right" size={20} color="gray" />
                 </View>
@@ -271,21 +273,21 @@ export default function GroupSettingsScreen() {
           <View>
             <View className="flex-row items-center justify-between mb-4">
               <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest ml-1">
-                THÀNH VIÊN ({members.length})
+                {t("group_settings.members_label", { count: members.length })}
               </AppText>
               {canEdit && (
                 <PressableFeedback
                   onPress={() => {
                     // TODO: Navigate to add member screen
                     toast.show({
-                      label: "Thêm thành viên sẽ được triển khai sau",
+                      label: t("group_settings.add_member_temp"),
                       variant: "warning",
                       icon: <IconSymbol name="exclamationmark.triangle.fill" size={20} color={warning} />,
                     });
                   }}
                 >
                   <AppText className="text-accent font-semibold text-sm">
-                    Thêm thành viên
+                    {t("group_settings.add_member_btn")}
                   </AppText>
                 </PressableFeedback>
               )}
@@ -295,8 +297,8 @@ export default function GroupSettingsScreen() {
                 <View className="p-6">
                   <EmptyState
                     icon="person.3.fill"
-                    title="Chưa có thành viên"
-                    description="Thêm thành viên vào nhóm"
+                    title={t("group_settings.no_members_title")}
+                    description={t("group_settings.no_members_desc")}
                   />
                 </View>
               ) : (
@@ -332,8 +334,8 @@ export default function GroupSettingsScreen() {
                           <View className="flex-1">
                             <AppText className="font-bold text-base">
                               {isCurrentUser
-                                ? "Bạn"
-                                : memberUser.name || "Thành viên"}
+                                ? t("group_card.you")
+                                : memberUser.name || t("group_detail.member")}
                             </AppText>
                             <AppText className="text-muted text-xs">
                               {memberUser.email || ""}
@@ -342,7 +344,7 @@ export default function GroupSettingsScreen() {
                           {member.role === "owner" && (
                             <View className="bg-accent/10 px-2 py-1 rounded-full">
                               <AppText className="text-accent text-xs font-bold">
-                                Owner
+                                {t("group_members.owner")}
                               </AppText>
                             </View>
                           )}
@@ -360,7 +362,7 @@ export default function GroupSettingsScreen() {
                             onPress={() => {
                               // TODO: Implement remove member
                               toast.show({
-                                label: "Xác nhận xóa thành viên chưa được cấu hình",
+                                label: t("group_settings.remove_member_temp"),
                                 variant: "warning",
                                 icon: <IconSymbol name="exclamationmark.triangle.fill" size={20} color={warning} />,
                               });
@@ -387,7 +389,7 @@ export default function GroupSettingsScreen() {
           <View>
             <Button variant="danger" onPress={() => setShowLeaveDialog(true)}>
               <IconSymbol name="arrow.right.square" size={20} color={useThemeColor("surface")} />
-              <Button.Label>Rời nhóm</Button.Label>
+              <Button.Label>{t("group_settings.leave_btn")}</Button.Label>
             </Button>
           </View>
         </View>
@@ -396,10 +398,10 @@ export default function GroupSettingsScreen() {
       <ConfirmDialog
         isOpen={showLeaveDialog}
         onOpenChange={setShowLeaveDialog}
-        title="Rời nhóm"
-        description={`Bạn có chắc chắn muốn rời nhóm "${group.name}"? Bạn sẽ không thể xem hoặc chỉnh sửa các khoản chi trong nhóm này.`}
-        confirmLabel="Rời nhóm"
-        cancelLabel="Hủy"
+        title={t("group_settings.leave_dialog_title")}
+        description={t("group_settings.leave_dialog_desc", { name: group.name })}
+        confirmLabel={t("group_settings.leave_btn")}
+        cancelLabel={t("cancel")}
         variant="danger"
         isLoading={leaveGroup.isPending}
         onConfirm={handleLeaveGroup}

@@ -4,7 +4,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { CATEGORY_CONFIG } from "@/constants";
-import { useRecentActivity } from "@/lib/hooks";
+import { useRecentActivity, useTranslation } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatCurrency } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
@@ -15,16 +15,16 @@ import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const FILTERS = [
-  { id: "all", label: "Tất cả", icon: "list.bullet" as any, actionTypes: [] },
+  { id: "all", labelKey: "activity.filter_all", icon: "list.bullet" as any, actionTypes: [] },
   {
     id: "expense",
-    label: "Chi tiêu",
+    labelKey: "activity.filter_expense",
     icon: "doc.text.fill" as any,
     actionTypes: ["expense_created", "expense_updated", "expense_deleted"],
   },
   {
     id: "payment",
-    label: "Thanh toán",
+    labelKey: "activity.filter_payment",
     icon: "checkmark.circle.fill" as any,
     actionTypes: [
       "settlement_created",
@@ -104,64 +104,65 @@ const getActivityIcon = (actionType: string) => {
 
 const formatActivityAction = (
   actionType: string,
-  metadata: Record<string, unknown>
+  metadata: Record<string, unknown>,
+  t: (key: string, options?: any) => string
 ): { action: string; subject?: string } => {
   const actionMap: Record<
     string,
     (meta: Record<string, unknown>) => { action: string; subject?: string }
   > = {
     expense_created: (meta) => ({
-      action: "đã thêm",
+      action: t("activity.actions.expense_created"),
       subject: meta.title as string,
     }),
     expense_updated: (meta) => ({
-      action: "đã cập nhật",
+      action: t("activity.actions.expense_updated"),
       subject: meta.title as string,
     }),
     expense_deleted: (meta) => ({
-      action: "đã xóa",
+      action: t("activity.actions.expense_deleted"),
       subject: meta.title as string,
     }),
-    settlement_created: () => ({ action: "đã yêu cầu thanh toán" }),
-    settlement_completed: () => ({ action: "đã hoàn tất thanh toán" }),
-    settlement_rejected: () => ({ action: "đã từ chối thanh toán" }),
-    group_member_added: () => ({ action: "đã tham gia nhóm" }),
-    group_member_removed: () => ({ action: "đã rời nhóm" }),
-    group_member_role_changed: () => ({ action: "đã thay đổi vai trò" }),
-    group_updated: () => ({ action: "đã cập nhật nhóm" }),
-    debt_assignment_created: () => ({ action: "đã gán nợ" }),
-    debt_assignment_updated: () => ({ action: "đã thay đổi gán nợ" }),
+    settlement_created: () => ({ action: t("activity.actions.settlement_created") }),
+    settlement_completed: () => ({ action: t("activity.actions.settlement_completed") }),
+    settlement_rejected: () => ({ action: t("activity.actions.settlement_rejected") }),
+    group_member_added: () => ({ action: t("activity.actions.group_member_added") }),
+    group_member_removed: () => ({ action: t("activity.actions.group_member_removed") }),
+    group_member_role_changed: () => ({ action: t("activity.actions.group_member_role_changed") }),
+    group_updated: () => ({ action: t("activity.actions.group_updated") }),
+    debt_assignment_created: () => ({ action: t("activity.actions.debt_assignment_created") }),
+    debt_assignment_updated: () => ({ action: t("activity.actions.debt_assignment_updated") }),
   };
 
   const formatter = actionMap[actionType];
-  return formatter ? formatter(metadata) : { action: "đã thực hiện hành động" };
+  return formatter ? formatter(metadata) : { action: t("activity.actions.default") };
 };
 
-const formatTimeAgo = (dateString: string): string => {
+const formatTimeAgo = (dateString: string, t: (key: string, options?: any) => string): string => {
   const date = new Date(dateString);
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
   if (diffInSeconds < 60) {
-    return "Vừa xong";
+    return t("activity.time.just_now");
   }
 
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   if (diffInMinutes < 60) {
-    return `${diffInMinutes} phút trước`;
+    return t("activity.time.minutes_ago", { count: diffInMinutes });
   }
 
   const diffInHours = Math.floor(diffInMinutes / 60);
   if (diffInHours < 24) {
-    return `${diffInHours} giờ trước`;
+    return t("activity.time.hours_ago", { count: diffInHours });
   }
 
   const diffInDays = Math.floor(diffInHours / 24);
   if (diffInDays === 1) {
-    return "Hôm qua";
+    return t("activity.time.yesterday");
   }
   if (diffInDays < 7) {
-    return `${diffInDays} ngày trước`;
+    return t("activity.time.days_ago", { count: diffInDays });
   }
 
   return date.toLocaleDateString("vi-VN");
@@ -179,6 +180,7 @@ export default function ActivityScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuthStore();
+  const { t } = useTranslation();
 
   const { data: activities, isLoading, error, refetch } = useRecentActivity(50);
 
@@ -226,9 +228,9 @@ export default function ActivityScreen() {
 
       let groupKey: string;
       if (activityDate.getTime() === today.getTime()) {
-        groupKey = "Hôm nay";
+        groupKey = t("activity.time.today");
       } else if (activityDate.getTime() === yesterday.getTime()) {
-        groupKey = "Hôm qua";
+        groupKey = t("activity.time.yesterday");
       } else {
         groupKey = activityDate.toLocaleDateString("vi-VN");
       }
@@ -239,11 +241,14 @@ export default function ActivityScreen() {
       groups[groupKey].push(activity);
     });
 
+    const keyToday = t("activity.time.today");
+    const keyYesterday = t("activity.time.yesterday");
+
     const groupKeys = Object.keys(groups).sort((a, b) => {
-      if (a === "Hôm nay") return -1;
-      if (b === "Hôm nay") return 1;
-      if (a === "Hôm qua") return -1;
-      if (b === "Hôm qua") return 1;
+      if (a === keyToday) return -1;
+      if (b === keyToday) return 1;
+      if (a === keyYesterday) return -1;
+      if (b === keyYesterday) return 1;
       return b.localeCompare(a);
     });
 
@@ -264,7 +269,7 @@ export default function ActivityScreen() {
     setRefreshing(false);
   }, [refetch]);
 
-  const renderItem = useCallback(({ item, index }: { item: ActivityListItem }) => {
+  const renderItem = useCallback(({ item, index }: { item: ActivityListItem; index: number }) => {
     if (item.type === "header") {
       return (
         <Animated.View 
@@ -284,7 +289,8 @@ export default function ActivityScreen() {
     const activityIcon = getActivityIcon(activity.actionType);
     const { action, subject } = formatActivityAction(
       activity.actionType,
-      activity.metadata
+      activity.metadata,
+      t
     );
     const categoryConfig = activity.metadata.category
       ? CATEGORY_CONFIG[activity.metadata.category as string] ||
@@ -307,11 +313,11 @@ export default function ActivityScreen() {
         exiting={FadeOut.duration(200)}
       >
         <ActivityItem
-          userName={isMe ? "Bạn" : activity.user?.name || "Ai đó"}
+          userName={isMe ? t("activity.you") : activity.user?.name || t("activity.someone")}
           userAvatar={activity.user?.avatarUrl || ""}
           action={action}
           subject={subject}
-          groupName={activity.group?.name || "Nhóm"}
+          groupName={activity.group?.name || t("activity.group")}
           groupIcon="person.3.fill"
           amount={amount}
           typeIcon={categoryConfig.icon}
@@ -321,7 +327,7 @@ export default function ActivityScreen() {
         />
       </Animated.View>
     );
-  }, [user?.id]);
+  }, [user?.id, t]);
 
   if (error) {
     return (
@@ -331,12 +337,12 @@ export default function ActivityScreen() {
           className="pb-4 bg-surface"
         >
           <AppText className="text-3xl font-extrabold text-foreground mb-6 px-6">
-            Hoạt động
+            {t("activity.title")}
           </AppText>
         </View>
         <ErrorState
-          title="Không thể tải hoạt động"
-          message={error instanceof Error ? error.message : "Đã xảy ra lỗi"}
+          title={t("activity.error_loading")}
+          message={error instanceof Error ? error.message : t("activity.error_occurred")}
           onRetry={() => refetch()}
         />
       </View>
@@ -347,14 +353,14 @@ export default function ActivityScreen() {
     <View className="flex-1 bg-background">
       <View style={{ paddingTop: insets.top + 20 }} className="pb-4 bg-surface">
         <AppText className="text-3xl font-extrabold text-foreground mb-6 px-6">
-          Hoạt động
+          {t("activity.title")}
         </AppText>
 
         <View className="px-6 mb-6">
           <TextField className="bg-default/5 rounded-2xl overflow-hidden">
             <View className="justify-center">
               <TextField.Input
-                placeholder="Tìm kiếm hoạt động, nhóm, bạn bè"
+                placeholder={t("activity.search_placeholder")}
                 className="text-base pl-12 h-14"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
@@ -387,7 +393,7 @@ export default function ActivityScreen() {
                         isSelected ? "text-white" : "text-foreground"
                       )}
                     >
-                      {filter.label}
+                      {t((filter as any).labelKey)}
                     </Tabs.Label>
                   )}
                 </Tabs.Trigger>
@@ -406,21 +412,23 @@ export default function ActivityScreen() {
           data={flattenedActivities}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
+          // @ts-expect-error - FlashList types lack full support
           estimatedItemSize={100}
           getItemType={(item) => item.type}
           onRefresh={onRefresh}
           refreshing={refreshing}
+          extraData={t}
           className="px-6"
           ListEmptyComponent={
             <EmptyState
               icon="clock.fill"
               title={
-                searchQuery ? "Không tìm thấy kết quả" : "Chưa có hoạt động nào"
+                searchQuery ? t("activity.empty_search_title") : t("activity.empty_title")
               }
               description={
                 searchQuery
-                  ? "Thử tìm kiếm với từ khóa khác"
-                  : "Các hoạt động sẽ hiển thị ở đây"
+                  ? t("activity.empty_search_desc")
+                  : t("activity.empty_desc")
               }
             />
           }

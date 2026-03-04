@@ -2,24 +2,26 @@ import { AppText } from "@/components/app-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
 import { useGroup } from "@/lib/hooks";
+import { useTranslation } from "@/lib/hooks/use-translation";
 import { FlashList } from "@shopify/flash-list";
 import * as Clipboard from "expo-clipboard";
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import {
-    Avatar,
-    Button,
-    Card,
-    PressableFeedback,
-    Spinner,
-    useThemeColor,
-    useToast,
+  Avatar,
+  Button,
+  Card,
+  PressableFeedback,
+  Spinner,
+  useThemeColor,
+  useToast,
 } from "heroui-native";
 import React, { useCallback, useMemo } from "react";
 import { Share, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function GroupMembersScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const insets = useSafeAreaInsets();
   const accent = useThemeColor("accent");
@@ -36,11 +38,11 @@ export default function GroupMembersScreen() {
   const handleCopyInviteCode = async () => {
     if (!inviteCode) {
       toast.show({
-        label: "Lỗi",
-        description: "Không tìm thấy mã mời cho nhóm này",
+        label: t("error"),
+        description: t("group_members.error_no_code"),
         variant: "danger",
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: "Đóng",
+        actionLabel: t("close"),
         onActionPress: ({ hide }) => hide(),
       });
       return;
@@ -48,11 +50,11 @@ export default function GroupMembersScreen() {
 
     await Clipboard.setStringAsync(inviteCode);
     toast.show({
-      label: "Đã sao chép",
-      description: "Mã mời đã được lưu vào bộ nhớ tạm",
+      label: t("copied"),
+      description: t("group_members.copy_success"),
       variant: "success",
       icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
-      actionLabel: "Đóng",
+      actionLabel: t("close"),
       onActionPress: ({ hide }) => hide(),
     });
   };
@@ -60,10 +62,10 @@ export default function GroupMembersScreen() {
   const handleShareInvite = async () => {
     if (!inviteCode) {
       toast.show({
-        label: "Lỗi",
-        description: "Không tìm thấy mã mời cho nhóm này",
+        label: t("error"),
+        description: t("group_members.error_no_code"),
         variant: "danger",
-        actionLabel: "Đóng",
+        actionLabel: t("close"),
         onActionPress: ({ hide }) => hide(),
       });
       return;
@@ -71,15 +73,15 @@ export default function GroupMembersScreen() {
 
     try {
       await Share.share({
-        message: `Tham gia nhóm "${group?.name}" trên SplitSmart!\n\nMã mời: ${inviteCode}\n\nTải app và nhập mã để tham gia.`,
+        message: t("group_members.share_message", { name: group?.name || '', code: inviteCode }),
       });
     } catch (error: any) {
       toast.show({
-        label: "Lỗi chia sẻ",
-        description: error.message || "Đã có lỗi xảy ra khi thực hiện chia sẻ",
+        label: t("group_members.share_error_title"),
+        description: error.message || t("group_members.share_error_desc"),
         variant: "danger",
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: "Thử lại",
+        actionLabel: t("retry"),
         onActionPress: ({ hide }) => hide(),
       });
     }
@@ -119,7 +121,7 @@ export default function GroupMembersScreen() {
           </Avatar>
           <View className="flex-1">
             <AppText className="font-bold text-base">
-              {userData?.name || "Thành viên"}
+              {userData?.name || t("group_detail.member")}
             </AppText>
             <AppText className="text-muted text-xs">
               {userData?.email}
@@ -128,7 +130,7 @@ export default function GroupMembersScreen() {
           {isOwner && (
             <View className="bg-accent/10 px-3 py-1 rounded-full">
               <AppText className="text-accent text-[10px] font-bold">
-                Chủ nhóm
+                {t("group_members.owner")}
               </AppText>
             </View>
           )}
@@ -138,20 +140,20 @@ export default function GroupMembersScreen() {
         )}
       </View>
     );
-  }, [members.length]);
+  }, [members.length, t]);
 
   const ListHeader = useMemo(() => (
     <View className="p-5">
       {/* Invite Code Card */}
       <View className="mb-6">
         <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
-          MÃ MỜI
+          {t("group_members.invite_code_label")}
         </AppText>
         <Card className="rounded-2xl border border-accent/20 bg-accent/5 p-4">
           <View className="flex-row items-center justify-between">
             <View className="flex-1">
               <AppText className="text-muted text-xs mb-1">
-                Chia sẻ mã này để mời bạn bè
+                {t("group_members.invite_hint")}
               </AppText>
               <AppText className="text-2xl font-bold text-accent tracking-widest">
                 {inviteCode || "------"}
@@ -180,10 +182,10 @@ export default function GroupMembersScreen() {
       </View>
 
       <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
-        DANH SÁCH THÀNH VIÊN ({members.length})
+        {t("group_members.list_title", { count: members.length })}
       </AppText>
     </View>
-  ), [inviteCode, members.length, accent]);
+  ), [inviteCode, members.length, accent, t, handleCopyInviteCode, handleShareInvite]);
 
   const ListFooter = useMemo(() => (
     <View className="p-5 pb-20">
@@ -198,11 +200,11 @@ export default function GroupMembersScreen() {
             size={18}
             color={foreground}
           />
-          <Button.Label className="font-bold">Chia sẻ lời mời</Button.Label>
+          <Button.Label className="font-bold">{t("group_members.share_btn")}</Button.Label>
         </View>
       </Button>
     </View>
-  ), [handleShareInvite, foreground]);
+  ), [handleShareInvite, foreground, t]);
 
   if (isLoading) {
     return (
@@ -215,7 +217,7 @@ export default function GroupMembersScreen() {
   return (
     <View className="flex-1 bg-background">
       <StickyHeader
-        title="Thành viên"
+        title={t("group_members.title")}
         rightContent={
           <PressableFeedback
             className="w-10 h-10 rounded-full bg-accent/10 items-center justify-center"
@@ -230,6 +232,7 @@ export default function GroupMembersScreen() {
         data={members}
         renderItem={renderMember}
         keyExtractor={(item) => item.id}
+        // @ts-expect-error - estimatedItemSize exists on FlashList but sometimes has type issues in certain environments
         estimatedItemSize={80}
         ListHeaderComponent={ListHeader}
         ListFooterComponent={ListFooter}

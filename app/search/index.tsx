@@ -4,18 +4,18 @@ import { ExpenseCard } from "@/components/ui/expense-card";
 import { GroupCard } from "@/components/ui/group-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
-import { useSearch } from "@/lib/hooks";
+import { useSearch, useTranslation } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import {
-    Avatar,
-    Card,
-    PressableFeedback,
-    Spinner,
-    TextField,
-    useThemeColor
+  Avatar,
+  Card,
+  PressableFeedback,
+  Spinner,
+  TextField,
+  useThemeColor
 } from "heroui-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
@@ -28,6 +28,7 @@ type SearchListItem =
   | { type: "user"; data: any; id: string };
 
 export default function SearchScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const accent = useThemeColor("accent");
@@ -45,21 +46,21 @@ export default function SearchScreen() {
     const { expenses = [], groups = [], users = [] } = searchResults as any;
 
     if (expenses.length > 0) {
-      flattened.push({ type: "header", title: "Khoản chi", id: "header-expenses" });
+      flattened.push({ type: "header", title: t('search.header.expenses', { defaultValue: "Khoản chi" }), id: "header-expenses" });
       expenses.forEach((expense: any) => {
         flattened.push({ type: "expense", data: expense, id: `expense-${expense.id}` });
       });
     }
 
     if (groups.length > 0) {
-      flattened.push({ type: "header", title: "Nhóm", id: "header-groups" });
+      flattened.push({ type: "header", title: t('search.header.groups', { defaultValue: "Nhóm" }), id: "header-groups" });
       groups.forEach((group: any) => {
         flattened.push({ type: "group", data: group, id: `group-${group.id}` });
       });
     }
 
     if (users.length > 0) {
-      flattened.push({ type: "header", title: "Người dùng", id: "header-users" });
+      flattened.push({ type: "header", title: t('search.header.users', { defaultValue: "Người dùng" }), id: "header-users" });
       users.forEach((user: any) => {
         flattened.push({ type: "user", data: user, id: `user-${user.id}` });
       });
@@ -151,7 +152,7 @@ export default function SearchScreen() {
                   </Avatar>
                 )}
                 <View className="flex-1">
-                  <AppText className="font-bold text-base">{user.name || "Người dùng"}</AppText>
+                  <AppText className="font-bold text-base">{user.name || t('search.default_user', { defaultValue: "Người dùng" })}</AppText>
                   {user.email && (
                     <AppText className="text-muted text-sm">{user.email}</AppText>
                   )}
@@ -164,14 +165,14 @@ export default function SearchScreen() {
       default:
         return null;
     }
-  }, [currentUser?.id, router, muted]);
+  }, [currentUser?.id, router, muted, t]);
 
   const ListHeader = useMemo(() => {
     if (searchQuery.length < 2 && recentSearches.length > 0) {
       return (
         <View className="p-6">
           <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
-            GẦN ĐÂY
+            {t('search.recent', { defaultValue: 'GẦN ĐÂY' })}
           </AppText>
           <View className="gap-2">
             {recentSearches.map((item, idx) => (
@@ -203,14 +204,14 @@ export default function SearchScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <StickyHeader title="Tìm kiếm" />
+      <StickyHeader title={t('search.title', { defaultValue: 'Tìm kiếm' })} />
 
       {/* Search Bar */}
       <View className="px-6 py-4">
         <TextField>
           <View className="justify-center">
             <TextField.Input
-              placeholder="Tìm nhóm, bạn bè, khoản chi..."
+              placeholder={t('search.placeholder', { defaultValue: 'Tìm nhóm, bạn bè, khoản chi...' })}
               placeholderTextColor={muted}
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -250,14 +251,15 @@ export default function SearchScreen() {
                       <IconSymbol name="magnifyingglass" size={40} color={muted} />
                     </View>
                     <AppText className="text-xl font-bold text-center mb-2">
-                      Tìm kiếm bất cứ điều gì
+                      {t('search.empty_query_title', { defaultValue: 'Tìm kiếm bất cứ điều gì' })}
                     </AppText>
                     <AppText className="text-muted text-center leading-6">
-                      Nhập tên khoản chi, tên nhóm hoặc email của bạn bè để tìm kiếm nhanh chóng.
+                      {t('search.empty_query_desc', { defaultValue: 'Nhập tên khoản chi, tên nhóm hoặc email của bạn bè để tìm kiếm nhanh chóng.' })}
                     </AppText>
                   </View>
                 ) : null
               }
+              // @ts-expect-error - FlashList types are incomplete
               estimatedItemSize={100}
             />
         ) : flattenedResults.length > 0 ? (
@@ -265,16 +267,18 @@ export default function SearchScreen() {
             data={flattenedResults}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
+            // @ts-expect-error - FlashList types are incomplete
             estimatedItemSize={100}
             getItemType={(item) => item.type}
+            extraData={t}
             contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: insets.bottom + 40 }}
             keyboardShouldPersistTaps="handled"
           />
         ) : (
           <EmptyState
             icon="magnifyingglass"
-            title="Không tìm thấy kết quả"
-            description={`Không có kết quả nào cho "${searchQuery}"`}
+            title={t('search.no_results_title', { defaultValue: 'Không tìm thấy kết quả' })}
+            description={t('search.no_results_desc', { query: searchQuery, defaultValue: `Không có kết quả nào cho "${searchQuery}"` })}
           />
         )}
       </View>

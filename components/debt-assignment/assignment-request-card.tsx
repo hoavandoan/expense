@@ -1,10 +1,11 @@
 import { AppText } from '@/components/app-text';
+import { useTranslation } from '@/lib/hooks';
 import { Image } from 'expo-image';
 import {
-    Avatar,
-    Button,
-    Card,
-    Divider,
+  Avatar,
+  Button,
+  Card,
+  Divider,
 } from 'heroui-native';
 import React from 'react';
 import { View } from 'react-native';
@@ -20,6 +21,7 @@ export const AssignmentRequestCard: React.FC<AssignmentRequestCardProps> = ({
   request,
   canReview,
 }) => {
+  const { t } = useTranslation();
   const { mutate: approve, isPending: isApproving } = useApproveAssignmentRequest();
   const { mutate: reject, isPending: isRejecting } = useRejectAssignmentRequest();
 
@@ -41,7 +43,7 @@ export const AssignmentRequestCard: React.FC<AssignmentRequestCardProps> = ({
 
   const renderUser = (user: any, role: string) => (
     <View className="flex-row items-center gap-2">
-      <Avatar size="sm" alt={user?.name || 'User'}>
+      <Avatar size="sm" alt={user?.name || t('debt_assignment.request_card.unknown_user', { defaultValue: 'User' })}>
         {user?.avatarUrl ? (
           <Avatar.Image source={{ uri: user.avatarUrl }} asChild>
             <Image source={{ uri: user.avatarUrl }} style={{ width: '100%', height: '100%' }} />
@@ -53,7 +55,7 @@ export const AssignmentRequestCard: React.FC<AssignmentRequestCardProps> = ({
         )}
       </Avatar>
       <View>
-        <AppText className="font-bold text-xs">{user?.name || 'Unknown'}</AppText>
+        <AppText className="font-bold text-xs">{user?.name || t('debt_assignment.request_card.unknown', { defaultValue: 'Unknown' })}</AppText>
         <AppText className="text-[10px] text-muted">{role}</AppText>
       </View>
     </View>
@@ -64,7 +66,7 @@ export const AssignmentRequestCard: React.FC<AssignmentRequestCardProps> = ({
       <View className="gap-3">
         <View className="flex-row items-center justify-between">
           <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest">
-            YÊU CẦU GÁN NỢ
+            {t('debt_assignment.request_card.title')}
           </AppText>
           <AppText className="text-[10px] text-muted">
             {new Date(request.createdAt).toLocaleDateString()}
@@ -72,9 +74,9 @@ export const AssignmentRequestCard: React.FC<AssignmentRequestCardProps> = ({
         </View>
 
         <View className="flex-row items-center justify-between bg-default-50 p-3 rounded-xl">
-            {renderUser(request.requestedByUser, 'Người yêu cầu')}
+            {renderUser(request.requestedByUser, t('debt_assignment.request_card.requester'))}
             <AppText className="text-muted mx-1 text-xs">→</AppText>
-            {renderUser(request.proposedAssigneeUser, 'Được đề xuất')}
+            {renderUser(request.proposedAssigneeUser, t('debt_assignment.request_card.proposed'))}
         </View>
 
         {request.reason && (
@@ -93,7 +95,7 @@ export const AssignmentRequestCard: React.FC<AssignmentRequestCardProps> = ({
                 onPress={handleReject}
                 isDisabled={isApproving || isRejecting}
               >
-                 <Button.Label className="text-danger font-semibold">Từ chối</Button.Label>
+                 <Button.Label className="text-danger font-semibold">{t('debt_assignment.request_card.reject')}</Button.Label>
               </Button>
               <Button
                 size="sm"
@@ -102,7 +104,7 @@ export const AssignmentRequestCard: React.FC<AssignmentRequestCardProps> = ({
                 isDisabled={isApproving || isRejecting}
               >
                  <Button.Label className="text-white font-bold">
-                   {isApproving ? 'Đang duyệt...' : 'Duyệt'}
+                   {isApproving ? t('debt_assignment.request_card.approving') : t('debt_assignment.request_card.approve')}
                  </Button.Label>
               </Button>
             </View>

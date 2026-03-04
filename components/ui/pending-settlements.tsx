@@ -2,6 +2,7 @@ import { AppText } from '@/components/app-text';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useCompleteSettlement, usePendingSettlements, useRejectSettlement } from '@/lib/hooks';
+import { useTranslation } from '@/lib/hooks/use-translation';
 import type { Settlement } from '@/lib/types';
 import { Image } from 'expo-image';
 import { Avatar, Button, Card, useThemeColor, useToast } from 'heroui-native';
@@ -13,6 +14,7 @@ interface PendingSettlementsProps {
 }
 
 export function PendingSettlements({ groupId }: PendingSettlementsProps) {
+  const { t, locale } = useTranslation();
   const { toast } = useToast();
   const { data: pendingSettlements, isLoading } = usePendingSettlements(groupId);
   const completeSettlement = useCompleteSettlement();
@@ -41,8 +43,8 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
         groupId: groupId,
       });
       toast.show({
-        label: 'Đã xác nhận',
-        description: 'Thanh toán đã được ghi nhận thành công',
+        label: t("pending_settlements.confirm_success_title"),
+        description: t("pending_settlements.confirm_success_desc"),
         variant: 'success',
         icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
         actionLabel: 'OK',
@@ -50,11 +52,11 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
       });
     } catch (error: any) {
       toast.show({
-        label: 'Lỗi xác nhận',
-        description: error.message || 'Không thể xác nhận thanh toán lúc này',
+        label: t("pending_settlements.confirm_error_title"),
+        description: error.message || t("pending_settlements.confirm_error_desc"),
         variant: 'danger',
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: 'Đóng',
+        actionLabel: t("close"),
         onActionPress: ({ hide }) => hide(),
       });
     }
@@ -70,8 +72,8 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
         groupId: groupId,
       });
       toast.show({
-        label: 'Đã từ chối',
-        description: 'Yêu cầu thanh toán đã được gỡ bỏ',
+        label: t("pending_settlements.reject_success_title"),
+        description: t("pending_settlements.reject_success_desc"),
         variant: 'warning',
         icon: <IconSymbol name="exclamationmark.triangle.fill" size={20} color={warning} />,
         actionLabel: 'OK',
@@ -79,11 +81,11 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
       });
     } catch (error: any) {
       toast.show({
-        label: 'Lỗi từ chối',
-        description: error.message || 'Không thể từ chối yêu cầu lúc này',
+        label: t("pending_settlements.reject_error_title"),
+        description: error.message || t("pending_settlements.reject_error_desc"),
         variant: 'danger',
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: 'Đóng',
+        actionLabel: t("close"),
         onActionPress: ({ hide }) => hide(),
       });
     }
@@ -98,7 +100,7 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
       <View className="flex-row items-center gap-2 mb-3 ml-1">
         <View className="w-2 h-2 rounded-full bg-warning animate-pulse" />
         <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest">
-          CHỜ XÁC NHẬN ({pendingSettlements.length})
+          {t("pending_settlements.waiting_confirm", { count: pendingSettlements.length })}
         </AppText>
       </View>
 
@@ -124,11 +126,11 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
                     )}
                   </Avatar>
                   <View className="flex-1">
-                    <AppText className="font-bold">{fromUser?.name || 'Thành viên'}</AppText>
-                    <AppText className="text-muted text-xs">gửi cho bạn</AppText>
+                    <AppText className="font-bold">{fromUser?.name || t("group_detail.member")}</AppText>
+                    <AppText className="text-muted text-xs">{t("pending_settlements.sent_to_you")}</AppText>
                   </View>
                   <AppText className="text-xl font-bold text-accent">
-                    {settlement.amount.toLocaleString()}đ
+                    {settlement.amount.toLocaleString(locale === "vi" ? "vi-VN" : "en-US")}{locale === "vi" ? "đ" : ""}
                   </AppText>
                 </View>
 
@@ -145,7 +147,7 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
                     onPress={() => setRejectDialog({ isOpen: true, settlement })}
                     isDisabled={rejectSettlement.isPending}
                   >
-                    <Button.Label className="font-bold">Từ chối</Button.Label>
+                    <Button.Label className="font-bold">{t("pending_settlements.reject_btn")}</Button.Label>
                   </Button>
                   <Button
                     variant="primary"
@@ -155,7 +157,7 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
                   >
                     <View className="flex-row items-center gap-2">
                       <IconSymbol name="checkmark" size={16} color="white" />
-                      <Button.Label className="font-bold text-white">Xác nhận</Button.Label>
+                      <Button.Label className="font-bold text-white">{t("pending_settlements.confirm_btn")}</Button.Label>
                     </View>
                   </Button>
                 </View>
@@ -169,8 +171,11 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
         onOpenChange={(open) => setConfirmDialog(prev => ({ ...prev, isOpen: open }))}
-        title="Xác nhận đã nhận tiền"
-        description={`Bạn xác nhận đã nhận ${confirmDialog.settlement?.amount.toLocaleString()}đ từ ${(confirmDialog.settlement as any)?.from_user?.name || 'thành viên'}?`}
+        title={t("pending_settlements.confirm_dialog_title")}
+        description={t("pending_settlements.confirm_dialog_desc", {
+          amount: confirmDialog.settlement?.amount.toLocaleString(locale === "vi" ? "vi-VN" : "en-US") + (locale === "vi" ? "đ" : ""),
+          name: (confirmDialog.settlement as any)?.from_user?.name || t("group_detail.member"),
+        })}
         onConfirm={handleConfirm}
         isLoading={completeSettlement.isPending}
       />
@@ -178,9 +183,9 @@ export function PendingSettlements({ groupId }: PendingSettlementsProps) {
       <ConfirmDialog
         isOpen={rejectDialog.isOpen}
         onOpenChange={(open) => setRejectDialog(prev => ({ ...prev, isOpen: open }))}
-        title="Từ chối thanh toán"
-        description="Bạn chắc chắn muốn từ chối yêu cầu thanh toán này?"
-        confirmLabel="Từ chối"
+        title={t("pending_settlements.reject_dialog_title")}
+        description={t("pending_settlements.reject_dialog_desc")}
+        confirmLabel={t("pending_settlements.reject_btn")}
         variant="danger"
         onConfirm={handleReject}
         isLoading={rejectSettlement.isPending}

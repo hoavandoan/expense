@@ -4,7 +4,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { StickyHeader } from '@/components/ui/sticky-header';
-import { useMarkAllNotificationsAsRead, useMarkNotificationAsRead, useNotifications } from '@/lib/hooks';
+import { useMarkAllNotificationsAsRead, useMarkNotificationAsRead, useNotifications, useTranslation } from '@/lib/hooks';
 import { cn, PressableFeedback, Spinner, Tabs, useThemeColor } from 'heroui-native';
 import React, { useMemo, useState } from 'react';
 import { View } from 'react-native';
@@ -24,31 +24,31 @@ const getNotificationIcon = (type: string) => {
   return iconMap[type] || 'bell';
 };
 
-const formatTimeAgo = (dateString: string): string => {
+const formatTimeAgo = (dateString: string, t: any): string => {
   const date = new Date(dateString);
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
   if (diffInSeconds < 60) {
-    return 'Vừa xong';
+    return t('notifications.just_now', { defaultValue: 'Vừa xong' });
   }
 
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   if (diffInMinutes < 60) {
-    return `${diffInMinutes} phút trước`;
+    return t('notifications.minutes_ago', { count: diffInMinutes, defaultValue: `${diffInMinutes} phút trước` });
   }
 
   const diffInHours = Math.floor(diffInMinutes / 60);
   if (diffInHours < 24) {
-    return `${diffInHours} giờ trước`;
+    return t('notifications.hours_ago', { count: diffInHours, defaultValue: `${diffInHours} giờ trước` });
   }
 
   const diffInDays = Math.floor(diffInHours / 24);
   if (diffInDays === 1) {
-    return 'Hôm qua';
+    return t('notifications.yesterday', { defaultValue: 'Hôm qua' });
   }
   if (diffInDays < 7) {
-    return `${diffInDays} ngày trước`;
+    return t('notifications.days_ago', { count: diffInDays, defaultValue: `${diffInDays} ngày trước` });
   }
 
   return date.toLocaleDateString('vi-VN');
@@ -84,6 +84,7 @@ const groupNotificationsByDate = (notifications: any[]) => {
 };
 
 export default function NotificationsScreen() {
+  const { t } = useTranslation();
   const accent = useThemeColor('accent');
   const muted = useThemeColor('muted');
   const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
@@ -121,10 +122,10 @@ export default function NotificationsScreen() {
   if (error) {
     return (
       <View className="flex-1 bg-background">
-        <StickyHeader title="Thông báo" />
+        <StickyHeader title={t('notifications.title', { defaultValue: 'Thông báo' })} />
         <ErrorState
-          title="Không thể tải thông báo"
-          message={error instanceof Error ? error.message : 'Đã xảy ra lỗi'}
+          title={t('notifications.error_title', { defaultValue: 'Không thể tải thông báo' })}
+          message={error instanceof Error ? error.message : t('notifications.error_default', { defaultValue: 'Đã xảy ra lỗi' })}
           onRetry={() => refetch()}
         />
       </View>
@@ -142,11 +143,11 @@ export default function NotificationsScreen() {
   return (
     <View className="flex-1 bg-background">
       <StickyHeader
-        title="Thông báo"
+        title={t('notifications.title', { defaultValue: 'Thông báo' })}
         rightElement={
           notifications && notifications.length > 0 && notifications.some((n) => !n.isRead) ? (
             <PressableFeedback onPress={handleMarkAllAsRead}>
-              <AppText className="text-accent font-semibold text-sm">Đánh dấu tất cả</AppText>
+              <AppText className="text-accent font-semibold text-sm">{t('notifications.mark_all_read', { defaultValue: 'Đánh dấu tất cả' })}</AppText>
             </PressableFeedback>
           ) : null
         }
@@ -158,12 +159,12 @@ export default function NotificationsScreen() {
             <Tabs.Indicator className="bg-accent shadow-none" />
             <Tabs.Trigger value="all" className="px-6 py-2 rounded-full">
               {({ isSelected }) => (
-                <Tabs.Label className={cn("font-bold text-[13px]", isSelected ? "text-white" : "text-foreground")}>Tất cả</Tabs.Label>
+                <Tabs.Label className={cn("font-bold text-[13px]", isSelected ? "text-white" : "text-foreground")}>{t('notifications.tab_all', { defaultValue: 'Tất cả' })}</Tabs.Label>
               )}
             </Tabs.Trigger>
             <Tabs.Trigger value="unread" className="px-6 py-2 rounded-full">
               {({ isSelected }) => (
-                <Tabs.Label className={cn("font-bold text-[13px]", isSelected ? "text-white" : "text-foreground")}>Chưa đọc</Tabs.Label>
+                <Tabs.Label className={cn("font-bold text-[13px]", isSelected ? "text-white" : "text-foreground")}>{t('notifications.tab_unread', { defaultValue: 'Chưa đọc' })}</Tabs.Label>
               )}
             </Tabs.Trigger>
           </Tabs.List>
@@ -180,7 +181,7 @@ export default function NotificationsScreen() {
             {groupKeys.map((groupTitle) => (
               <View key={groupTitle} className="mb-6">
                 <AppText className="text-[13px] font-bold text-muted uppercase tracking-widest mb-4">
-                  {groupTitle === 'Today' ? 'Hôm nay' : groupTitle === 'Yesterday' ? 'Hôm qua' : groupTitle}
+                  {groupTitle === 'Today' ? t('notifications.today', { defaultValue: 'Hôm nay' }) : groupTitle === 'Yesterday' ? t('notifications.yesterday', { defaultValue: 'Hôm qua' }) : groupTitle}
                 </AppText>
                 <View className="gap-4">
                   {groupedNotifications[groupTitle].map((notif) => (
@@ -188,7 +189,7 @@ export default function NotificationsScreen() {
                       <View className={cn("flex-row items-center p-3 rounded-2xl", !notif.isRead && "bg-accent/5")}>
                         <View className={cn("w-12 h-12 rounded-full items-center justify-center", !notif.isRead ? "bg-accent" : "bg-surface-secondary")}>
                           <IconSymbol
-                            name={getNotificationIcon(notif.type)}
+                            name={getNotificationIcon(notif.type) as any}
                             size={20}
                             color={!notif.isRead ? 'white' : muted}
                           />
@@ -205,7 +206,7 @@ export default function NotificationsScreen() {
                         </View>
                         <View className="items-end">
                           <AppText className="text-muted text-[11px] font-medium mb-1">
-                            {formatTimeAgo(notif.createdAt)}
+                            {formatTimeAgo(notif.createdAt, t)}
                           </AppText>
                           {!notif.isRead && <View className="w-2 h-2 rounded-full bg-accent" />}
                         </View>
@@ -220,8 +221,8 @@ export default function NotificationsScreen() {
       ) : (
         <EmptyState
           icon="bell.slash"
-          title={activeTab === 'unread' ? 'Không có thông báo chưa đọc' : 'Chưa có thông báo nào'}
-          description={activeTab === 'unread' ? 'Tất cả thông báo đã được đọc' : 'Các thông báo sẽ hiển thị ở đây'}
+          title={activeTab === 'unread' ? t('notifications.empty_unread_title', { defaultValue: 'Không có thông báo chưa đọc' }) : t('notifications.empty_all_title', { defaultValue: 'Chưa có thông báo nào' })}
+          description={activeTab === 'unread' ? t('notifications.empty_unread_desc', { defaultValue: 'Tất cả thông báo đã được đọc' }) : t('notifications.empty_all_desc', { defaultValue: 'Các thông báo sẽ hiển thị ở đây' })}
         />
       )}
     </View>

@@ -1,6 +1,7 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useTranslation } from '@/lib/hooks/use-translation';
 import { useRouter } from 'expo-router';
 import { Card, cn, PressableFeedback, useThemeColor } from 'heroui-native';
 import React from 'react';
@@ -14,6 +15,7 @@ const MOCK_HISTORY = [
 ];
 
 export default function TransactionHistoryScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const accent = useThemeColor('accent');
 
@@ -24,7 +26,7 @@ export default function TransactionHistoryScreen() {
         <PressableFeedback onPress={() => router.back()} className="w-10 h-10 rounded-full bg-surface items-center justify-center shadow-sm">
           <IconSymbol name="chevron.left" size={20} color="black" />
         </PressableFeedback>
-        <AppText className="text-lg font-bold">Lịch sử chi tiêu</AppText>
+        <AppText className="text-lg font-bold">{t("group_history.title")}</AppText>
         <PressableFeedback className="w-10 h-10 rounded-full bg-surface items-center justify-center shadow-sm">
           <IconSymbol name="line.3.horizontal.decrease.circle" size={20} color="black" />
         </PressableFeedback>
@@ -33,11 +35,11 @@ export default function TransactionHistoryScreen() {
       {/* Summary Stats (Image 2) */}
       <View className="flex-row px-6 gap-4 mb-8">
         <Card variant="default" className="flex-1 p-5 rounded-[28px] bg-accent/5 border border-accent/10">
-          <AppText className="text-muted text-[10px] font-bold uppercase mb-2">TỔNG CHI TIÊU</AppText>
+          <AppText className="text-muted text-[10px] font-bold uppercase mb-2">{t("group_history.total_spent")}</AppText>
           <AppText className="text-xl font-bold">4.250k</AppText>
         </Card>
         <Card variant="default" className="flex-1 p-5 rounded-[28px] bg-success/5 border border-success/10">
-          <AppText className="text-muted text-[10px] font-bold uppercase mb-2">SỐ DƯ CỦA BẠN</AppText>
+          <AppText className="text-muted text-[10px] font-bold uppercase mb-2">{t("group_history.your_balance")}</AppText>
           <AppText className="text-success text-xl font-bold">+1.250k</AppText>
         </Card>
       </View>
@@ -45,7 +47,7 @@ export default function TransactionHistoryScreen() {
       {/* History List Grouped (Image 2) */}
       <View className="px-6 pb-10">
         <View className="mb-8">
-          <AppText className="text-muted text-xs font-bold mb-4 ml-1">HÔM NAY</AppText>
+          <AppText className="text-muted text-xs font-bold mb-4 ml-1">{t("group_history.today")}</AppText>
           <View className="gap-3">
             <Card variant="default" className="p-4 rounded-[28px] border border-divider/5">
               <View className="flex-row items-center gap-3">
@@ -53,8 +55,8 @@ export default function TransactionHistoryScreen() {
                   <IconSymbol name="creditcard" size={24} color="#F5A623" />
                 </View>
                 <View className="flex-1">
-                  <AppText className="font-bold text-base">Ăn trưa Kichi</AppText>
-                  <AppText className="text-muted text-xs">Chi cho cả nhóm • 12:30</AppText>
+                  <AppText className="font-bold text-base">{t("group_history.mock_lunch")}</AppText>
+                  <AppText className="text-muted text-xs">{t("group_history.split_all")} • 12:30</AppText>
                 </View>
                 <AppText className="text-danger font-bold text-base">-150k</AppText>
               </View>
@@ -63,7 +65,7 @@ export default function TransactionHistoryScreen() {
         </View>
 
         <View className="mb-8">
-          <AppText className="text-muted text-xs font-bold mb-4 ml-1">HÔM QUA</AppText>
+          <AppText className="text-muted text-xs font-bold mb-4 ml-1">{t("group_history.yesterday")}</AppText>
           <View className="gap-3">
             <Card variant="default" className="p-4 rounded-[28px] border border-divider/5">
               <View className="flex-row items-center gap-3">
@@ -71,8 +73,8 @@ export default function TransactionHistoryScreen() {
                   <IconSymbol name="house.fill" size={24} color="#0070F3" />
                 </View>
                 <View className="flex-1">
-                  <AppText className="font-bold text-base">Tiền nhà tháng 12</AppText>
-                  <AppText className="text-muted text-xs">Bạn đã trả • 09:15</AppText>
+                  <AppText className="font-bold text-base">{t("group_history.mock_rent")}</AppText>
+                  <AppText className="text-muted text-xs">{t("group_history.you_paid")} • 09:15</AppText>
                 </View>
                 <AppText className="text-success font-bold text-base">+2.500k</AppText>
               </View>
@@ -81,7 +83,7 @@ export default function TransactionHistoryScreen() {
         </View>
 
         <View className="mb-8">
-          <AppText className="text-muted text-xs font-bold mb-4 ml-1">24 THÁNG 12</AppText>
+          <AppText className="text-muted text-xs font-bold mb-4 ml-1">{t("group_history.dec_24")}</AppText>
           <View className="gap-3">
             {MOCK_HISTORY.slice(2).map((item) => (
               <Card key={item.id} variant="default" className="p-4 rounded-[28px] border border-divider/5">
@@ -90,8 +92,8 @@ export default function TransactionHistoryScreen() {
                     <IconSymbol name="paperplane.fill" size={24} color="#71717A" />
                   </View>
                   <View className="flex-1">
-                    <AppText className="font-bold text-base">{item.title}</AppText>
-                    <AppText className="text-muted text-xs">{item.subtitle}</AppText>
+                    <AppText className="font-bold text-base">{t(`group_history.mock_${item.id}` as any)}</AppText>
+                    <AppText className="text-muted text-xs">{t("group_history.mock_paid_by_an")} • 24/12</AppText>
                   </View>
                   <AppText className={cn(
                     'font-bold text-base',

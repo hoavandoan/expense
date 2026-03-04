@@ -54,10 +54,14 @@ interface ErrorFallbackProps {
   onRetry?: () => void;
 }
 
+import { useTranslation } from '@/lib/hooks/use-translation';
+
 /**
  * Default error fallback UI - Uses native components since this renders outside HeroUINativeProvider
  */
 export function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
+  const { t } = useTranslation();
+
   return (
     <View className="flex-1 bg-background items-center justify-center px-8">
       <View className="w-24 h-24 rounded-full bg-danger/10 items-center justify-center mb-6">
@@ -65,12 +69,12 @@ export function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
       </View>
       
       <AppText className="text-2xl font-bold text-foreground text-center mb-2">
-        Đã xảy ra lỗi
+        {t("error_boundary.title")}
       </AppText>
       
       <AppText className="text-muted text-center mb-6 leading-relaxed">
-        Ứng dụng gặp sự cố không mong muốn.{'\n'}
-        Vui lòng thử lại hoặc liên hệ hỗ trợ.
+        {t("error_boundary.message")}{'\n'}
+        {t("error_boundary.hint")}
       </AppText>
 
       {__DEV__ && error && (
@@ -86,7 +90,7 @@ export function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
           onPress={onRetry}
           className="h-14 rounded-xl px-8 bg-accent items-center justify-center"
         >
-          <AppText className="font-bold text-white">Thử lại</AppText>
+          <AppText className="font-bold text-white">{t("error_boundary.retry")}</AppText>
         </Pressable>
       )}
     </View>

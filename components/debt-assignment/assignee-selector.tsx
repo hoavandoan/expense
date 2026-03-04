@@ -1,5 +1,6 @@
 import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useTranslation } from '@/lib/hooks';
 import { Image } from 'expo-image';
 import {
   Avatar,
@@ -35,6 +36,7 @@ export const AssigneeSelector: React.FC<AssigneeSelectorProps> = ({
 }) => {
   const { mutate: setAssignment, isPending } = useSetDebtAssignment();
   const [selectedUserId, setSelectedUserId] = React.useState<string | null>(currentAssigneeId || null);
+  const { t } = useTranslation();
 
   const handleConfirm = () => {
     if (!selectedUserId) return;
@@ -54,7 +56,7 @@ export const AssigneeSelector: React.FC<AssigneeSelectorProps> = ({
         <Dialog.Overlay />
         <Dialog.Content className="max-w-md w-[90%] self-center">
           <View className="flex-row justify-between items-center mb-2">
-            <Dialog.Title className="text-xl font-bold">Chọn Người Gán Nợ</Dialog.Title>
+            <Dialog.Title className="text-xl font-bold">{t('debt_assignment.assignee_selector.title')}</Dialog.Title>
             <Dialog.Close asChild>
               <Button isIconOnly variant="ghost" size="sm">
                 <IconSymbol name="xmark" size={24} color="gray" />
@@ -63,7 +65,7 @@ export const AssigneeSelector: React.FC<AssigneeSelectorProps> = ({
           </View>
           
           <Dialog.Description className="text-muted mb-4">
-            Chọn thành viên sẽ làm trung gian thanh toán. Các thành viên khác sẽ thanh toán nợ cho người này.
+            {t('debt_assignment.assignee_selector.description')}
           </Dialog.Description>
 
           <ScrollView className="max-h-80 mb-6" showsVerticalScrollIndicator={false}>
@@ -93,7 +95,7 @@ export const AssigneeSelector: React.FC<AssigneeSelectorProps> = ({
                       )}
                     </Avatar>
                     <View className="items-start">
-                      <AppText className="font-bold">{member.name || 'Unknown'}</AppText>
+                      <AppText className="font-bold">{member.name || t('debt_assignment.assignee_selector.unknown', { defaultValue: 'Unknown' })}</AppText>
                       <AppText className="text-xs text-muted capitalize">{member.role}</AppText>
                     </View>
                   </View>
@@ -113,7 +115,7 @@ export const AssigneeSelector: React.FC<AssigneeSelectorProps> = ({
                 variant="ghost" 
                 className="flex-1"
               >
-                <Button.Label>Hủy</Button.Label>
+                <Button.Label>{t('common.cancel')}</Button.Label>
               </Button>
             </Dialog.Close>
             <Button
@@ -123,7 +125,7 @@ export const AssigneeSelector: React.FC<AssigneeSelectorProps> = ({
               isDisabled={isPending || !selectedUserId || selectedUserId === currentAssigneeId}
             >
                <Button.Label className="text-white">
-                 {isPending ? 'Đang xử lý...' : 'Xác nhận'}
+                 {isPending ? t('debt_assignment.assignee_selector.processing') : t('debt_assignment.assignee_selector.confirm')}
                </Button.Label>
             </Button>
           </View>

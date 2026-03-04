@@ -1,10 +1,12 @@
 import { AppText } from "@/components/app-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTranslation } from "@/lib/hooks";
 import { Stack, useRouter } from "expo-router";
 
 import { Button, PressableFeedback, useThemeColor } from "heroui-native";
 
 export default function ModalLayout() {
+  const { t } = useTranslation();
   const router = useRouter();
   const foreground = useThemeColor("foreground");
   const background = useThemeColor("background");
@@ -38,10 +40,10 @@ export default function ModalLayout() {
       <Stack.Screen
         name="add-expense"
         options={{
-          title: "Thêm chi tiêu",
+          title: t('modal_layout.add_expense_title', { defaultValue: "Thêm chi tiêu" }),
           headerRight: () => (
             <PressableFeedback onPress={() => router.back()} className="mr-4">
-              <AppText className="text-accent font-bold text-base">Lưu</AppText>
+              <AppText className="text-accent font-bold text-base">{t('modal_layout.save_btn', { defaultValue: "Lưu" })}</AppText>
             </PressableFeedback>
           ),
         }}
@@ -49,19 +51,19 @@ export default function ModalLayout() {
       <Stack.Screen
         name="add-group"
         options={{
-          title: "Tạo nhóm mới",
+          title: t('modal_layout.create_group_title', { defaultValue: "Tạo nhóm mới" }),
           headerRight: () => (
             <PressableFeedback onPress={() => router.back()} className="mr-4">
-              <AppText className="text-accent font-bold text-base">Tạo</AppText>
+              <AppText className="text-accent font-bold text-base">{t('modal_layout.create_btn', { defaultValue: "Tạo" })}</AppText>
             </PressableFeedback>
           ),
         }}
       />
-      <Stack.Screen name="join-group" options={{ title: "Tham gia nhóm" }} />
-      <Stack.Screen name="settle-up" options={{ title: "Thanh toán" }} />
+      <Stack.Screen name="join-group" options={{ title: t('modal_layout.join_group_title', { defaultValue: "Tham gia nhóm" }) }} />
+      <Stack.Screen name="settle-up" options={{ title: t('modal_layout.settle_up_title', { defaultValue: "Thanh toán" }) }} />
       <Stack.Screen
         name="payment-confirm"
-        options={{ title: "Xác nhận thanh toán" }}
+        options={{ title: t('modal_layout.payment_confirm_title', { defaultValue: "Xác nhận thanh toán" }) }}
       />
     </Stack>
   );

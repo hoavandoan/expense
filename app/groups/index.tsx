@@ -2,7 +2,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { GroupCard } from "@/components/ui/group-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
-import { useGroups } from "@/lib/hooks";
+import { useGroups, useTranslation } from "@/lib/hooks";
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { Button, Spinner, useThemeColor } from "heroui-native";
@@ -12,6 +12,7 @@ import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function GroupsListScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const accent = useThemeColor("accent");
@@ -37,13 +38,13 @@ export default function GroupsListScreen() {
         onPress={() => router.push(`/group/${item.id}` as any)}
       />
     </Animated.View>
-  ), [router]);
+  ), [router, t]);
 
 
   return (
     <View className="flex-1 bg-background">
       <StickyHeader 
-        title="Tất cả nhóm" 
+        title={t('groups.title', { defaultValue: 'Tất cả nhóm' })} 
         rightContent={
           <Button
             isIconOnly
@@ -66,15 +67,17 @@ export default function GroupsListScreen() {
           data={groups}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
+          // @ts-expect-error - FlashList types are incomplete
           estimatedItemSize={150}
+          extraData={t}
           onRefresh={refetch}
           refreshing={false}
           ListEmptyComponent={
             <EmptyState
               icon="person.3.fill"
-              title="Chưa có nhóm nào"
-              description="Tạo nhóm mới hoặc tham gia nhóm bạn bè để bắt đầu chia sẻ chi phí."
-              actionLabel="Tạo nhóm ngay"
+              title={t('groups.empty_title', { defaultValue: 'Chưa có nhóm nào' })}
+              description={t('groups.empty_desc', { defaultValue: 'Tạo nhóm mới hoặc tham gia nhóm bạn bè để bắt đầu chia sẻ chi phí.' })}
+              actionLabel={t('groups.create_btn', { defaultValue: 'Tạo nhóm ngay' })}
               onAction={() => router.push("/add-group")}
             />
           }

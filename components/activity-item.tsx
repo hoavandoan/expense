@@ -1,5 +1,6 @@
 import { AppText } from "@/components/app-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTranslation } from "@/lib/hooks";
 import { Avatar, cn, PressableFeedback, useThemeColor } from "heroui-native";
 import React from "react";
 import { View } from "react-native";
@@ -33,6 +34,7 @@ export const ActivityItem = React.memo(({
                                 iconColor,
                                 isMe,
                               }: ActivityItemProps) => {
+  const { t } = useTranslation();
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
 
@@ -44,7 +46,7 @@ export const ActivityItem = React.memo(({
             {isMe ? (
               <View className="w-full h-full bg-accent-soft items-center justify-center">
                 <AppText className="text-accent font-bold text-xs uppercase">
-                  Bạn
+                  {t('common.you')}
                 </AppText>
               </View>
             ) : userAvatar ? (

@@ -1,0 +1,663 @@
+{
+    "common": {
+        "cancel": "Hủy",
+        "save": "Lưu",
+        "ok": "Đồng ý",
+        "delete": "Xóa",
+        "edit": "Sửa",
+        "done": "Hoàn tất",
+        "loading": "Đang tải...",
+        "error": "Lỗi",
+        "success": "Thành công",
+        "close": "Đóng",
+        "retry": "Thử lại",
+        "member": "Thành viên"
+    },
+    "settings": {
+        "title": "Cài đặt",
+        "language": "Ngôn ngữ",
+        "language_english": "English",
+        "language_vietnamese": "Tiếng Việt",
+        "logout": "Đăng xuất",
+        "not_logged_in": "Chưa đăng nhập",
+        "login_prompt": "Đăng nhập ngay để trải nghiệm",
+        "premium": {
+            "badge": "PREMIUM",
+            "title": "Nâng cấp lên Pro",
+            "description": "Sử dụng không giới hạn nhóm và tính năng cao cấp"
+        },
+        "section": {
+            "account": "TÀI KHOẢN",
+            "general": "CÀI ĐẶT CHUNG",
+            "support": "HỖ TRỢ & KHÁC"
+        },
+        "account": {
+            "payment_method": "Phương thức thanh toán",
+            "change_password": "Đổi mật khẩu",
+            "privacy": "Quyền riêng tư"
+        },
+        "general": {
+            "dark_mode": "Chế độ tối",
+            "notifications": "Thông báo",
+            "currency": "Tiền tệ"
+        },
+        "support": {
+            "invite_friends": "Mời bạn bè",
+            "help": "Trợ giúp",
+            "about_us": "Về chúng tôi"
+        },
+        "button": {
+            "login": "Đăng nhập"
+        },
+        "version": "Phiên bản 1.0.2 (Build 2024)"
+    },
+    "auth": {
+        "login": {
+            "welcome": "Chào mừng bạn!",
+            "description": "Đăng nhập để đồng bộ dữ liệu chi tiêu và kết nối cùng bạn bè.",
+            "continue_with_apple": "Tiếp tục với Apple",
+            "continue_with_google": "Tiếp tục với Google",
+            "terms_agreement": "Bằng cách tiếp tục, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của chúng tôi."
+        }
+    },
+    "group_types": {
+        "trip": "Du lịch",
+        "home": "Nhà",
+        "couple": "Cặp đôi",
+        "other": "Khác"
+    },
+    "categories": {
+        "food": "Ăn uống",
+        "transport": "Di chuyển",
+        "shopping": "Mua sắm",
+        "entertainment": "Giải trí",
+        "utilities": "Tiện ích",
+        "gift": "Lì xì",
+        "other": "Khác"
+    },
+    "modal": {
+        "add_group": {
+            "title": "Tạo nhóm",
+            "cover_image": "Ảnh đại diện nhóm",
+            "name_label": "Tên nhóm",
+            "name_placeholder": "e.g. Du lịch Đà Lạt",
+            "desc_label": "Mô tả",
+            "desc_placeholder": "Mô tả ngắn gọn về nhóm...",
+            "type_label": "Loại nhóm",
+            "currency_label": "Tiền tệ",
+            "creating": "Đang tạo...",
+            "submit": "Tạo nhóm và bắt đầu",
+            "errors": {
+                "name_required": "Vui lòng nhập tên nhóm",
+                "currency_required": "Vui lòng chọn tiền tệ"
+            }
+        },
+        "join_group": {
+            "title": "Quét mã QR",
+            "subtitle": "Di chuyển camera đến mã QR của nhóm để\ntham gia ngay lập tức.",
+            "camera_permission_title": "Quyền Truy Cập Camera",
+            "camera_permission_desc": "Chúng tôi cần quyền truy cập camera để bạn có thể quét mã QR tham gia nhóm nhanh chóng.",
+            "grant_permission": "Cấp quyền camera",
+            "gallery": "Thư viện",
+            "flash": "Đèn flash",
+            "or": "HOẶC",
+            "enter_code_label": "NHẬP MÃ HOẶC LIÊN KẾT",
+            "enter_code_desc": "Sử dụng mã nhóm hoặc dán liên kết mời",
+            "code_placeholder": "Mã hoặc liên kết mời",
+            "paste": "Dán",
+            "joining": "Đang tham gia...",
+            "join_btn": "Tham gia nhóm",
+            "how_to_find": "Làm thế nào để tìm mã QR?",
+            "errors": {
+                "no_code_title": "Không tìm thấy mã",
+                "no_code_desc": "Vui lòng chọn ảnh chứa mã QR nhóm hợp lệ",
+                "scan_error_title": "Lỗi",
+                "scan_error_desc": "Không thể quét mã từ ảnh này",
+                "empty_input_title": "Mục nhập trống",
+                "empty_input_desc": "Vui lòng nhập mã mời hoặc dán liên kết mời để tiếp tục",
+                "join_error_title": "Không thể tham gia",
+                "join_error_desc": "Mã mời không chính xác hoặc đã hết hạn"
+            },
+            "success": {
+                "title": "Tham gia thành công",
+                "desc": "Bạn đã trở thành thành viên của nhóm mới"
+            }
+        },
+        "add_expense": {
+            "title_add": "Thêm khoản chi",
+            "group_label": "Nhóm",
+            "group_placeholder": "Chọn nhóm",
+            "amount_label": "Số tiền",
+            "desc_label": "Mô tả",
+            "desc_placeholder": "Bạn đã chi cho việc gì? (e.g. Ăn trưa)",
+            "category_label": "Phân loại",
+            "category_placeholder": "Chọn phân loại",
+            "payer_label": "Người trả",
+            "payer_placeholder": "Chọn người trả",
+            "split_label": "Chia cho",
+            "notes_label": "Ghi chú",
+            "notes_placeholder": "Ghi chú thêm về khoản chi này...",
+            "receipt_label": "Ảnh hóa đơn",
+            "receipt_change": "Thay đổi ảnh",
+            "receipt_upload": "Tải lên ảnh hóa đơn",
+            "receipt_hint": "Chụp hoặc chọn từ thư viện",
+            "saving": "Đang lưu...",
+            "uploading": "Đang tải ảnh...",
+            "submit": "Lưu khoản chi",
+            "no_group_title": "Chưa có nhóm nào",
+            "no_group_desc": "Bạn cần tham gia hoặc tạo một nhóm trước khi thêm khoản chi tiêu",
+            "btn_join_group": "Tham gia nhóm",
+            "btn_create_group": "Tạo nhóm mới",
+            "success_title": "Thành công",
+            "success_desc": "Khoản chi tiêu mới đã được thêm vào nhóm",
+            "error_title": "Lỗi tạo chi tiêu",
+            "error_desc": "Đã có lỗi xảy ra khi lưu khoản chi mới",
+            "errors": {
+                "group_required": "Vui lòng chọn nhóm",
+                "payer_required": "Vui lòng chọn người trả tiền",
+                "participants_required": "Vui lòng chọn ít nhất một người tham gia",
+                "title_required": "Vui lòng nhập mô tả chi tiêu",
+                "amount_required": "Vui lòng nhập số tiền",
+                "amount_min": "Số tiền phải lớn hơn 0"
+            }
+        },
+        "payment_confirm": {
+            "success": "Thành công!",
+            "desc": "Giao dịch đã được ghi nhận.\nSố dư nhóm đã cập nhật.",
+            "home_btn": "Quay về trang chủ"
+        },
+        "settle_up": {
+            "payment_via": "Thanh toán qua %{method}",
+            "total_owe": "BẠN CẦN TRẢ TỔNG CỘNG",
+            "total_gain": "BẠN SẼ NHẬN LẠI TỔNG CỘNG",
+            "details_title": "CHI TIẾT CÁC KHOẢN",
+            "no_debt_title": "Không có khoản nợ",
+            "no_debt_desc": "Tất cả đã được thanh toán",
+            "you_owe": "Bạn nợ",
+            "owe_you": "Nợ bạn",
+            "method_title": "PHƯƠNG THỨC THANH TOÁN",
+            "methods": {
+                "vietqr": {
+                    "label": "VietQR",
+                    "desc": "Chuyển khoản nhanh qua QR"
+                },
+                "bank": {
+                    "label": "Chuyển khoản",
+                    "desc": "Nhập số tài khoản thủ công"
+                },
+                "cash": {
+                    "label": "Tiền mặt",
+                    "desc": "Xác nhận đã trả bằng tiền mặt"
+                }
+            },
+            "processing": "Đang xử lý...",
+            "confirm_btn": "Xác nhận thanh toán",
+            "success_title": "Gửi yêu cầu thành công",
+            "success_desc": "Yêu cầu thanh toán cho %{name} đang chờ xác nhận",
+            "errors": {
+                "cannot_pay_title": "Không thể thanh toán",
+                "cannot_pay_desc": "Vui lòng chọn một khoản nợ để tiếp tục",
+                "pay_error_title": "Lỗi thanh toán",
+                "pay_error_desc": "Đã có lỗi xảy ra khi gửi yêu cầu"
+            }
+        }
+    },
+    "home": {
+        "greeting": "Xin chào,",
+        "you": "Bạn",
+        "someone": "Ai đó",
+        "balance": {
+            "title": "Số dư của bạn",
+            "self_expenses": "Chi tiêu cá nhân",
+            "owed_to_you": "Bạn được trả",
+            "you_owe": "Bạn nợ"
+        },
+        "actions": {
+            "expense": "Chi tiêu",
+            "create_group": "Tạo nhóm",
+            "join_group": "Tham gia"
+        },
+        "groups": {
+            "title": "Nhóm của bạn",
+            "view_all": "Xem tất cả",
+            "empty_title": "Chưa có nhóm nào",
+            "empty_description": "Tạo nhóm mới hoặc tham gia nhóm bạn bè",
+            "create_group": "Tạo nhóm"
+        },
+        "recent_activity": {
+            "title": "Hoạt động gần đây",
+            "added": "đã thêm",
+            "group": "Nhóm",
+            "empty_title": "Chưa có hoạt động nào",
+            "empty_description": "Các hoạt động chi tiêu sẽ hiển thị ở đây"
+        }
+    },
+    "activity": {
+        "title": "Hoạt động",
+        "search_placeholder": "Tìm kiếm hoạt động, nhóm, bạn bè",
+        "filter_all": "Tất cả",
+        "filter_expense": "Chi tiêu",
+        "filter_payment": "Thanh toán",
+        "you": "Bạn",
+        "someone": "Ai đó",
+        "group": "Nhóm",
+        "error_loading": "Không thể tải hoạt động",
+        "error_occurred": "Đã xảy ra lỗi",
+        "empty_search_title": "Không tìm thấy kết quả",
+        "empty_search_desc": "Thử tìm kiếm với từ khóa khác",
+        "empty_title": "Chưa có hoạt động nào",
+        "empty_desc": "Các hoạt động sẽ hiển thị ở đây",
+        "actions": {
+            "expense_created": "đã thêm",
+            "expense_updated": "đã cập nhật",
+            "expense_deleted": "đã xóa",
+            "settlement_created": "đã yêu cầu thanh toán",
+            "settlement_completed": "đã hoàn tất thanh toán",
+            "settlement_rejected": "đã từ chối thanh toán",
+            "group_member_added": "đã tham gia nhóm",
+            "group_member_removed": "đã rời nhóm",
+            "group_member_role_changed": "đã thay đổi vai trò",
+            "group_updated": "đã cập nhật nhóm",
+            "debt_assignment_created": "đã gán nợ",
+            "debt_assignment_updated": "đã thay đổi gán nợ",
+            "default": "đã thực hiện hành động"
+        },
+        "time": {
+            "just_now": "Vừa xong",
+            "minutes_ago": "%{count} phút trước",
+            "hours_ago": "%{count} giờ trước",
+            "yesterday": "Hôm qua",
+            "days_ago": "%{count} ngày trước",
+            "today": "Hôm nay"
+        }
+    },
+    "debt_assignment": {
+        "assignee_selector": {
+            "title": "Chọn Người Gán Nợ",
+            "description": "Chọn thành viên sẽ làm trung gian thanh toán. Các thành viên khác sẽ thanh toán nợ cho người này.",
+            "processing": "Đang xử lý...",
+            "confirm": "Xác nhận"
+        },
+        "request_card": {
+            "title": "YÊU CẦU GÁN NỢ",
+            "requester": "Người yêu cầu",
+            "proposed": "Được đề xuất",
+            "reject": "Từ chối",
+            "approving": "Đang duyệt...",
+            "approve": "Duyệt"
+        },
+        "create_request": {
+            "title": "Đề Xuất Người Gán Nợ",
+            "description": "Đề xuất một thành viên để làm trung gian thanh toán. Chủ nhóm sẽ duyệt yêu cầu này.",
+            "select_member": "CHỌN THÀNH VIÊN",
+            "you": "Bạn",
+            "reason_label": "LÝ DO (TÙY CHỌN)",
+            "reason_placeholder": "Tại sao nên chọn người này?",
+            "submit": "Gửi đề xuất"
+        },
+        "pending_list": {
+            "title": "ĐỀ XUẤT GÁN NỢ (%{count})"
+        }
+    },
+    "onboarding": {
+        "tutorial": {
+            "slide1": {
+                "title": "Tạo nhóm ",
+                "accent": "dễ dàng",
+                "description": "Lên kế hoạch cho chuyến đi hoặc chia tiền nhà chỉ trong vài giây.",
+                "overlay_title": "Nhà trọ Happy",
+                "overlay_desc": "5 thành viên"
+            },
+            "slide2": {
+                "title": "Thêm bạn & ",
+                "accent": "Quản lý chi",
+                "description": "Dễ dàng mời thành viên mới và kiểm soát ngân sách nhóm mọi lúc, mọi nơi.",
+                "overlay_group_title": "Chi tiêu nhóm",
+                "overlay_group_name": "Đà Lạt 2024 🍓",
+                "overlay_item1": "Ăn trưa Gà nướng",
+                "overlay_item2": "Cafe Tùng",
+                "overlay_item3": "Homestay"
+            },
+            "slide3": {
+                "title": "Quản lý nợ ",
+                "accent": "minh bạch",
+                "description": "Theo dõi ai nợ ai và xem báo cáo thống kê chi tiêu trực quan theo từng tháng.",
+                "overlay_collected": "Đã thu nợ",
+                "overlay_monthly": "Chi tiêu tháng"
+            },
+            "slide4": {
+                "title": "Phân tích ",
+                "accent": "thông minh",
+                "description": "Dễ dàng nắm bắt thói quen chi tiêu thông qua các biểu đồ phân tích hàng tháng.",
+                "overlay_food": "ĂN UỐNG",
+                "overlay_travel": "DU LỊCH",
+                "overlay_other": "KHÁC"
+            },
+            "slide5": {
+                "title": "An toàn & ",
+                "accent": "Bảo mật",
+                "description": "Dữ liệu của bạn luôn được mã hóa và bảo mật tuyệt đối theo tiêu chuẩn cao nhất.",
+                "overlay_encrypted": "Đã được mã hóa",
+                "overlay_desc": "Tất cả các giao dịch và dữ liệu cá nhân của bạn được bảo mật 256-bit.",
+                "overlay_verify": "Verify by SplitSmart"
+            },
+            "skip": "Bỏ qua",
+            "start_now": "Bắt đầu ngay",
+            "continue": "Tiếp tục"
+        },
+        "welcome": {
+            "total": "Tổng cộng",
+            "title_1": "Chia sẻ hóa đơn\n",
+            "title_3": "thật dễ dàng",
+            "description": "Quên đi nỗi lo tính toán. Chia tiền minh bạch và nhận lại tiền nhanh chóng từ bạn bè.",
+            "explore": "Khám phá ngay",
+            "login": "Đã có tài khoản? Đăng nhập"
+        },
+        "login": {
+            "empty_info": "Thông tin trống",
+            "empty_info_desc": "Vui lòng nhập cả email và mật khẩu để tiếp tục",
+            "missing_info": "Thiếu thông tin",
+            "missing_info_desc": "Vui lòng cung cấp tên của bạn cho tài khoản mới",
+            "signup_success": "Đăng ký thành công",
+            "signup_success_desc": "Vui lòng kiểm tra email của bạn để xác nhận tài khoản trước khi đăng nhập",
+            "auth_error": "Lỗi xác thực",
+            "auth_error_desc": "Đã có lỗi xảy ra trong quá trình đăng nhập",
+            "apple_fail": "Đăng nhập Apple thất bại",
+            "google_fail": "Đăng nhập Google thất bại",
+            "create_account": "Tạo tài khoản",
+            "welcome": "Chào mừng bạn!",
+            "signup_desc": "Đăng ký để bắt đầu chia tiền cùng bạn bè.",
+            "login_desc": "Đăng nhập để đồng bộ dữ liệu chi tiêu.",
+            "name_label": "Họ và tên",
+            "name_placeholder": "Nguyễn Văn A",
+            "email_label": "Email",
+            "password_label": "Mật khẩu",
+            "processing": "Đang xử lý...",
+            "signup_btn": "Đăng ký",
+            "login_btn": "Đăng nhập",
+            "has_account": "Đã có tài khoản? ",
+            "no_account": "Chưa có tài khoản? ",
+            "or": "hoặc",
+            "apple_btn": "Tiếp tục với Apple",
+            "google_btn": "Tiếp tục với Google",
+            "terms_1": "Bằng cách tiếp tục, bạn đồng ý với ",
+            "terms_2": "Điều khoản dịch vụ",
+            "terms_3": " và ",
+            "terms_4": "Chính sách bảo mật",
+            "terms_5": "."
+        }
+    },
+    "tabs": {
+        "home": "Trang chủ",
+        "activity": "Hoạt động",
+        "settings": "Cài đặt"
+    },
+    "groups": {
+        "title": "Tất cả nhóm",
+        "empty_title": "Chưa có nhóm nào",
+        "empty_desc": "Tạo nhóm mới hoặc tham gia nhóm bạn bè để bắt đầu chia sẻ chi phí.",
+        "create_btn": "Tạo nhóm ngay"
+    },
+    "group": {
+        "expenses": {
+            "empty_filter": "Thử thay đổi bộ lọc",
+            "empty_start": "Thêm khoản chi mới để bắt đầu"
+        }
+    },
+    "search": {
+        "title": "Tìm kiếm",
+        "placeholder": "Tìm nhóm, bạn bè, khoản chi...",
+        "empty_query_title": "Tìm kiếm bất cứ điều gì",
+        "empty_query_desc": "Nhập tên khoản chi, tên nhóm hoặc email của bạn bè để tìm kiếm nhanh chóng.",
+        "no_results_title": "Không tìm thấy kết quả",
+        "no_results_desc": "Không có kết quả nào cho \"%{query}\"",
+        "header": {
+            "expenses": "Khoản chi",
+            "groups": "Nhóm",
+            "users": "Người dùng"
+        },
+        "default_user": "Người dùng"
+    },
+    "profile": {
+        "edit_title": "Chỉnh sửa hồ sơ",
+        "change_avatar": "Thay đổi ảnh đại diện",
+        "save": "Lưu thay đổi"
+    },
+    "notifications": {
+        "title": "Thông báo",
+        "just_now": "Vừa xong",
+        "minutes_ago": "%{count} phút trước",
+        "hours_ago": "%{count} giờ trước",
+        "yesterday": "Hôm qua",
+        "days_ago": "%{count} ngày trước",
+        "today": "Hôm nay",
+        "error_title": "Không thể tải thông báo",
+        "error_default": "Đã xảy ra lỗi",
+        "mark_all_read": "Đánh dấu tất cả",
+        "tab_all": "Tất cả",
+        "tab_unread": "Chưa đọc",
+        "empty_unread_title": "Không có thông báo chưa đọc",
+        "empty_unread_desc": "Tất cả thông báo đã được đọc",
+        "empty_all_title": "Chưa có thông báo nào",
+        "empty_all_desc": "Các thông báo sẽ hiển thị ở đây"
+    },
+    "modal_layout": {
+        "add_expense_title": "Thêm chi tiêu",
+        "create_group_title": "Tạo nhóm mới",
+        "join_group_title": "Tham gia nhóm",
+        "settle_up_title": "Thanh toán",
+        "payment_confirm_title": "Xác nhận thanh toán",
+        "save_btn": "Lưu",
+        "create_btn": "Tạo",
+        "paste": "Dán"
+    },
+    "expense_detail": {
+        "title": "Chi tiết chi tiêu",
+        "error_title": "Không thể tải chi tiết",
+        "error_not_found": "Khoản chi không tồn tại",
+        "paid_by": "Trả bởi",
+        "default_user": "Người dùng",
+        "description": "MÔ TẢ",
+        "split_for": "CHIA CHO {{count}} NGƯỜI",
+        "you": "Bạn",
+        "member": "Thành viên",
+        "paid": "Đã trả",
+        "unpaid": "Chưa trả",
+        "receipt": "ẢNH HÓA ĐƠN",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "delete_success_title": "Đã xóa",
+        "delete_success_desc": "Khoản chi tiêu đã được gỡ bỏ khỏi nhóm",
+        "delete_error_title": "Lỗi xóa",
+        "delete_error_desc": "Không thể xóa khoản chi lúc này",
+        "delete_dialog_title": "Xóa khoản chi",
+        "delete_dialog_desc": "Bạn có chắc chắn muốn xóa khoản chi \"{{title}}\"? Hành động này không thể hoàn tác.",
+        "cancel": "Hủy"
+    },
+    "not_found": {
+        "title": "Oops!",
+        "message": "Trang này không tồn tại.",
+        "link": "Quay về trang chủ"
+    },
+    "expense_card": {
+        "paid_by": "Trả bởi",
+        "you": "Bạn",
+        "someone": "Ai đó"
+    },
+    "group_card": {
+        "total_spent": "Tổng chi",
+        "member_count": "%{count} thành viên",
+        "you_are_owed": "Bạn được trả: %{amount}",
+        "you_owe": "Bạn nợ: %{amount}",
+        "you": "Bạn"
+    },
+    "pending_settlements": {
+        "confirm_success_title": "Đã xác nhận",
+        "confirm_success_desc": "Thanh toán đã được ghi nhận thành công",
+        "confirm_error_title": "Lỗi xác nhận",
+        "confirm_error_desc": "Không thể xác nhận thanh toán lúc này",
+        "reject_success_title": "Đã từ chối",
+        "reject_success_desc": "Yêu cầu thanh toán đã được gỡ bỏ",
+        "reject_error_title": "Lỗi từ chối",
+        "reject_error_desc": "Không thể từ chối yêu cầu lúc này",
+        "waiting_confirm": "CHỜ XÁC NHẬN (%{count})",
+        "sent_to_you": "gửi cho bạn",
+        "reject_btn": "Từ chối",
+        "confirm_btn": "Xác nhận",
+        "confirm_dialog_title": "Xác nhận đã nhận tiền",
+        "confirm_dialog_desc": "Bạn xác nhận đã nhận %{amount} từ %{name}?",
+        "reject_dialog_title": "Từ chối thanh toán",
+        "reject_dialog_desc": "Bạn chắc chắn muốn từ chối yêu cầu thanh toán này?"
+    },
+    "share_qr": {
+        "title": "Mã QR tham gia nhóm",
+        "description": "Người khác có thể quét mã này để tham gia nhóm \"%{name}\"",
+        "invite_code_label": "MÃ MỜI:",
+        "save_btn": "Lưu ảnh",
+        "share_btn": "Chia sẻ",
+        "save_success_title": "Đã lưu",
+        "save_success_desc": "Mã QR đã được lưu vào thư viện ảnh",
+        "process_error": "Không thể xử lý mã QR lúc này",
+        "share_error": "Không thể chia sẻ mã QR lúc này",
+        "share_dialog_title": "Chia sẻ mã mời nhóm %{name}"
+    },
+    "error_boundary": {
+        "title": "Đã xảy ra lỗi",
+        "message": "Ứng dụng gặp sự cố không mong muốn.",
+        "hint": "Vui lòng thử lại hoặc liên hệ hỗ trợ.",
+        "retry": "Thử lại"
+    },
+    "group_detail": {
+        "not_found_title": "Không tìm thấy nhóm",
+        "not_found_desc": "Nhóm này không tồn tại hoặc bạn không có quyền truy cập",
+        "members_label": "THÀNH VIÊN: %{count}",
+        "you_receive": "BẠN NHẬN LẠI",
+        "you_owe_label": "BẠN NỢ",
+        "total_group_spent": "TỔNG CHI NHÓM",
+        "group_badge": "NHÓM",
+        "you_spent": "BẠN CHI",
+        "action_expense": "CHI TIÊU",
+        "action_settle": "TẤT TOÁN",
+        "action_report": "BÁO CÁO",
+        "change": "Thay đổi",
+        "setup": "Thiết lập",
+        "propose": "Đề xuất",
+        "view_all": "Xem tất cả",
+        "summary_small": "Tóm tắt",
+        "details_small": "Chi tiết",
+        "member": "Thành viên",
+        "debt_assignment_title": "Gán Nợ Trung Gian",
+        "disable_feature": "Tắt tính năng",
+        "receiving_all_debts": "Đang nhận tất cả khoản nợ",
+        "no_assignee": "Chưa gán người nhận nợ",
+        "assignee_hint": "Gán một người để đơn giản hóa việc trả nợ",
+        "tab_expenses": "Khoản chi",
+        "tab_summary": "Tổng kết",
+        "recent_expenses": "Khoản chi gần đây",
+        "no_expenses": "Chưa có khoản chi nào",
+        "debt_details": "Chi tiết nợ nần",
+        "settlement_suggestions": "Đề xuất thanh toán",
+        "summary": "Tóm tắt",
+        "no_debts": "Không có khoản nợ nào",
+        "owes": "NỢ",
+        "for": "cho",
+        "all_settled": "Tất cả nợ đã được tất toán!",
+        "disable_assignment_title": "Tắt Gán Nợ Trung Gian",
+        "disable_assignment_desc": "Bạn có chắc chắn muốn tắt tính năng này? Các khoản nợ sẽ được tính toán lại theo cách tối ưu hóa thông thường."
+    },
+    "group_history": {
+        "title": "Lịch sử chi tiêu",
+        "total_spent": "TỔNG CHI TIÊU",
+        "your_balance": "SỐ DƯ CỦA BẠN",
+        "split_all": "Chi cho cả nhóm",
+        "you_paid": "Bạn đã trả",
+        "today": "HÔM NAY",
+        "yesterday": "HÔM QUA",
+        "dec_24": "24 THÁNG 12",
+        "mock_lunch": "Ăn trưa Kichi",
+        "mock_rent": "Tiền nhà tháng 12",
+        "mock_3": "Cafe sáng",
+        "mock_4": "Vé xem phim",
+        "mock_paid_by_an": "An trả"
+    },
+    "group_members": {
+        "title": "Thành viên",
+        "error_no_code": "Không tìm thấy mã mời cho nhóm này",
+        "copy_success": "Mã mời đã được lưu vào bộ nhớ tạm",
+        "share_message": "Tham gia nhóm \"%{name}\" trên SplitSmart!\n\nMã mời: %{code}\n\nTải app và nhập mã để tham gia.",
+        "share_error_title": "Lỗi chia sẻ",
+        "share_error_desc": "Đã có lỗi xảy ra khi thực hiện chia sẻ",
+        "owner": "Chủ nhóm",
+        "invite_code_label": "MÃ MỜI",
+        "invite_hint": "Chia sẻ mã này để mời bạn bè",
+        "list_title": "DANH SÁCH THÀNH VIÊN (%{count})",
+        "share_btn": "Chia sẻ lời mời"
+    },
+    "group_settings": {
+        "title": "Cài đặt nhóm",
+        "leave_success_title": "Đã rời nhóm",
+        "leave_success_desc": "Bạn không còn là thành viên của nhóm này nữa",
+        "leave_error_title": "Lỗi rời nhóm",
+        "update_name_success": "Tên nhóm đã được cập nhật mới",
+        "update_error_title": "Lỗi cập nhật",
+        "update_error_desc": "Không thể đổi tên nhóm lúc này",
+        "load_error": "Không thể tải cài đặt",
+        "info_label": "THÔNG TIN NHÓM",
+        "name_label": "Tên nhóm",
+        "name_display_label": "Tên nhóm",
+        "invite_code_label": "Mã mời",
+        "share_label": "CHIA SẺ NHÓM",
+        "qr_title": "Mã QR nhóm",
+        "qr_desc": "Chia sẻ hoặc quét để tham gia nhóm",
+        "members_label": "THÀNH VIÊN (%{count})",
+        "add_member_temp": "Thêm thành viên sẽ được triển khai sau",
+        "add_member_btn": "Thêm thành viên",
+        "no_members_title": "Chưa có thành viên",
+        "no_members_desc": "Thêm thành viên vào nhóm",
+        "remove_member_temp": "Xác nhận xóa thành viên chưa được cấu hình",
+        "leave_btn": "Rời nhóm",
+        "leave_dialog_title": "Rời nhóm",
+        "leave_dialog_desc": "Bạn có chắc chắn muốn rời nhóm \"%{name}\"? Bạn sẽ không thể xem hoặc chỉnh sửa các khoản chi trong nhóm này."
+    },
+    "group_stats": {
+        "title": "Thống kê nhóm",
+        "empty_title": "Chưa có dữ liệu",
+        "empty_desc": "Hãy thêm các khoản chi tiêu để xem thống kê.",
+        "overview_label": "TỔNG QUAN CHI TIÊU",
+        "total_spent": "Tổng cộng đã chi",
+        "avg_per_person": "Trung bình / người",
+        "expense_count": "Số lượng chi tiêu",
+        "category_split_label": "PHÂN LOẠI CHI TIÊU"
+    },
+    "expense_edit": {
+        "validation_title": "Vui lòng nhập mô tả chi tiêu",
+        "validation_amount": "Vui lòng nhập số tiền",
+        "validation_amount_positive": "Số tiền phải lớn hơn 0",
+        "validation_payer": "Vui lòng chọn người trả tiền",
+        "validation_participants": "Vui lòng chọn ít nhất một người tham gia",
+        "update_success_title": "Đã cập nhật",
+        "update_success_desc": "Thông tin chi tiêu đã được lưu thành công",
+        "update_error_title": "Lỗi cập nhật",
+        "update_error_desc": "Đã có lỗi xảy ra khi lưu thay đổi",
+        "not_found": "Không tìm thấy khoản chi",
+        "title": "Chỉnh sửa chi tiêu",
+        "category": "DANH MỤC",
+        "description_label": "MÔ TẢ",
+        "description_placeholder": "Nhập mô tả chi tiêu",
+        "amount_label": "SỐ TIỀN",
+        "split_equally": "Chia đều: {{amount}} mỗi người",
+        "payer_label": "NGƯỜI TRẢ TIỀN",
+        "select_payer": "Chọn người trả",
+        "participants_label": "NGƯỜI THAM GIA",
+        "you": "Bạn",
+        "notes_label": "GHI CHÚ (TÙY CHỌN)",
+        "notes_placeholder": "Thêm ghi chú...",
+        "receipt_label": "ẢNH HÓA ĐƠN (TÙY CHỌN)",
+        "change_image": "Thay đổi ảnh",
+        "upload_image": "Tải lên ảnh hóa đơn",
+        "upload_desc": "Chụp hoặc chọn từ thư viện",
+        "save": "Lưu thay đổi",
+        "retry": "Thử lại",
+        "ok": "OK"
+    }
+}

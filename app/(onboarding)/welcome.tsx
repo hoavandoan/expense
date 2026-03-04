@@ -1,6 +1,7 @@
 import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { SkiaOnboardingBackground } from '@/components/ui/skia-onboarding-background';
+import { useTranslation } from '@/lib/hooks';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -11,6 +12,7 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function WelcomeScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const accent = useThemeColor('accent');
@@ -33,11 +35,11 @@ export default function WelcomeScreen() {
         >
           <View className="bg-surface px-4 py-2 rounded-full border border-divider/10 flex-row items-center gap-2">
             <IconSymbol name="person.3.fill" size={16} color="#10b981" />
-            <AppText weight="bold" className="text-xs uppercase tracking-wider">SplitSmart</AppText>
+            <AppText className="text-xs font-bold uppercase tracking-wider">SplitSmart</AppText>
           </View>
 
           <PressableFeedback onPress={handleSkipToLogin}>
-            <AppText weight="bold" className="text-muted">Bỏ qua</AppText>
+            <AppText className="text-muted font-bold">{t('onboarding.welcome.skip', { defaultValue: 'Bỏ qua' })}</AppText>
           </PressableFeedback>
         </Animated.View>
 
@@ -63,12 +65,12 @@ export default function WelcomeScreen() {
                     <Avatar.Image source={{ uri: "https://i.pravatar.cc/100?u=2" }} />
                   </Avatar>
                   <View className="w-8 h-8 rounded-full bg-accent items-center justify-center border-2 border-surface">
-                    <AppText weight="bold" className="text-[10px] text-white">+3</AppText>
+                    <AppText className="text-[10px] font-bold text-white">+3</AppText>
                   </View>
                 </View>
                 <View>
-                  <AppText weight="medium" className="text-[10px] text-muted uppercase">Tổng cộng</AppText>
-                  <AppText weight="bold" className="text-base">1.250.000đ</AppText>
+                  <AppText className="text-[10px] font-medium text-muted uppercase">{t('onboarding.welcome.total')}</AppText>
+                  <AppText className="text-base font-bold">1.250.000đ</AppText>
                 </View>
                 <View className="w-8 h-8 rounded-full bg-accent/20 items-center justify-center ml-4">
                   <IconSymbol name="checkmark" size={14} color={accent} />
@@ -82,12 +84,12 @@ export default function WelcomeScreen() {
           entering={FadeInUp.delay(600).duration(800)}
           className="w-full items-center"
         >
-          <AppText variant="heading" weight="bold" className="text-4xl text-center leading-[44px] mb-4">
-            Chia sẻ hóa đơn{"\n"}
-            <AppText variant="heading" weight="bold" className="text-accent underline decoration-accent/30">thật dễ dàng</AppText>
+          <AppText className="text-4xl font-bold text-center leading-[44px] mb-4">
+            {t('onboarding.welcome.title_1')}
+            <AppText className="text-accent font-bold underline decoration-accent/30">{t('onboarding.welcome.title_3')}</AppText>
           </AppText>
           <AppText className="text-muted text-center leading-relaxed px-4">
-            Quên đi nỗi lo tính toán. Chia tiền minh bạch và nhận lại tiền nhanh chóng từ bạn bè.
+            {t('onboarding.welcome.description')}
           </AppText>
         </Animated.View>
 
@@ -104,14 +106,14 @@ export default function WelcomeScreen() {
             onPress={() => router.push('/(onboarding)/tutorial')}
           >
             <View className="flex-row items-center gap-2">
-              <AppText weight="bold" className="text-lg text-white">Khám phá ngay</AppText>
+              <AppText className="text-lg font-bold text-white">{t('onboarding.welcome.explore')}</AppText>
               <IconSymbol name="arrow.right" size={20} color="white" />
             </View>
           </Button>
 
           <PressableFeedback onPress={handleSkipToLogin}>
             <View className="h-16 rounded-2xl border border-divider/10 bg-surface/50 items-center justify-center">
-              <AppText weight="semibold" className="text-foreground">Đã có tài khoản? Đăng nhập</AppText>
+              <AppText className="text-foreground font-semibold">{t('onboarding.welcome.login')}</AppText>
             </View>
           </PressableFeedback>
         </View>

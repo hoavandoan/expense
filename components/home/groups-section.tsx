@@ -1,6 +1,7 @@
 import { AppText } from "@/components/app-text";
 import { EmptyState } from "@/components/ui/empty-state";
 import { CARD_WIDTH, GAP, GroupCard } from "@/components/ui/group-card";
+import { useTranslation } from "@/lib/hooks";
 import { useRouter } from "expo-router";
 import { PressableFeedback, Skeleton, useThemeColor } from "heroui-native";
 import { View } from "react-native";
@@ -17,6 +18,7 @@ interface GroupsSectionProps {
 
 export const GroupsSection = ({ groups, isLoading }: GroupsSectionProps) => {
   const router = useRouter();
+  const { t } = useTranslation();
   const accent = useThemeColor("accent");
   const scrollX = useSharedValue(0);
 
@@ -51,10 +53,10 @@ export const GroupsSection = ({ groups, isLoading }: GroupsSectionProps) => {
         entering={FadeInRight.delay(700).springify()}
         className="px-6 flex-row items-center justify-between mb-4"
       >
-        <AppText className="text-xl font-bold">Nhóm của bạn</AppText>
+        <AppText className="text-xl font-bold">{t('home.groups.title')}</AppText>
         <PressableFeedback onPress={() => router.push("/groups" as any)}>
           <AppText className="text-foreground font-semibold text-sm">
-            Xem tất cả
+            {t('home.groups.view_all')}
           </AppText>
         </PressableFeedback>
       </Animated.View>
@@ -95,9 +97,9 @@ export const GroupsSection = ({ groups, isLoading }: GroupsSectionProps) => {
         <View className="mx-6">
           <EmptyState
             icon="person.3.fill"
-            title="Chưa có nhóm nào"
-            description="Tạo nhóm mới hoặc tham gia nhóm bạn bè"
-            actionLabel="Tạo nhóm"
+            title={t('home.groups.empty_title')}
+            description={t('home.groups.empty_description')}
+            actionLabel={t('home.groups.create_group')}
             onAction={() => router.push("/add-group")}
           />
         </View>

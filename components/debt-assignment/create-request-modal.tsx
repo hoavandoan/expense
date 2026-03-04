@@ -1,12 +1,13 @@
 import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useTranslation } from '@/lib/hooks';
 import { Image } from 'expo-image';
 import {
-    Avatar,
-    Button,
-    cn,
-    Dialog,
-    TextField,
+  Avatar,
+  Button,
+  cn,
+  Dialog,
+  TextField,
 } from 'heroui-native';
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
@@ -37,6 +38,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
   const { mutate: createRequest, isPending } = useCreateAssignmentRequest();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [reason, setReason] = useState('');
+  const { t } = useTranslation();
 
   const handleConfirm = () => {
     if (!selectedUserId) return;
@@ -58,7 +60,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
         <Dialog.Overlay />
         <Dialog.Content className="max-w-md w-[90%] self-center">
           <View className="flex-row justify-between items-center mb-2">
-            <Dialog.Title className="text-xl font-bold">Đề Xuất Người Gán Nợ</Dialog.Title>
+            <Dialog.Title className="text-xl font-bold">{t('debt_assignment.create_request.title')}</Dialog.Title>
             <Dialog.Close asChild>
               <Button isIconOnly variant="ghost" size="sm">
                 <IconSymbol name="xmark" size={24} color="gray" />
@@ -67,11 +69,11 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
           </View>
           
           <Dialog.Description className="text-muted mb-4">
-            Đề xuất một thành viên để làm trung gian thanh toán. Chủ nhóm sẽ duyệt yêu cầu này.
+            {t('debt_assignment.create_request.description')}
           </Dialog.Description>
           
           <TextField isRequired className="mb-4">
-            <TextField.Label className="mb-3 ml-1">CHỌN THÀNH VIÊN</TextField.Label>
+            <AppText className="text-sm font-medium mb-3 ml-1">{t('debt_assignment.create_request.select_member')}</AppText>
             <ScrollView className="max-h-60" showsVerticalScrollIndicator={false}>
               <View className="gap-3">
                 {members.map((member) => (
@@ -99,9 +101,9 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                         )}
                       </Avatar>
                       <View className="items-start">
-                        <AppText className="font-bold">{member.name || 'Unknown'}</AppText>
+                        <AppText className="font-bold">{member.name || t('debt_assignment.create_request.unknown', { defaultValue: 'Unknown' })}</AppText>
                         <AppText className="text-xs text-muted capitalize">
-                           {member.userId === currentUserId ? 'Bạn' : member.role}
+                           {member.userId === currentUserId ? t('debt_assignment.create_request.you') : member.role}
                         </AppText>
                       </View>
                     </View>
@@ -118,9 +120,9 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
 
           <View className="mb-6">
             <TextField>
-              <TextField.Label className="mb-3 ml-1">LÝ DO (TÙY CHỌN)</TextField.Label>
+              <AppText className="text-sm font-medium mb-3 ml-1">{t('debt_assignment.create_request.reason_label')}</AppText>
               <TextField.Input
-                placeholder="Tại sao nên chọn người này?"
+                placeholder={t('debt_assignment.create_request.reason_placeholder')}
                 value={reason}
                 onChangeText={setReason}
                 multiline
@@ -133,7 +135,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
           <View className="flex-row gap-3">
             <Dialog.Close asChild>
               <Button variant="ghost" className="flex-1">
-                <Button.Label>Hủy</Button.Label>
+                <Button.Label>{t('common.cancel')}</Button.Label>
               </Button>
             </Dialog.Close>
             <Button
@@ -142,7 +144,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
               onPress={handleConfirm}
               isDisabled={isPending || !selectedUserId}
             >
-              <Button.Label className="text-white">Gửi đề xuất</Button.Label>
+              <Button.Label className="text-white">{t('debt_assignment.create_request.submit')}</Button.Label>
             </Button>
           </View>
         </Dialog.Content>

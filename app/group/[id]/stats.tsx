@@ -6,6 +6,7 @@ import { StickyHeader } from '@/components/ui/sticky-header';
 import { CATEGORY_CONFIG } from '@/constants';
 import { useGroup } from '@/lib/hooks';
 import { useGroupSpendingStats } from '@/lib/hooks/use-group-balance';
+import { useTranslation } from '@/lib/hooks/use-translation';
 import { formatCurrency } from '@/lib/utils';
 import { useLocalSearchParams } from 'expo-router';
 import { Card, Spinner, useThemeColor } from 'heroui-native';
@@ -14,6 +15,7 @@ import { View } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
 
 export default function GroupStatsScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const groupId = typeof id === 'string' ? id : null;
   
@@ -29,19 +31,7 @@ export default function GroupStatsScreen() {
       return {
         totalAmount: 0,
         averagePerPerson: 0,
-        count: 0, // This is not returned by new RPC yet, but maybe simpler to just hide count or add it?
-        // Wait, the RPC returns totalAmount, memberCount, categoryStats.
-        // It DOES NOT return txn count.
-        // The UI shows "Số lượng chi tiêu".
-        // I should probably add count to the RPC or just 0 for now.
-        // Actually, let's look at the RPC again.
-        // I created it with 'totalAmount', 'memberCount', 'categoryStats'. NO count of expenses.
-        // I should update the RPC to include count if I want it. 
-        // Or I can calculate count if I knew it.
-        // Let's hide it or update RPC. 
-        // Re-reading SQL: "SELECT COUNT(*) INTO v_member_count ...".
-        // I missed counting expenses. 
-        // I will stick with what I have but I should update RPC next if crucial.
+        count: 0,
         categories: [],
         pieData: []
       };
@@ -52,7 +42,8 @@ export default function GroupStatsScreen() {
     const categories = categoryStats.map((stat: any) => {
       const config = CATEGORY_CONFIG[stat.category] || CATEGORY_CONFIG.other;
       return {
-        label: config.label,
+        label: t(`categories.${stat.category}` as any),
+        category: stat.category,
         amount: stat.amount,
         percent: totalAmount > 0 ? (stat.amount / totalAmount) * 100 : 0,
         icon: config.icon,
@@ -68,8 +59,6 @@ export default function GroupStatsScreen() {
       text: cat.label,
     }));
 
-    // Count is missing. I'll just set it to 0 or remove that card.
-    
     return {
       totalAmount,
       averagePerPerson: memberCount > 0 ? totalAmount / memberCount : 0,
@@ -77,15 +66,15 @@ export default function GroupStatsScreen() {
       categories,
       pieData
     };
-  }, [statsData]);
+  }, [statsData, t]);
 
   if (isLoading) {
     return (
       <View className="flex-1 bg-background">
-        <StickyHeader title="Thống kê nhóm" />
+        <StickyHeader title={t("group_stats.title")} />
         <View className="flex-1 items-center justify-center">
           <Spinner size="lg" color={accent} />
-          <AppText className="mt-4 text-muted">Đang tải dữ liệu...</AppText>
+          <AppText className="mt-4 text-muted">{t("loading")}</AppText>
         </View>
       </View>
     );
@@ -94,12 +83,12 @@ export default function GroupStatsScreen() {
   if (stats.totalAmount === 0 && !isLoading) {
     return (
       <View className="flex-1 bg-background">
-        <StickyHeader title="Thống kê nhóm" />
+        <StickyHeader title={t("group_stats.title")} />
         <View className="flex-1 p-6">
           <EmptyState
             icon="chart.pie.fill"
-            title="Chưa có dữ liệu"
-            description="Hãy thêm các khoản chi tiêu để xem thống kê."
+            title={t("group_stats.empty_title")}
+            description={t("group_stats.empty_desc")}
           />
         </View>
       </View>
@@ -108,24 +97,24 @@ export default function GroupStatsScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <StickyHeader title="Thống kê nhóm" />
+      <StickyHeader title={t("group_stats.title")} />
       <ScreenScrollView contentContainerStyle={{ padding: 20 }}>
         <View className="mb-8">
-          <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">TỔNG QUAN CHI TIÊU</AppText>
+          <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">{t("group_stats.overview_label")}</AppText>
           <Card className="p-6 rounded-3xl border border-divider/10">
-            <AppText className="text-muted text-xs uppercase font-bold mb-1">Tổng cộng đã chi</AppText>
+            <AppText className="text-muted text-xs uppercase font-bold mb-1">{t("group_stats.total_spent")}</AppText>
             <AppText className="text-3xl font-bold mb-4">
               {formatCurrency(stats.totalAmount, group?.currency)}
             </AppText>
             <View className="flex-row gap-4">
               <View className="flex-1 bg-surface-secondary p-4 rounded-2xl border border-divider/5">
-                <AppText className="text-[10px] text-muted font-bold uppercase mb-1">Trung bình / người</AppText>
+                <AppText className="text-[10px] text-muted font-bold uppercase mb-1">{t("group_stats.avg_per_person")}</AppText>
                 <AppText className="text-lg font-bold" numberOfLines={1} adjustsFontSizeToFit>
                   {formatCurrency(stats.averagePerPerson, group?.currency)}
                 </AppText>
               </View>
               <View className="flex-1 bg-surface-secondary p-4 rounded-2xl border border-divider/5">
-                <AppText className="text-[10px] text-muted font-bold uppercase mb-1">Số lượng chi tiêu</AppText>
+                <AppText className="text-[10px] text-muted font-bold uppercase mb-1">{t("group_stats.expense_count")}</AppText>
                 <AppText className="text-lg font-bold">{stats.count}</AppText>
               </View>
             </View>
@@ -133,7 +122,7 @@ export default function GroupStatsScreen() {
         </View>
 
         <View className="mb-8">
-          <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">PHÂN LOẠI CHI TIÊU</AppText>
+          <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">{t("group_stats.category_split_label")}</AppText>
           <Card className="p-6 rounded-3xl border border-divider/10">
             <View className="items-center justify-center mb-6">
               <PieChart

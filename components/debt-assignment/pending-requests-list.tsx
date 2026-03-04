@@ -1,4 +1,5 @@
 import { AppText } from '@/components/app-text';
+import { useTranslation } from '@/lib/hooks';
 import React from 'react';
 import { View } from 'react-native';
 import { usePendingAssignmentRequests } from '../../lib/hooks/use-debt-assignment-requests';
@@ -13,6 +14,7 @@ export const PendingRequestsList: React.FC<PendingRequestsListProps> = ({
   groupId,
   isAdminOrOwner,
 }) => {
+  const { t } = useTranslation();
   const { data: requests, isLoading } = usePendingAssignmentRequests(groupId);
 
   if (isLoading) return null;
@@ -25,7 +27,7 @@ export const PendingRequestsList: React.FC<PendingRequestsListProps> = ({
         <View className="flex-row items-center gap-2">
             <View className="w-2 h-2 rounded-full bg-primary" />
             <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest">
-            ĐỀ XUẤT GÁN NỢ ({requests.length})
+            {t('debt_assignment.pending_list.title', { count: requests.length })}
             </AppText>
         </View>
       </View>

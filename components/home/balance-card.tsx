@@ -1,5 +1,6 @@
 import { AppText } from "@/components/app-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTranslation } from "@/lib/hooks";
 import { formatCurrency } from "@/lib/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import { PressableFeedback, Surface } from "heroui-native";
@@ -23,6 +24,8 @@ export const BalanceCard = ({
   showBalance,
   onToggleBalance,
 }: BalanceCardProps) => {
+  const { t } = useTranslation();
+
   return (
     <Animated.View
       entering={FadeInUp.delay(200).duration(800).springify()}
@@ -40,7 +43,7 @@ export const BalanceCard = ({
         />
         <View className="flex-row items-center justify-between mb-4">
           <AppText className="text-white/80 text-xs uppercase tracking-[2px] font-semibold">
-            Số dư của bạn
+            {t('home.balance.title')}
           </AppText>
           <PressableFeedback 
             onPress={onToggleBalance}
@@ -72,7 +75,7 @@ export const BalanceCard = ({
               <IconSymbol name="person.3.fill" size={12} color="white" />
             </View>
             <AppText className="text-white/80 text-xs font-medium">
-              Chi tiêu cá nhân
+              {t('home.balance.self_expenses')}
             </AppText>
             <AppText
               className="text-white font-semibold text-xs ml-auto"
@@ -93,7 +96,7 @@ export const BalanceCard = ({
                 <IconSymbol name="arrow.down.left" size={12} color="#4ade80" />
               </View>
               <AppText className="text-white text-xs uppercase tracking-wider font-semibold">
-                Bạn được trả
+                {t('home.balance.owed_to_you')}
               </AppText>
             </View>
             <AppText
@@ -115,7 +118,7 @@ export const BalanceCard = ({
                 <IconSymbol name="arrow.up.right" size={12} color="#fb7185" />
               </View>
               <AppText className="text-white text-xs uppercase tracking-wider font-semibold">
-                Bạn nợ
+                {t('home.balance.you_owe')}
               </AppText>
             </View>
             <AppText

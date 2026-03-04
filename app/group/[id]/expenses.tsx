@@ -5,7 +5,7 @@ import { ExpenseCard } from "@/components/ui/expense-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
 import { EXPENSE_CATEGORIES } from "@/constants";
-import { useGroup, useInfiniteExpenses } from "@/lib/hooks";
+import { useGroup, useInfiniteExpenses, useTranslation } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatDate } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
@@ -42,6 +42,7 @@ function useDebounced<T>(value: T, delay: number): T {
 }
 
 export default function GroupExpensesScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -115,9 +116,9 @@ export default function GroupExpensesScreen() {
   const memberOptions = useMemo(() =>
     (groupData?.group_members ?? []).map((member: any) => ({
       value: member.user_id,
-      label: member.user?.name || "Thành viên",
+      label: member.user?.name || t('search.default_user', { defaultValue: "Người dùng" }),
     })),
-    [groupData]
+    [groupData, t]
   );
 
   const renderItem = useCallback(
@@ -156,7 +157,7 @@ export default function GroupExpensesScreen() {
         </Animated.View>
       );
     },
-    [groupData?.currency, memberMap, user?.id, router]
+    [groupData?.currency, memberMap, user?.id, router, t]
   );
 
   const hasActiveFilters = !!(debouncedSearch || selectedCategory || selectedMember);
@@ -172,10 +173,10 @@ export default function GroupExpensesScreen() {
   if (error) {
     return (
       <View className="flex-1 bg-background">
-        <StickyHeader title="Khoản chi" />
+        <StickyHeader title={t('search.header.expenses', { defaultValue: "Khoản chi" })} />
         <ErrorState
-          title="Không thể tải khoản chi"
-          message={error instanceof Error ? error.message : "Đã xảy ra lỗi"}
+          title={t('common.error', { defaultValue: "Không thể tải khoản chi" })}
+          message={error instanceof Error ? error.message : t('common.error_occurred', { defaultValue: "Đã xảy ra lỗi" })}
           onRetry={() => refetch()}
         />
       </View>
@@ -184,7 +185,7 @@ export default function GroupExpensesScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <StickyHeader title="Khoản chi" />
+      <StickyHeader title={t('search.header.expenses', { defaultValue: "Khoản chi" })} />
 
       {/* Filters */}
       <View className="px-6 py-4 bg-surface border-b border-divider/10 gap-4">
@@ -192,7 +193,7 @@ export default function GroupExpensesScreen() {
         <TextField className="bg-surface-secondary border border-divider/10 rounded-xl">
           <View className="justify-center">
             <TextField.Input
-              placeholder="Tìm kiếm khoản chi..."
+              placeholder={t('search.placeholder', { defaultValue: "Tìm kiếm khoản chi..." })}
               value={searchQuery}
               onChangeText={setSearchQuery}
               className="h-12 pl-10"
@@ -227,12 +228,12 @@ export default function GroupExpensesScreen() {
             className="flex-1"
           >
             <Select.Trigger className="h-12 border border-divider/10 bg-surface-secondary rounded-xl px-4">
-              <Select.Value placeholder="Danh mục" />
+              <Select.Value placeholder={t('common.category', { defaultValue: "Danh mục" })} />
             </Select.Trigger>
             <Select.Portal>
               <Select.Overlay />
               <Select.Content placement="bottom" width={200} className="rounded-xl bg-surface border border-divider/10">
-                <Select.Item value={null} label="Tất cả danh mục" className="p-4">
+                <Select.Item value={null} label={t('common.all_categories', { defaultValue: "Tất cả danh mục" })} className="p-4">
                   <Select.ItemLabel />
                   <Select.ItemIndicator />
                 </Select.Item>
@@ -263,12 +264,12 @@ export default function GroupExpensesScreen() {
             className="flex-1"
           >
             <Select.Trigger className="h-12 border border-divider/10 bg-surface-secondary rounded-xl px-4">
-              <Select.Value placeholder="Thành viên" />
+              <Select.Value placeholder={t('search.default_user', { defaultValue: "Thành viên" })} />
             </Select.Trigger>
             <Select.Portal>
               <Select.Overlay />
               <Select.Content placement="bottom" width={200} className="rounded-xl bg-surface border border-divider/10">
-                <Select.Item value={null} label="Tất cả thành viên" className="p-4">
+                <Select.Item value={null} label={t('common.all_members', { defaultValue: "Tất cả thành viên" })} className="p-4">
                   <Select.ItemLabel />
                   <Select.ItemIndicator />
                 </Select.Item>
@@ -305,7 +306,7 @@ export default function GroupExpensesScreen() {
                       isSelected ? "text-white" : "text-foreground"
                     )}
                   >
-                    Ngày
+                    {t('common.date', { defaultValue: "Ngày" })}
                   </Tabs.Label>
                 )}
               </Tabs.Trigger>
@@ -317,7 +318,7 @@ export default function GroupExpensesScreen() {
                       isSelected ? "text-white" : "text-foreground"
                     )}
                   >
-                    Số tiền
+                    {t('common.amount', { defaultValue: "Số tiền" })}
                   </Tabs.Label>
                 )}
               </Tabs.Trigger>
@@ -330,8 +331,11 @@ export default function GroupExpensesScreen() {
       <FlashList
         data={flattenedExpenses}
         renderItem={renderItem}
+        // @ts-expect-error - FlashList type issues
+        estimatedItemSize={100}
         keyExtractor={(item) => item.id}
         getItemType={(item) => item.type}
+        extraData={t}
         onRefresh={() => refetch()}
         refreshing={false}
         onEndReached={() => {
@@ -350,9 +354,9 @@ export default function GroupExpensesScreen() {
         ListEmptyComponent={
           <EmptyState
             icon="doc.text.fill"
-            title={hasActiveFilters ? "Không tìm thấy kết quả" : "Chưa có khoản chi nào"}
+            title={hasActiveFilters ? t('search.no_results_title', { defaultValue: "Không tìm thấy kết quả" }) : t('common.no_expenses', { defaultValue: "Chưa có khoản chi nào" })}
             description={
-              hasActiveFilters ? "Thử thay đổi bộ lọc" : "Thêm khoản chi mới để bắt đầu"
+              hasActiveFilters ? t('group.expenses.empty_filter', { defaultValue: "Thử thay đổi bộ lọc" }) : t('group.expenses.empty_start', { defaultValue: "Thêm khoản chi mới để bắt đầu" })
             }
           />
         }

@@ -2,7 +2,7 @@ import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { signInWithApple, signInWithGoogle } from '@/lib/auth/oauth';
-import { useAuth } from '@/lib/hooks';
+import { useAuth, useTranslation } from '@/lib/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Button, PressableFeedback, TextField, useThemeColor, useToast } from 'heroui-native';
@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 
 export default function LoginScreen() {
+  const { t } = useTranslation();
   const { signInWithEmail, signUpWithEmail } = useAuth();
   const router = useRouter();
   const foreground = useThemeColor('foreground');
@@ -29,11 +30,11 @@ export default function LoginScreen() {
   const handleEmailAuth = async () => {
     if (!email || !password) {
       toast.show({
-        label: 'Thông tin trống',
-        description: 'Vui lòng nhập cả email và mật khẩu để tiếp tục',
+        label: t('onboarding.login.empty_info'),
+        description: t('onboarding.login.empty_info_desc'),
         variant: 'danger',
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: 'Đóng',
+        actionLabel: t('common.close', { defaultValue: 'Đóng' }),
         onActionPress: ({ hide }) => hide(),
       });
       return;
@@ -41,11 +42,11 @@ export default function LoginScreen() {
 
     if (isSignUp && !name) {
       toast.show({
-        label: 'Thiếu thông tin',
-        description: 'Vui lòng cung cấp tên của bạn cho tài khoản mới',
+        label: t('onboarding.login.missing_info'),
+        description: t('onboarding.login.missing_info_desc'),
         variant: 'danger',
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: 'Đóng',
+        actionLabel: t('common.close', { defaultValue: 'Đóng' }),
         onActionPress: ({ hide }) => hide(),
       });
       return;
@@ -56,8 +57,8 @@ export default function LoginScreen() {
       if (isSignUp) {
         await signUpWithEmail(email, password, name);
         toast.show({
-          label: 'Đăng ký thành công',
-          description: 'Vui lòng kiểm tra email của bạn để xác nhận tài khoản trước khi đăng nhập',
+          label: t('onboarding.login.signup_success'),
+          description: t('onboarding.login.signup_success_desc'),
           variant: 'success',
           icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
           actionLabel: 'OK',
@@ -69,11 +70,11 @@ export default function LoginScreen() {
       }
     } catch (error: any) {
       toast.show({
-        label: 'Lỗi xác thực',
-        description: error.message || 'Đã có lỗi xảy ra trong quá trình đăng nhập',
+        label: t('onboarding.login.auth_error'),
+        description: error.message || t('onboarding.login.auth_error_desc'),
         variant: 'danger',
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: 'Thử lại',
+        actionLabel: t('common.retry', { defaultValue: 'Thử lại' }),
         onActionPress: ({ hide }) => hide(),
       });
     } finally {
@@ -87,9 +88,9 @@ export default function LoginScreen() {
       await signInWithApple();
       router.replace('/(tabs)');
     } catch (error: any) {
-      if (!error.message?.includes('hủy')) {
+      if (!error.message?.includes('hủy') && !error.message?.includes('cancel')) {
         toast.show({
-          label: error.message || 'Đăng nhập Apple thất bại',
+          label: error.message || t('onboarding.login.apple_fail'),
           variant: 'danger',
           icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
         });
@@ -105,9 +106,9 @@ export default function LoginScreen() {
       await signInWithGoogle();
       router.replace('/(tabs)');
     } catch (error: any) {
-      if (!error.message?.includes('hủy')) {
+      if (!error.message?.includes('hủy') && !error.message?.includes('cancel')) {
         toast.show({
-          label: error.message || 'Đăng nhập Google thất bại',
+          label: error.message || t('onboarding.login.google_fail'),
           variant: 'danger',
           icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
         });
@@ -136,12 +137,12 @@ export default function LoginScreen() {
             </View>
 
             <AppText className="text-3xl font-bold text-foreground mb-2">
-              {isSignUp ? 'Tạo tài khoản' : 'Chào mừng bạn!'}
+              {isSignUp ? t('onboarding.login.create_account') : t('onboarding.login.welcome')}
             </AppText>
             <AppText className="text-base text-muted leading-relaxed">
               {isSignUp
-                ? 'Đăng ký để bắt đầu chia tiền cùng bạn bè.'
-                : 'Đăng nhập để đồng bộ dữ liệu chi tiêu.'}
+                ? t('onboarding.login.signup_desc')
+                : t('onboarding.login.login_desc')}
             </AppText>
           </View>
         </View>
@@ -150,18 +151,18 @@ export default function LoginScreen() {
         <View className="gap-4 my-6">
           {isSignUp && (
             <TextField isRequired className="mb-4">
-              <TextField.Label className="mb-2 ml-1">Họ và tên</TextField.Label>
+              <AppText className="text-sm font-medium mb-2 ml-1">{t('onboarding.login.name_label')}</AppText>
               <TextField.Input
                 value={name}
                 onChangeText={setName}
-                placeholder="Nguyễn Văn A"
+                placeholder={t('onboarding.login.name_placeholder')}
                 autoCapitalize="words"
               />
             </TextField>
           )}
 
           <TextField isRequired className="mb-4">
-            <TextField.Label className="mb-2 ml-1">Email</TextField.Label>
+            <AppText className="text-sm font-medium mb-2 ml-1">{t('onboarding.login.email_label')}</AppText>
             <TextField.Input
               value={email}
               onChangeText={setEmail}
@@ -172,7 +173,7 @@ export default function LoginScreen() {
           </TextField>
 
           <TextField isRequired className="mb-6">
-            <TextField.Label className="mb-2 ml-1">Mật khẩu</TextField.Label>
+            <AppText className="text-sm font-medium mb-2 ml-1">{t('onboarding.login.password_label')}</AppText>
             <TextField.Input
               value={password}
               onChangeText={setPassword}
@@ -188,15 +189,15 @@ export default function LoginScreen() {
             isDisabled={isLoading}
           >
             <Button.Label className="text-lg font-bold text-white">
-              {isLoading ? 'Đang xử lý...' : isSignUp ? 'Đăng ký' : 'Đăng nhập'}
+              {isLoading ? t('onboarding.login.processing') : isSignUp ? t('onboarding.login.signup_btn') : t('onboarding.login.login_btn')}
             </Button.Label>
           </Button>
 
           <PressableFeedback onPress={() => setIsSignUp(!isSignUp)} className="items-center py-2">
             <AppText className="text-muted">
-              {isSignUp ? 'Đã có tài khoản? ' : 'Chưa có tài khoản? '}
+              {isSignUp ? t('onboarding.login.has_account') : t('onboarding.login.no_account')}
               <AppText className="text-accent font-semibold">
-                {isSignUp ? 'Đăng nhập' : 'Đăng ký'}
+                {isSignUp ? t('onboarding.login.login_btn') : t('onboarding.login.signup_btn')}
               </AppText>
             </AppText>
           </PressableFeedback>
@@ -206,7 +207,7 @@ export default function LoginScreen() {
         <View className="gap-4">
           <View className="flex-row items-center gap-4">
             <View className="flex-1 h-px bg-divider/20" />
-            <AppText className="text-muted text-sm">hoặc</AppText>
+            <AppText className="text-muted text-sm">{t('onboarding.login.or')}</AppText>
             <View className="flex-1 h-px bg-divider/20" />
           </View>
 
@@ -217,7 +218,7 @@ export default function LoginScreen() {
             <View className="flex-row items-center gap-3">
               <Ionicons name="logo-apple" size={20} color={background} />
               <Button.Label className="font-bold" style={{ color: background }}>
-                Tiếp tục với Apple
+                {t('onboarding.login.apple_btn')}
               </Button.Label>
             </View>
           </Button>
@@ -229,16 +230,16 @@ export default function LoginScreen() {
           >
             <View className="flex-row items-center gap-3">
               <Ionicons name="logo-google" size={20} color={foreground} />
-              <Button.Label className="font-bold">Tiếp tục với Google</Button.Label>
+              <Button.Label className="font-bold">{t('onboarding.login.google_btn')}</Button.Label>
             </View>
           </Button>
 
           {/* Footer */}
           <View className="mt-4 items-center">
             <AppText className="text-[10px] text-muted/60 text-center px-8 leading-4">
-              Bằng cách tiếp tục, bạn đồng ý với{' '}
-              <AppText className="text-accent">Điều khoản dịch vụ</AppText> và{' '}
-              <AppText className="text-accent">Chính sách bảo mật</AppText>.
+              {t('onboarding.login.terms_1')}
+              <AppText className="text-accent">{t('onboarding.login.terms_2')}</AppText>{t('onboarding.login.terms_3')}
+              <AppText className="text-accent">{t('onboarding.login.terms_4')}</AppText>{t('onboarding.login.terms_5')}
             </AppText>
           </View>
         </View>

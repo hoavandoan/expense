@@ -1,5 +1,6 @@
 import { FAB } from '@/components/ui/fab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useTranslation } from '@/lib/hooks';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { BlurView } from 'expo-blur';
 import { Redirect, Tabs, useRouter } from 'expo-router';
@@ -10,6 +11,7 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
+  const { t } = useTranslation();
   const { isAuthenticated, isLoading } = useAuthStore();
   const accent = useThemeColor('accent');
   const foreground = useThemeColor('foreground');
@@ -45,7 +47,7 @@ export default function TabLayout() {
               drawable="home_drawable"
               selectedColor={accent}
             />
-            <Label>Trang chủ</Label>
+            <Label>{t('tabs.home')}</Label>
           </NativeTabs.Trigger>
 
           <NativeTabs.Trigger name="activity">
@@ -54,7 +56,7 @@ export default function TabLayout() {
               drawable="activity_drawable"
               selectedColor={accent}
             />
-            <Label>Hoạt động</Label>
+            <Label>{t('tabs.activity')}</Label>
           </NativeTabs.Trigger>
 
           <NativeTabs.Trigger name="settings">
@@ -63,7 +65,7 @@ export default function TabLayout() {
               drawable="settings_drawable"
               selectedColor={accent}
             />
-            <Label>Cài đặt</Label>
+            <Label>{t('tabs.settings')}</Label>
           </NativeTabs.Trigger>
         </NativeTabs>
       );
@@ -100,21 +102,21 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: 'Trang chủ',
+            title: t('tabs.home'),
             tabBarIcon: ({ color }) => <IconSymbol name="house.fill" size={24} color={color} />,
           }}
         />
         <Tabs.Screen
           name="activity"
           options={{
-            title: 'Hoạt động',
+            title: t('tabs.activity'),
             tabBarIcon: ({ color }) => <IconSymbol name="clock.fill" size={24} color={color} />,
           }}
         />
         <Tabs.Screen
           name="settings"
           options={{
-            title: 'Cài đặt',
+            title: t('tabs.settings'),
             tabBarIcon: ({ color }) => <IconSymbol name="gearshape.fill" size={24} color={color} />,
           }}
         />

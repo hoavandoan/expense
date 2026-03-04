@@ -1,0 +1,663 @@
+{
+    "common": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "ok": "OK",
+        "delete": "Delete",
+        "edit": "Edit",
+        "done": "Done",
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "close": "Close",
+        "retry": "Retry",
+        "member": "Member"
+    },
+    "settings": {
+        "title": "Settings",
+        "language": "Language",
+        "language_english": "English",
+        "language_vietnamese": "Tiếng Việt",
+        "logout": "Log Out",
+        "not_logged_in": "Not logged in",
+        "login_prompt": "Log in now to experience",
+        "premium": {
+            "badge": "PREMIUM",
+            "title": "Upgrade to Pro",
+            "description": "Unlimited groups and premium features"
+        },
+        "section": {
+            "account": "ACCOUNT",
+            "general": "GENERAL SETTINGS",
+            "support": "SUPPORT & OTHERS"
+        },
+        "account": {
+            "payment_method": "Payment Method",
+            "change_password": "Change Password",
+            "privacy": "Privacy"
+        },
+        "general": {
+            "dark_mode": "Dark Mode",
+            "notifications": "Notifications",
+            "currency": "Currency"
+        },
+        "support": {
+            "invite_friends": "Invite Friends",
+            "help": "Help",
+            "about_us": "About Us"
+        },
+        "button": {
+            "login": "Log in"
+        },
+        "version": "Version 1.0.2 (Build 2024)"
+    },
+    "auth": {
+        "login": {
+            "welcome": "Welcome!",
+            "description": "Log in to sync your expense data and connect with friends.",
+            "continue_with_apple": "Continue with Apple",
+            "continue_with_google": "Continue with Google",
+            "terms_agreement": "By continuing, you agree to our Terms of Service and Privacy Policy."
+        }
+    },
+    "group_types": {
+        "trip": "Trip",
+        "home": "Home",
+        "couple": "Couple",
+        "other": "Other"
+    },
+    "categories": {
+        "food": "Food & Drink",
+        "transport": "Transport",
+        "shopping": "Shopping",
+        "entertainment": "Entertainment",
+        "utilities": "Utilities",
+        "gift": "Gift",
+        "other": "Other"
+    },
+    "modal": {
+        "add_group": {
+            "title": "Create Group",
+            "cover_image": "Group cover image",
+            "name_label": "Group Name",
+            "name_placeholder": "e.g. Dalat Trip",
+            "desc_label": "Description",
+            "desc_placeholder": "Brief description...",
+            "type_label": "Group Type",
+            "currency_label": "Currency",
+            "creating": "Creating...",
+            "submit": "Create group and start",
+            "errors": {
+                "name_required": "Please enter group name",
+                "currency_required": "Please select currency"
+            }
+        },
+        "join_group": {
+            "title": "Scan QR Code",
+            "subtitle": "Point camera at group QR code to\njoin instantly.",
+            "camera_permission_title": "Camera Access",
+            "camera_permission_desc": "We need camera access so you can scan QR codes to join groups quickly.",
+            "grant_permission": "Grant access",
+            "gallery": "Gallery",
+            "flash": "Flash",
+            "or": "OR",
+            "enter_code_label": "ENTER CODE OR LINK",
+            "enter_code_desc": "Use group code or paste invite link",
+            "code_placeholder": "Code or invite link",
+            "paste": "Paste",
+            "joining": "Joining...",
+            "join_btn": "Join Group",
+            "how_to_find": "How to find QR code?",
+            "errors": {
+                "no_code_title": "Code not found",
+                "no_code_desc": "Please select an image with a valid group QR",
+                "scan_error_title": "Error",
+                "scan_error_desc": "Cannot scan code from this image",
+                "empty_input_title": "Empty entry",
+                "empty_input_desc": "Please enter a code or paste link to continue",
+                "join_error_title": "Cannot join",
+                "join_error_desc": "Invite code is incorrect or expired"
+            },
+            "success": {
+                "title": "Joined successfully",
+                "desc": "You are now a member of the group"
+            }
+        },
+        "add_expense": {
+            "title_add": "Add Expense",
+            "group_label": "Group",
+            "group_placeholder": "Select group",
+            "amount_label": "Amount",
+            "desc_label": "Description",
+            "desc_placeholder": "What did you pay for? (e.g. Lunch)",
+            "category_label": "Category",
+            "category_placeholder": "Select category",
+            "payer_label": "Paid by",
+            "payer_placeholder": "Select payer",
+            "split_label": "Split with",
+            "notes_label": "Notes",
+            "notes_placeholder": "Additional notes...",
+            "receipt_label": "Receipt image",
+            "receipt_change": "Change image",
+            "receipt_upload": "Upload receipt",
+            "receipt_hint": "Take a photo or choose from gallery",
+            "saving": "Saving...",
+            "uploading": "Uploading...",
+            "submit": "Save expense",
+            "no_group_title": "No groups yet",
+            "no_group_desc": "You need to join or create a group first",
+            "btn_join_group": "Join Group",
+            "btn_create_group": "Create Group",
+            "success_title": "Success",
+            "success_desc": "Expense added to group",
+            "error_title": "Error saving",
+            "error_desc": "Failed to save expense",
+            "errors": {
+                "group_required": "Please select a group",
+                "payer_required": "Please select who paid",
+                "participants_required": "Please select at least one participant",
+                "title_required": "Please enter description",
+                "amount_required": "Please enter amount",
+                "amount_min": "Amount must be greater than 0"
+            }
+        },
+        "payment_confirm": {
+            "success": "Success!",
+            "desc": "Transaction has been recorded.\nGroup balance updated.",
+            "home_btn": "Back to Home"
+        },
+        "settle_up": {
+            "payment_via": "Payment via %{method}",
+            "total_owe": "YOU OWE IN TOTAL",
+            "total_gain": "YOU WILL RECEIVE IN TOTAL",
+            "details_title": "DEBT DETAILS",
+            "no_debt_title": "No Debts",
+            "no_debt_desc": "All debts are settled",
+            "you_owe": "You owe",
+            "owe_you": "Owes you",
+            "method_title": "PAYMENT METHOD",
+            "methods": {
+                "vietqr": {
+                    "label": "VietQR",
+                    "desc": "Fast transfer via QR"
+                },
+                "bank": {
+                    "label": "Bank Transfer",
+                    "desc": "Manual account entry"
+                },
+                "cash": {
+                    "label": "Cash",
+                    "desc": "Confirm paid by cash"
+                }
+            },
+            "processing": "Processing...",
+            "confirm_btn": "Confirm Payment",
+            "success_title": "Request sent successfully",
+            "success_desc": "Payment request for %{name} is pending confirmation",
+            "errors": {
+                "cannot_pay_title": "Cannot pay",
+                "cannot_pay_desc": "Please select a debt to continue",
+                "pay_error_title": "Payment error",
+                "pay_error_desc": "An error occurred while sending the request"
+            }
+        }
+    },
+    "home": {
+        "greeting": "Hello,",
+        "you": "You",
+        "someone": "Someone",
+        "balance": {
+            "title": "Your Balance",
+            "self_expenses": "Personal Expenses",
+            "owed_to_you": "Owed to you",
+            "you_owe": "You owe"
+        },
+        "actions": {
+            "expense": "Expense",
+            "create_group": "Create Group",
+            "join_group": "Join"
+        },
+        "groups": {
+            "title": "Your Groups",
+            "view_all": "View All",
+            "empty_title": "No groups yet",
+            "empty_description": "Create a new group or join friends",
+            "create_group": "Create Group"
+        },
+        "recent_activity": {
+            "title": "Recent Activity",
+            "added": "added",
+            "group": "Group",
+            "empty_title": "No activities yet",
+            "empty_description": "Your spending activities will appear here"
+        }
+    },
+    "activity": {
+        "title": "Activity",
+        "search_placeholder": "Search activity, groups, friends",
+        "filter_all": "All",
+        "filter_expense": "Expense",
+        "filter_payment": "Payment",
+        "you": "You",
+        "someone": "Someone",
+        "group": "Group",
+        "error_loading": "Could not load activities",
+        "error_occurred": "An error occurred",
+        "empty_search_title": "No results found",
+        "empty_search_desc": "Try searching with different keywords",
+        "empty_title": "No activities yet",
+        "empty_desc": "Activities will appear here",
+        "actions": {
+            "expense_created": "added",
+            "expense_updated": "updated",
+            "expense_deleted": "deleted",
+            "settlement_created": "requested payment",
+            "settlement_completed": "completed payment",
+            "settlement_rejected": "rejected payment",
+            "group_member_added": "joined group",
+            "group_member_removed": "left group",
+            "group_member_role_changed": "changed role",
+            "group_updated": "updated group",
+            "debt_assignment_created": "assigned debt",
+            "debt_assignment_updated": "changed assigned debt",
+            "default": "performed an action"
+        },
+        "time": {
+            "just_now": "Just now",
+            "minutes_ago": "%{count} minutes ago",
+            "hours_ago": "%{count} hours ago",
+            "yesterday": "Yesterday",
+            "days_ago": "%{count} days ago",
+            "today": "Today"
+        }
+    },
+    "debt_assignment": {
+        "assignee_selector": {
+            "title": "Select Debt Assignee",
+            "description": "Select a member to act as a payment intermediary. Other members will pay their debts to this person.",
+            "processing": "Processing...",
+            "confirm": "Confirm"
+        },
+        "request_card": {
+            "title": "DEBT ASSIGNMENT REQUEST",
+            "requester": "Requester",
+            "proposed": "Proposed",
+            "reject": "Reject",
+            "approving": "Approving...",
+            "approve": "Approve"
+        },
+        "create_request": {
+            "title": "Propose Debt Assignee",
+            "description": "Propose a member to act as a payment intermediary. The group owner will review this request.",
+            "select_member": "SELECT MEMBER",
+            "you": "You",
+            "reason_label": "REASON (OPTIONAL)",
+            "reason_placeholder": "Why choose this person?",
+            "submit": "Submit Proposal"
+        },
+        "pending_list": {
+            "title": "DEBT ASSIGNMENT REQUESTS (%{count})"
+        }
+    },
+    "onboarding": {
+        "tutorial": {
+            "slide1": {
+                "title": "Create groups ",
+                "accent": "easily",
+                "description": "Plan trips or split rent in seconds.",
+                "overlay_title": "Happy House",
+                "overlay_desc": "5 members"
+            },
+            "slide2": {
+                "title": "Add friends & ",
+                "accent": "Manage expenses",
+                "description": "Easily invite new members and track group budget anytime, anywhere.",
+                "overlay_group_title": "Group Expense",
+                "overlay_group_name": "Dalat 2024 🍓",
+                "overlay_item1": "Lunch Grilled Chicken",
+                "overlay_item2": "Tung Coffee",
+                "overlay_item3": "Homestay"
+            },
+            "slide3": {
+                "title": "Transparent ",
+                "accent": "debt management",
+                "description": "Track who owes whom and view visual monthly expense reports.",
+                "overlay_collected": "Collected",
+                "overlay_monthly": "Monthly Expense"
+            },
+            "slide4": {
+                "title": "Smart ",
+                "accent": "analytics",
+                "description": "Easily understand spending habits through monthly analytic charts.",
+                "overlay_food": "FOOD",
+                "overlay_travel": "TRAVEL",
+                "overlay_other": "OTHER"
+            },
+            "slide5": {
+                "title": "Safe & ",
+                "accent": "Secure",
+                "description": "Your data is always encrypted and absolutely secure to the highest standards.",
+                "overlay_encrypted": "Encrypted",
+                "overlay_desc": "All your transactions and personal data are secured with 256-bit encryption.",
+                "overlay_verify": "Verified by SplitSmart"
+            },
+            "skip": "Skip",
+            "start_now": "Start Now",
+            "continue": "Continue"
+        },
+        "welcome": {
+            "total": "Total",
+            "title_1": "Sharing bills\n",
+            "title_3": "is easy",
+            "description": "Forget calculation worries. Split bills transparently and get paid back quickly.",
+            "explore": "Explore Now",
+            "login": "Already have an account? Log in"
+        },
+        "login": {
+            "empty_info": "Empty Information",
+            "empty_info_desc": "Please enter both email and password to continue",
+            "missing_info": "Missing Information",
+            "missing_info_desc": "Please provide your name for the new account",
+            "signup_success": "Registration Successful",
+            "signup_success_desc": "Please check your email to verify your account before logging in",
+            "auth_error": "Authentication Error",
+            "auth_error_desc": "An error occurred during login",
+            "apple_fail": "Apple login failed",
+            "google_fail": "Google login failed",
+            "create_account": "Create Account",
+            "welcome": "Welcome!",
+            "signup_desc": "Register to start splitting bills with friends.",
+            "login_desc": "Log in to sync your expense data.",
+            "name_label": "Full Name",
+            "name_placeholder": "John Doe",
+            "email_label": "Email",
+            "password_label": "Password",
+            "processing": "Processing...",
+            "signup_btn": "Sign Up",
+            "login_btn": "Log In",
+            "has_account": "Already have an account? ",
+            "no_account": "Don't have an account? ",
+            "or": "or",
+            "apple_btn": "Continue with Apple",
+            "google_btn": "Continue with Google",
+            "terms_1": "By continuing, you agree to our ",
+            "terms_2": "Terms of Service",
+            "terms_3": " and ",
+            "terms_4": "Privacy Policy",
+            "terms_5": "."
+        }
+    },
+    "tabs": {
+        "home": "Home",
+        "activity": "Activity",
+        "settings": "Settings"
+    },
+    "groups": {
+        "title": "All Groups",
+        "empty_title": "No groups yet",
+        "empty_desc": "Create a new group or join a friend's group to start sharing expenses.",
+        "create_btn": "Create group now"
+    },
+    "group": {
+        "expenses": {
+            "empty_filter": "Try changing filters",
+            "empty_start": "Add a new expense to get started"
+        }
+    },
+    "search": {
+        "title": "Search",
+        "placeholder": "Search groups, friends, expenses...",
+        "empty_query_title": "Search anything",
+        "empty_query_desc": "Enter expense name, group name, or friend's email to search quickly.",
+        "no_results_title": "No results found",
+        "no_results_desc": "No results for \"%{query}\"",
+        "header": {
+            "expenses": "Expenses",
+            "groups": "Groups",
+            "users": "Users"
+        },
+        "default_user": "User"
+    },
+    "profile": {
+        "edit_title": "Edit Profile",
+        "change_avatar": "Change avatar",
+        "save": "Save changes"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "just_now": "Just now",
+        "minutes_ago": "%{count} minutes ago",
+        "hours_ago": "%{count} hours ago",
+        "yesterday": "Yesterday",
+        "days_ago": "%{count} days ago",
+        "today": "Today",
+        "error_title": "Failed to load notifications",
+        "error_default": "An error occurred",
+        "mark_all_read": "Mark all as read",
+        "tab_all": "All",
+        "tab_unread": "Unread",
+        "empty_unread_title": "No unread notifications",
+        "empty_unread_desc": "All notifications have been read",
+        "empty_all_title": "No notifications yet",
+        "empty_all_desc": "Notifications will appear here"
+    },
+    "modal_layout": {
+        "add_expense_title": "Add Expense",
+        "create_group_title": "Create New Group",
+        "join_group_title": "Join Group",
+        "settle_up_title": "Settle Up",
+        "payment_confirm_title": "Confirm Payment",
+        "save_btn": "Save",
+        "create_btn": "Create",
+        "paste": "Paste"
+    },
+    "expense_detail": {
+        "title": "Expense Details",
+        "error_title": "Could not load details",
+        "error_not_found": "Expense not found",
+        "paid_by": "Paid by",
+        "default_user": "User",
+        "description": "DESCRIPTION",
+        "split_for": "SPLIT FOR {{count}} PEOPLE",
+        "you": "You",
+        "member": "Member",
+        "paid": "Paid",
+        "unpaid": "Unpaid",
+        "receipt": "RECEIPT",
+        "edit": "Edit",
+        "delete": "Delete",
+        "delete_success_title": "Deleted",
+        "delete_success_desc": "Expense has been removed from the group",
+        "delete_error_title": "Delete Error",
+        "delete_error_desc": "Could not delete the expense at this time",
+        "delete_dialog_title": "Delete Expense",
+        "delete_dialog_desc": "Are you sure you want to delete the expense \"{{title}}\"? This action cannot be undone.",
+        "cancel": "Cancel"
+    },
+    "not_found": {
+        "title": "Oops!",
+        "message": "This screen doesn't exist.",
+        "link": "Go to home screen"
+    },
+    "expense_card": {
+        "paid_by": "Paid by",
+        "you": "You",
+        "someone": "Someone"
+    },
+    "group_card": {
+        "total_spent": "Total spent",
+        "member_count": "%{count} members",
+        "you_are_owed": "You are owed: %{amount}",
+        "you_owe": "You owe: %{amount}",
+        "you": "You"
+    },
+    "pending_settlements": {
+        "confirm_success_title": "Confirmed",
+        "confirm_success_desc": "Payment has been recorded successfully",
+        "confirm_error_title": "Confirm Error",
+        "confirm_error_desc": "Could not confirm payment at this time",
+        "reject_success_title": "Rejected",
+        "reject_success_desc": "Payment request has been removed",
+        "reject_error_title": "Reject Error",
+        "reject_error_desc": "Could not reject request at this time",
+        "waiting_confirm": "WAITING FOR CONFIRMATION (%{count})",
+        "sent_to_you": "sent to you",
+        "reject_btn": "Reject",
+        "confirm_btn": "Confirm",
+        "confirm_dialog_title": "Confirm Received",
+        "confirm_dialog_desc": "Do you confirm you have received %{amount} from %{name}?",
+        "reject_dialog_title": "Reject Payment",
+        "reject_dialog_desc": "Are you sure you want to reject this payment request?"
+    },
+    "share_qr": {
+        "title": "Group Invitation QR",
+        "description": "Others can scan this code to join group \"%{name}\"",
+        "invite_code_label": "INVITE CODE:",
+        "save_btn": "Save Image",
+        "share_btn": "Share",
+        "save_success_title": "Saved",
+        "save_success_desc": "QR code has been saved to your photo library",
+        "process_error": "Could not process QR code at this time",
+        "share_error": "Could not share QR code at this time",
+        "share_dialog_title": "Share invite code for group %{name}"
+    },
+    "error_boundary": {
+        "title": "An error occurred",
+        "message": "The application encountered an unexpected problem.",
+        "hint": "Please try again or contact support.",
+        "retry": "Try again"
+    },
+    "group_detail": {
+        "not_found_title": "Group not found",
+        "not_found_desc": "This group does not exist or you don't have access",
+        "members_label": "MEMBERS: %{count}",
+        "you_receive": "YOU RECEIVE",
+        "you_owe_label": "YOU OWE",
+        "total_group_spent": "TOTAL GROUP SPENT",
+        "group_badge": "GROUP",
+        "you_spent": "YOU SPENT",
+        "action_expense": "EXPENSE",
+        "action_settle": "SETTLE",
+        "action_report": "REPORT",
+        "change": "Change",
+        "setup": "Setup",
+        "propose": "Propose",
+        "view_all": "View all",
+        "summary_small": "Summary",
+        "details_small": "Details",
+        "member": "Member",
+        "debt_assignment_title": "Intermediary Debt Assignment",
+        "disable_feature": "Disable feature",
+        "receiving_all_debts": "Receiving all debts",
+        "no_assignee": "No assignee assigned",
+        "assignee_hint": "Assign someone to simplify debt settlement",
+        "tab_expenses": "Expenses",
+        "tab_summary": "Summary",
+        "recent_expenses": "Recent Expenses",
+        "no_expenses": "No expenses yet",
+        "debt_details": "Debt Details",
+        "settlement_suggestions": "Settlement Suggestions",
+        "summary": "Summary",
+        "no_debts": "No debts found",
+        "owes": "OWES",
+        "for": "for",
+        "all_settled": "All debts settled!",
+        "disable_assignment_title": "Disable Debt Assignment",
+        "disable_assignment_desc": "Are you sure you want to disable this feature? Debts will be recalculated using normal optimization."
+    },
+    "group_history": {
+        "title": "Expense History",
+        "total_spent": "TOTAL SPENT",
+        "your_balance": "YOUR BALANCE",
+        "split_all": "Split for group",
+        "you_paid": "You paid",
+        "today": "TODAY",
+        "yesterday": "YESTERDAY",
+        "dec_24": "24 DECEMBER",
+        "mock_lunch": "Lunch at Kichi",
+        "mock_rent": "House Rent Dec",
+        "mock_3": "Morning Coffee",
+        "mock_4": "Movie Tickets",
+        "mock_paid_by_an": "An paid"
+    },
+    "group_members": {
+        "title": "Members",
+        "error_no_code": "Invite code not found for this group",
+        "copy_success": "Invite code copied to clipboard",
+        "share_message": "Join group \"%{name}\" on SplitSmart!\n\nInvite code: %{code}\n\nDownload the app and enter the code to join.",
+        "share_error_title": "Share Error",
+        "share_error_desc": "An error occurred while sharing",
+        "owner": "Group Owner",
+        "invite_code_label": "INVITE CODE",
+        "invite_hint": "Share this code to invite friends",
+        "list_title": "MEMBER LIST (%{count})",
+        "share_btn": "Share invitation"
+    },
+    "group_settings": {
+        "title": "Group Settings",
+        "leave_success_title": "Left Group",
+        "leave_success_desc": "You are no longer a member of this group",
+        "leave_error_title": "Leave Error",
+        "update_name_success": "Group name updated successfully",
+        "update_error_title": "Update Error",
+        "update_error_desc": "Could not change group name at this time",
+        "load_error": "Could not load settings",
+        "info_label": "GROUP INFORMATION",
+        "name_label": "Group Name",
+        "name_display_label": "Group name",
+        "invite_code_label": "Invite code",
+        "share_label": "SHARE GROUP",
+        "qr_title": "Group QR Code",
+        "qr_desc": "Share or scan to join group",
+        "members_label": "MEMBERS (%{count})",
+        "add_member_temp": "Add member will be implemented later",
+        "add_member_btn": "Add member",
+        "no_members_title": "No members",
+        "no_members_desc": "Add members to group",
+        "remove_member_temp": "Confirm remove member not configured",
+        "leave_btn": "Leave group",
+        "leave_dialog_title": "Leave Group",
+        "leave_dialog_desc": "Are you sure you want to leave group \"%{name}\"? You will not be able to view or edit expenses in this group."
+    },
+    "expense_edit": {
+        "validation_title": "Please enter description",
+        "validation_amount": "Please enter amount",
+        "validation_amount_positive": "Amount must be greater than 0",
+        "validation_payer": "Please select payer",
+        "validation_participants": "Please select at least one participant",
+        "update_success_title": "Updated",
+        "update_success_desc": "Expense information has been saved successfully",
+        "update_error_title": "Update Error",
+        "update_error_desc": "An error occurred while saving changes",
+        "not_found": "Expense not found",
+        "title": "Edit Expense",
+        "category": "CATEGORY",
+        "description_label": "DESCRIPTION",
+        "description_placeholder": "Enter expense description",
+        "amount_label": "AMOUNT",
+        "split_equally": "Split equally: {{amount}} each",
+        "payer_label": "PAYER",
+        "select_payer": "Select payer",
+        "participants_label": "PARTICIPANTS",
+        "you": "You",
+        "notes_label": "NOTES (OPTIONAL)",
+        "notes_placeholder": "Add notes...",
+        "receipt_label": "RECEIPT (OPTIONAL)",
+        "change_image": "Change image",
+        "upload_image": "Upload receipt photo",
+        "upload_desc": "Take a photo or choose from library",
+        "save": "Save changes",
+        "retry": "Retry",
+        "ok": "OK"
+    },
+    "group_stats": {
+        "title": "Group Statistics",
+        "overview_label": "SPENDING OVERVIEW",
+        "total_spent": "Total Spent",
+        "avg_per_person": "Average / Person",
+        "expense_count": "Number of Expenses",
+        "category_split_label": "SPENDING CATEGORIES",
+        "empty_title": "No Data Yet",
+        "empty_desc": "Add some expenses to see statistics."
+    }
+}

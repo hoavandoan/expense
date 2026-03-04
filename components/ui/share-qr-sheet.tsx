@@ -1,5 +1,6 @@
 import { AppText } from "@/components/app-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTranslation } from "@/lib/hooks/use-translation";
 import { decode } from "base64-arraybuffer";
 import { File, Paths } from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
@@ -30,6 +31,7 @@ export function ShareQRSheet({
 	                             groupName,
 	                             inviteCode,
                              }: ShareQRSheetProps) {
+	const { t } = useTranslation();
 	const { toast } = useToast();
 	const accent = useThemeColor("accent");
 	const insets = useSafeAreaInsets();
@@ -66,8 +68,8 @@ export function ShareQRSheet({
 
 					await MediaLibrary.saveToLibraryAsync(fileUri);
 					toast.show({
-						label: "Đã lưu",
-						description: "Mã QR đã được lưu vào thư viện ảnh",
+						label: t("share_qr.save_success_title"),
+						description: t("share_qr.save_success_desc"),
 						variant: "success",
 					});
 				} catch (innerError: any) {
@@ -77,8 +79,8 @@ export function ShareQRSheet({
 			});
 		} catch (error: any) {
 			toast.show({
-				label: "Lỗi",
-				description: "Không thể xử lý mã QR lúc này",
+				label: t("error"),
+				description: t("share_qr.process_error"),
 				variant: "danger",
 			});
 		}
@@ -94,20 +96,20 @@ export function ShareQRSheet({
 
 					await Sharing.shareAsync(fileUri, {
 						mimeType: "image/png",
-						dialogTitle: `Chia sẻ mã mời nhóm ${groupName}`,
+						dialogTitle: t("share_qr.share_dialog_title", { name: groupName }),
 					});
 				} catch (innerError: any) {
 					toast.show({
-						label: "Lỗi",
-						description: "Không thể chia sẻ mã QR lúc này",
+						label: t("error"),
+						description: t("share_qr.share_error"),
 						variant: "danger",
 					});
 				}
 			});
 		} catch (error: any) {
 			toast.show({
-				label: "Lỗi",
-				description: "Không thể xử lý mã QR lúc này",
+				label: t("error"),
+				description: t("share_qr.process_error"),
 				variant: "danger",
 			});
 		}
@@ -127,10 +129,10 @@ export function ShareQRSheet({
 				>
 					<View className="w-full px-6 items-center">
 						<AppText className="text-xl font-bold mb-1 text-center">
-							Mã QR tham gia nhóm
+							{t("share_qr.title")}
 						</AppText>
 						<AppText className="text-muted text-sm mb-8 text-center px-4">
-							Người khác có thể quét mã này để tham gia nhóm "{groupName}"
+							{t("share_qr.description", { name: groupName })}
 						</AppText>
 
 						<View className="bg-white p-6 rounded-3xl shadow-sm border border-divider/10 mb-8">
@@ -144,7 +146,7 @@ export function ShareQRSheet({
 
 						<View className="bg-surface-secondary px-6 py-3 rounded-2xl mb-8 flex-row items-center gap-3 border border-divider/5">
 							<AppText className="text-muted font-bold text-xs tracking-widest uppercase">
-								MÃ MỜI:
+								{t("share_qr.invite_code_label")}
 							</AppText>
 							<AppText className="text-lg font-mono tracking-tighter">
 								{inviteCode}
@@ -164,7 +166,7 @@ export function ShareQRSheet({
 									size={20}
 									color={useThemeColor("foreground")}
 								/>
-								<Button.Label className="font-bold">Lưu ảnh</Button.Label>
+								<Button.Label className="font-bold">{t("share_qr.save_btn")}</Button.Label>
 							</Button>
 							<Button
 								variant="primary"
@@ -172,7 +174,7 @@ export function ShareQRSheet({
 								onPress={handleShareQR}
 							>
 								<IconSymbol name="square.and.arrow.up" size={20} color="white" />
-								<Button.Label className="font-bold">Chia sẻ</Button.Label>
+								<Button.Label className="font-bold">{t("share_qr.share_btn")}</Button.Label>
 							</Button>
 						</View>
 					</View>

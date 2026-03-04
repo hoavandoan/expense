@@ -3,7 +3,7 @@ import { ScreenScrollView } from "@/components/screen-scroll-view";
 import { FormSection } from "@/components/ui/form-section";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { EXPENSE_CATEGORIES } from "@/constants";
-import { useCreateExpense, useGroup, useGroups } from "@/lib/hooks";
+import { useCreateExpense, useGroup, useGroups, useTranslation } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatCurrency, uploadImage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,38 +11,38 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  Avatar,
-  Button,
-  Card,
-  Checkbox,
-  PressableFeedback,
-  Select,
-  Skeleton,
-  TextField,
-  useThemeColor,
-  useToast,
+    Avatar,
+    Button,
+    Card,
+    Checkbox,
+    PressableFeedback,
+    Select,
+    Skeleton,
+    TextField,
+    useThemeColor,
+    useToast,
 } from "heroui-native";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
 import * as z from "zod";
 
-const expenseSchema = z.object({
-  groupId: z.string().min(1, "Vui lòng chọn nhóm"),
-  paidById: z.string().min(1, "Vui lòng chọn người trả tiền"),
+const getExpenseSchema = (t: any) => z.object({
+  groupId: z.string().min(1, t("modal.add_expense.errors.group_required")),
+  paidById: z.string().min(1, t("modal.add_expense.errors.payer_required")),
   participantIds: z
     .array(z.string())
-    .min(1, "Vui lòng chọn ít nhất một người tham gia"),
-  title: z.string().min(1, "Vui lòng nhập mô tả chi tiêu"),
+    .min(1, t("modal.add_expense.errors.participants_required")),
+  title: z.string().min(1, t("modal.add_expense.errors.title_required")),
   amount: z
     .string()
-    .min(1, "Vui lòng nhập số tiền")
+    .min(1, t("modal.add_expense.errors.amount_required"))
     .refine(
       (val) => {
         const num = parseInt(val.replace(/\D/g, ""));
         return num > 0;
       },
-      { message: "Số tiền phải lớn hơn 0" }
+      { message: t("modal.add_expense.errors.amount_min") }
     ),
   category: z.enum([
     "food",
@@ -56,7 +56,7 @@ const expenseSchema = z.object({
   notes: z.string().optional(),
 });
 
-type ExpenseFormValues = z.infer<typeof expenseSchema>;
+type ExpenseFormValues = z.infer<ReturnType<typeof getExpenseSchema>>;
 
 interface GroupOption {
   id: string;
@@ -79,6 +79,7 @@ export default function AddExpenseScreen() {
   const success = useThemeColor("success");
   const danger = useThemeColor("danger");
 
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { data: groups, isLoading: isLoadingGroups } = useGroups();
   const createExpense = useCreateExpense();
@@ -101,6 +102,8 @@ export default function AddExpenseScreen() {
   // Get initial groupId
   const initialGroupId =
     params.groupId || (groupOptions.length > 0 ? groupOptions[0].value : "");
+
+  const expenseSchema = useMemo(() => getExpenseSchema(t), [t]);
 
   const {
     control,
@@ -150,10 +153,10 @@ export default function AddExpenseScreen() {
     if (!groupData?.group_members) return [];
     return groupData.group_members.map((m: any) => ({
       id: m.user_id,
-      name: m.user?.name || "Thành viên",
+      name: m.user?.name || t("activity.someone"),
       avatarUrl: m.user?.avatar_url,
     }));
-  }, [currentGroupDetail]);
+  }, [currentGroupDetail, t]);
 
   // Set default participantIds when members load
   useEffect(() => {
@@ -244,8 +247,8 @@ export default function AddExpenseScreen() {
       });
 
       toast.show({
-        label: "Thành công",
-        description: "Khoản chi tiêu mới đã được thêm vào nhóm",
+        label: t("modal.add_expense.success_title"),
+        description: t("modal.add_expense.success_desc"),
         variant: "success",
         icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
         actionLabel: "OK",
@@ -254,11 +257,11 @@ export default function AddExpenseScreen() {
       router.back();
     } catch (error: any) {
       toast.show({
-        label: "Lỗi tạo chi tiêu",
-        description: error.message || "Đã có lỗi xảy ra khi lưu khoản chi mới",
+        label: t("modal.add_expense.error_title"),
+        description: error.message || t("modal.add_expense.error_desc"),
         variant: "danger",
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: "Thử lại",
+        actionLabel: t("common.retry"),
         onActionPress: ({ hide }) => hide(),
       });
     } finally {
@@ -284,9 +287,9 @@ export default function AddExpenseScreen() {
         <View className="bg-accent/10 p-6 rounded-full mb-6">
           <IconSymbol name="person.3.fill" size={48} color={accent} />
         </View>
-        <AppText className="text-xl font-bold mb-2">Chưa có nhóm nào</AppText>
+        <AppText className="text-xl font-bold mb-2">{t("modal.add_expense.no_group_title")}</AppText>
         <AppText className="text-muted text-center mb-8">
-          Bạn cần tham gia hoặc tạo một nhóm trước khi thêm khoản chi tiêu
+          {t("modal.add_expense.no_group_desc")}
         </AppText>
         <View className="flex-row gap-3">
           <Button
@@ -294,7 +297,7 @@ export default function AddExpenseScreen() {
             className="flex-1 h-12 rounded-2xl"
             onPress={() => router.replace("/(modal)/join-group")}
           >
-            <Button.Label className="font-bold">Tham gia nhóm</Button.Label>
+            <Button.Label className="font-bold">{t("modal.add_expense.btn_join_group")}</Button.Label>
           </Button>
           <Button
             variant="primary"
@@ -302,7 +305,7 @@ export default function AddExpenseScreen() {
             onPress={() => router.replace("/(modal)/add-group")}
           >
             <Button.Label className="font-bold text-white">
-              Tạo nhóm mới
+              {t("modal.add_expense.btn_create_group")}
             </Button.Label>
           </Button>
         </View>
@@ -324,7 +327,7 @@ export default function AddExpenseScreen() {
                   {currentGroup.label}
                 </AppText>
                 <AppText className="text-muted text-sm">
-                  Thêm khoản chi mới
+                  {t("modal.add_expense.title_add")}
                 </AppText>
               </View>
             </View>
@@ -332,7 +335,7 @@ export default function AddExpenseScreen() {
         )}
 
         <FormSection
-          label="Nhóm"
+          label={t("modal.add_expense.group_label")}
           isRequired
           error={errors.groupId?.message}
           className={hasPreselectedGroup ? "hidden" : "mb-6 mt-4"}
@@ -354,7 +357,7 @@ export default function AddExpenseScreen() {
                     />
                     <Select.Value
                       className="text-base font-medium"
-                      placeholder="Chọn nhóm"
+                      placeholder={t("modal.add_expense.group_placeholder")}
                     />
                   </View>
                   <IconSymbol
@@ -397,7 +400,7 @@ export default function AddExpenseScreen() {
         </FormSection>
         
         <FormSection
-          label="Số tiền"
+          label={t("modal.add_expense.amount_label")}
           isRequired
           error={errors.amount?.message}
         >
@@ -430,7 +433,7 @@ export default function AddExpenseScreen() {
         </FormSection>
 
         <FormSection
-          label="Mô tả"
+          label={t("modal.add_expense.desc_label")}
           isRequired
           error={errors.title?.message}
         >
@@ -440,7 +443,7 @@ export default function AddExpenseScreen() {
               name="title"
               render={({ field: { onChange, value } }) => (
                 <TextField.Input
-                  placeholder="Bạn đã chi cho việc gì? (e.g. Ăn trưa)"
+                  placeholder={t("modal.add_expense.desc_placeholder")}
                   value={value}
                   onChangeText={onChange}
                   className="bg-surface border border-divider/10 h-12 rounded-2xl px-4 text-base"
@@ -451,7 +454,7 @@ export default function AddExpenseScreen() {
         </FormSection>
 
         <FormSection
-          label="Phân loại"
+          label={t("modal.add_expense.category_label")}
           isRequired
           error={errors.category?.message}
         >
@@ -487,7 +490,7 @@ export default function AddExpenseScreen() {
                     </View>
                     <Select.Value
                       className="text-base font-medium"
-                      placeholder="Chọn phân loại"
+                      placeholder={t("modal.add_expense.category_placeholder")}
                     />
                   </View>
                   <IconSymbol
@@ -535,7 +538,7 @@ export default function AddExpenseScreen() {
         </FormSection>
 
         <FormSection
-          label="Người trả"
+          label={t("modal.add_expense.payer_label")}
           isRequired
           error={errors.paidById?.message}
         >
@@ -546,7 +549,7 @@ export default function AddExpenseScreen() {
               const selectedPayer = members.find((m) => m.id === value);
               const payerOptions = members.map((m) => ({
                 value: m.id,
-                label: m.id === user?.id ? "Bạn" : m.name,
+                label: m.id === user?.id ? t("activity.you") : m.name,
                 initial: m.name.charAt(0),
               }));
               const currentPayerOption = payerOptions.find(
@@ -566,7 +569,7 @@ export default function AddExpenseScreen() {
                       </View>
                       <Select.Value
                         className="text-base font-medium"
-                        placeholder="Chọn người trả"
+                        placeholder={t("modal.add_expense.payer_placeholder")}
                       />
                     </View>
                     <IconSymbol
@@ -610,7 +613,7 @@ export default function AddExpenseScreen() {
         </FormSection>
 
         <FormSection
-          label="Chia cho"
+          label={t("modal.add_expense.split_label")}
           isRequired
           error={errors.participantIds?.message}
           className="mb-8"
@@ -650,7 +653,7 @@ export default function AddExpenseScreen() {
                           !isSelected ? "text-muted opacity-50" : ""
                         }`}
                       >
-                        {member.id === user?.id ? "Bạn" : member.name}
+                        {member.id === user?.id ? t("activity.you") : member.name}
                       </AppText>
                     </View>
                     {isSelected && totalAmount > 0 && (
@@ -669,7 +672,7 @@ export default function AddExpenseScreen() {
         </FormSection>
 
         <FormSection
-          label="Ghi chú"
+          label={t("modal.add_expense.notes_label")}
           error={errors.notes?.message}
         >
           <TextField isInvalid={!!errors.notes}>
@@ -678,7 +681,7 @@ export default function AddExpenseScreen() {
               name="notes"
               render={({ field: { onChange, value } }) => (
                 <TextField.Input
-                  placeholder="Ghi chú thêm về khoản chi này..."
+                  placeholder={t("modal.add_expense.notes_placeholder")}
                   value={value}
                   onChangeText={onChange}
                   multiline
@@ -691,7 +694,7 @@ export default function AddExpenseScreen() {
         </FormSection>
 
         <FormSection
-          label="Ảnh hóa đơn"
+          label={t("modal.add_expense.receipt_label")}
         >
           {selectedReceipt ? (
             <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
@@ -719,7 +722,7 @@ export default function AddExpenseScreen() {
                 className="p-4 border-t border-divider/10"
               >
                 <AppText className="text-accent text-center font-semibold">
-                  Thay đổi ảnh
+                  {t("modal.add_expense.receipt_change")}
                 </AppText>
               </PressableFeedback>
             </Card>
@@ -730,10 +733,10 @@ export default function AddExpenseScreen() {
                   <IconSymbol name="camera.fill" size={32} color={accent} />
                 </View>
                 <AppText className="text-accent font-semibold text-base">
-                  Tải lên ảnh hóa đơn
+                  {t("modal.add_expense.receipt_upload")}
                 </AppText>
                 <AppText className="text-muted text-xs mt-1">
-                  Chụp hoặc chọn từ thư viện
+                  {t("modal.add_expense.receipt_hint")}
                 </AppText>
               </Card>
             </PressableFeedback>
@@ -763,9 +766,9 @@ export default function AddExpenseScreen() {
             <Button.Label className="text-white font-bold text-lg">
               {createExpense.isPending || isUploadingReceipt
                 ? isUploadingReceipt
-                  ? "Đang tải ảnh..."
-                  : "Đang lưu..."
-                : "Lưu khoản chi"}
+                  ? t("modal.add_expense.uploading")
+                  : t("modal.add_expense.saving")
+                : t("modal.add_expense.submit")}
             </Button.Label>
           </View>
         </Button>

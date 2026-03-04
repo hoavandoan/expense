@@ -1,7 +1,7 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useCreateSettlement, useDebtAssignment, useGroup } from '@/lib/hooks';
+import { useCreateSettlement, useDebtAssignment, useGroup, useTranslation } from '@/lib/hooks';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { assignDebtsOptimized, assignDebtsWithAssignee } from '@/lib/utils/debt-calculator';
 import { Image } from 'expo-image';
@@ -26,6 +26,7 @@ export default function SettleUpScreen() {
   const [selectedMethod, setSelectedMethod] = useState<'vietqr' | 'bank' | 'cash'>('vietqr');
   const [selectedDebt, setSelectedDebt] = useState<DebtItem | null>(null);
 
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { data: group, isLoading } = useGroup(params.groupId || null);
   const { data: activeAssignment } = useDebtAssignment(params.groupId || null);
@@ -90,7 +91,7 @@ export default function SettleUpScreen() {
         userDebts.push({
           id: `debt-${index}`,
           userId: debt.to,
-          name: toMember?.user?.name || 'Thành viên',
+          name: toMember?.user?.name || t('common.member'),
           amount: debt.amount,
           type: 'you_owe',
           avatarUrl: toMember?.user?.avatar_url,
@@ -100,7 +101,7 @@ export default function SettleUpScreen() {
         userDebts.push({
           id: `debt-${index}`,
           userId: debt.from,
-          name: fromMember?.user?.name || 'Thành viên',
+          name: fromMember?.user?.name || t('common.member'),
           amount: debt.amount,
           type: 'owe_you',
           avatarUrl: fromMember?.user?.avatar_url,
@@ -118,11 +119,11 @@ export default function SettleUpScreen() {
 
     if (!selectedDebt || !params.groupId) {
       toast.show({
-        label: 'Không thể thanh toán',
-        description: 'Vui lòng chọn một khoản nợ để tiếp tục',
+        label: t('modal.settle_up.errors.cannot_pay_title'),
+        description: t('modal.settle_up.errors.cannot_pay_desc'),
         variant: 'danger',
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: 'Đóng',
+        actionLabel: t('common.close'),
         onActionPress: ({ hide }) => hide(),
       });
       return;
@@ -133,12 +134,12 @@ export default function SettleUpScreen() {
         groupId: params.groupId,
         toUserId: selectedDebt.userId,
         amount: selectedDebt.amount,
-        note: `Thanh toán qua ${selectedMethod}`,
+        note: t('modal.settle_up.payment_via', { method: t(`modal.settle_up.methods.${selectedMethod}.label`) }),
       });
 
       toast.show({
-        label: 'Gửi yêu cầu thành công',
-        description: `Yêu cầu thanh toán cho ${selectedDebt.name} đang chờ xác nhận`,
+        label: t('modal.settle_up.success_title'),
+        description: t('modal.settle_up.success_desc', { name: selectedDebt.name }),
         variant: 'success',
         icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
         actionLabel: 'OK',
@@ -147,11 +148,11 @@ export default function SettleUpScreen() {
       router.back();
     } catch (error: any) {
       toast.show({
-        label: 'Lỗi thanh toán',
-        description: error.message || 'Đã có lỗi xảy ra khi gửi yêu cầu',
+        label: t('modal.settle_up.errors.pay_error_title'),
+        description: error.message || t('modal.settle_up.errors.pay_error_desc'),
         variant: 'danger',
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: 'Thử lại',
+        actionLabel: t('common.retry'),
         onActionPress: ({ hide }) => hide(),
       });
     }
@@ -173,21 +174,21 @@ export default function SettleUpScreen() {
             <IconSymbol name="dongsign" size={40} color={accent} />
           </View>
           <AppText className="text-3xl font-bold mb-1">
-            {totalOwe > totalGain ? (totalOwe - totalGain).toLocaleString() : (totalGain - totalOwe).toLocaleString()} đ
+            {totalOwe > totalGain ? (totalOwe - totalGain).toLocaleString() : (totalGain - totalOwe).toLocaleString()} ₫
           </AppText>
           <AppText className="text-muted font-medium uppercase tracking-widest text-xs">
-            {totalOwe > totalGain ? 'BẠN CẦN TRẢ TỔNG CỘNG' : 'BẠN SẼ NHẬN LẠI TỔNG CỘNG'}
+            {totalOwe > totalGain ? t('modal.settle_up.total_owe') : t('modal.settle_up.total_gain')}
           </AppText>
         </View>
 
         <View className="mb-8">
-          <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">CHI TIẾT CÁC KHOẢN</AppText>
+          <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">{t('modal.settle_up.details_title')}</AppText>
           {debts.length === 0 ? (
             <View className="p-6 bg-surface rounded-2xl border border-divider/10 items-center">
               <IconSymbol name="checkmark.circle.fill" size={40} color={accent} />
-              <AppText className="text-foreground font-semibold mt-3">Không có khoản nợ</AppText>
+              <AppText className="text-foreground font-semibold mt-3">{t('modal.settle_up.no_debt_title')}</AppText>
               <AppText className="text-muted text-sm text-center mt-1">
-                Tất cả đã được thanh toán
+                {t('modal.settle_up.no_debt_desc')}
               </AppText>
             </View>
           ) : (
@@ -215,7 +216,7 @@ export default function SettleUpScreen() {
                     <View className="flex-1">
                       <AppText className="font-bold text-base">{debt.name}</AppText>
                       <AppText className="text-muted text-xs">
-                        {debt.type === 'you_owe' ? 'Bạn nợ' : 'Nợ bạn'}
+                        {debt.type === 'you_owe' ? t('modal.settle_up.you_owe') : t('modal.settle_up.owe_you')}
                       </AppText>
                     </View>
                     <AppText className={cn("text-lg font-bold", debt.type === 'you_owe' ? 'text-danger' : 'text-accent')}>
@@ -235,12 +236,12 @@ export default function SettleUpScreen() {
         {debts.length > 0 && selectedDebt && (
           <>
             <View className="mb-8">
-              <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">PHƯƠNG THỨC THANH TOÁN</AppText>
+              <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">{t('modal.settle_up.method_title')}</AppText>
               <View className="gap-3">
                 {[
-                  { id: 'vietqr', label: 'VietQR', icon: 'qrcode', desc: 'Chuyển khoản nhanh qua QR' },
-                  { id: 'bank', label: 'Chuyển khoản', icon: 'creditcard', desc: 'Nhập số tài khoản thủ công' },
-                  { id: 'cash', label: 'Tiền mặt', icon: 'dongsign', desc: 'Xác nhận đã trả bằng tiền mặt' },
+                  { id: 'vietqr', label: t('modal.settle_up.methods.vietqr.label'), icon: 'qrcode', desc: t('modal.settle_up.methods.vietqr.desc') },
+                  { id: 'bank', label: t('modal.settle_up.methods.bank.label'), icon: 'creditcard', desc: t('modal.settle_up.methods.bank.desc') },
+                  { id: 'cash', label: t('modal.settle_up.methods.cash.label'), icon: 'dongsign', desc: t('modal.settle_up.methods.cash.desc') },
                 ].map((method) => {
                   const isSelected = selectedMethod === method.id;
                   return (
@@ -285,7 +286,7 @@ export default function SettleUpScreen() {
               isDisabled={createSettlement.isPending}
             >
               <Button.Label className="text-lg font-bold text-white">
-                {createSettlement.isPending ? 'Đang xử lý...' : 'Xác nhận thanh toán'}
+                {createSettlement.isPending ? t('modal.settle_up.processing') : t('modal.settle_up.confirm_btn')}
               </Button.Label>
             </Button>
           </>

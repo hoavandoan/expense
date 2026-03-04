@@ -5,38 +5,39 @@ import { AssigneeSelector } from "@/components/debt-assignment/assignee-selector
 import { CreateRequestModal } from "@/components/debt-assignment/create-request-modal";
 import { PendingRequestsList } from "@/components/debt-assignment/pending-requests-list";
 import {
-    AnimatedScrollView,
-    AnimatedScrollViewTitle,
-    AnimatedScrollViewTitleWrapper,
-    HeaderComponentWrapper,
-    HeaderNavBar,
+  AnimatedScrollView,
+  AnimatedScrollViewTitle,
+  AnimatedScrollViewTitleWrapper,
+  HeaderComponentWrapper,
+  HeaderNavBar,
 } from "@/components/parallax-header";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ExpenseCard } from "@/components/ui/expense-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { PendingSettlements } from "@/components/ui/pending-settlements";
 import {
-    useDebtAssignment,
-    useDisableDebtAssignment,
-    useGroup,
-    useMembersBalance,
-    useUserBalanceInGroup,
+  useDebtAssignment,
+  useDisableDebtAssignment,
+  useGroup,
+  useMembersBalance,
+  useUserBalanceInGroup,
 } from "@/lib/hooks";
+import { useTranslation } from "@/lib/hooks/use-translation";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { assignDebtsOptimized } from "@/lib/utils/debt-calculator";
 import { formatCurrency } from "@/lib/utils/format";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    Avatar,
-    Button,
-    Card,
-    cn,
-    Divider,
-    PressableFeedback,
-    Skeleton,
-    Tabs,
-    useThemeColor,
+  Avatar,
+  Button,
+  Card,
+  cn,
+  Divider,
+  PressableFeedback,
+  Skeleton,
+  Tabs,
+  useThemeColor,
 } from "heroui-native";
 import React, { useMemo, useState } from "react";
 import { RefreshControl, View } from "react-native";
@@ -51,6 +52,7 @@ interface MemberWithBalance {
 
 export default function GroupDetailScreen() {
   const { id } = useLocalSearchParams();
+  const { t, locale } = useTranslation();
   const router = useRouter();
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
@@ -168,8 +170,8 @@ export default function GroupDetailScreen() {
     return (
       <View className="flex-1 bg-background">
         <ErrorState
-          title="Không tìm thấy nhóm"
-          message="Nhóm này không tồn tại hoặc bạn không có quyền truy cập"
+          title={t("group_detail.not_found_title")}
+          message={t("group_detail.not_found_desc")}
           onRetry={() => refetch()}
         />
       </View>
@@ -293,7 +295,7 @@ export default function GroupDetailScreen() {
           <View className="flex-row gap-3 mb-8">
             <View className="bg-surface-secondary px-4 py-2 rounded-full border border-divider/10">
               <AppText className="text-muted text-[10px] font-bold uppercase tracking-widest">
-                THÀNH VIÊN: {groupData?.group_members?.length || 0}
+                {t("group_detail.members_label", { count: groupData?.group_members?.length || 0 })}
               </AppText>
             </View>
             <View
@@ -310,7 +312,7 @@ export default function GroupDetailScreen() {
                   userStats.balance >= 0 ? "text-success" : "text-danger"
                 )}
               >
-                {userStats.balance >= 0 ? "BẠN NHẬN LẠI" : "BẠN NỢ"}:{" "}
+                {userStats.balance >= 0 ? t("group_detail.you_receive") : t("group_detail.you_owe_label")}:{" "}
                 {formatCurrency(
                   Math.abs(userStats.balance),
                   group?.currency || "VND"
@@ -328,10 +330,10 @@ export default function GroupDetailScreen() {
               <View className="mb-6">
                 <View className="flex-row items-center justify-between mb-2">
                   <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest">
-                    TỔNG CHI NHÓM
+                    {t("group_detail.total_group_spent")}
                   </AppText>
                   <View className="bg-white/10 px-2 py-0.5 rounded-md border border-white/10">
-                    <AppText className="text-white/80 text-[10px] font-bold">NHÓM</AppText>
+                    <AppText className="text-white/80 text-[10px] font-bold">{t("group_detail.group_badge")}</AppText>
                   </View>
                 </View>
                 <AppText className="text-white text-4xl font-bold tracking-tighter" adjustsFontSizeToFit numberOfLines={1}>
@@ -347,7 +349,7 @@ export default function GroupDetailScreen() {
               <View className="flex-row gap-4">
                 <View className="flex-1">
                   <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">
-                    BẠN CHI
+                    {t("group_detail.you_spent")}
                   </AppText>
                   <AppText className="text-white text-xl font-bold" adjustsFontSizeToFit numberOfLines={1}>
                     {formatCurrency(
@@ -359,7 +361,7 @@ export default function GroupDetailScreen() {
                 <Divider orientation="vertical" className="bg-white/20" />
                 <View className="flex-1">
                   <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">
-                    {userStats.balance >= 0 ? "BẠN NHẬN LẠI" : "BẠN NỢ"}
+                    {userStats.balance >= 0 ? t("group_detail.you_receive") : t("group_detail.you_owe_label")}
                   </AppText>
                   <AppText className={cn("text-xl font-bold", userStats.balance >= 0 ? "text-success" : "text-danger")} adjustsFontSizeToFit numberOfLines={1}>
                     {formatCurrency(
@@ -380,7 +382,7 @@ export default function GroupDetailScreen() {
                   <View className="bg-white/10 p-4 rounded-2xl items-center justify-center border border-white/10">
                     <IconSymbol name="plus" size={20} color="white" />
                     <AppText className="text-white text-[10px] font-bold mt-1 uppercase">
-                      CHI TIÊU
+                      {t("group_detail.action_expense")}
                     </AppText>
                   </View>
                 </PressableFeedback>
@@ -393,7 +395,7 @@ export default function GroupDetailScreen() {
                   <View className="bg-white/10 p-4 rounded-2xl items-center justify-center border border-white/10">
                     <IconSymbol name="qrcode" size={20} color="white" />
                     <AppText className="text-white text-[10px] font-bold mt-1 uppercase">
-                      TẤT TOÁN
+                      {t("group_detail.action_settle")}
                     </AppText>
                   </View>
                 </PressableFeedback>
@@ -404,7 +406,7 @@ export default function GroupDetailScreen() {
                   <View className="bg-white/10 p-4 rounded-2xl items-center justify-center border border-white/10">
                     <IconSymbol name="chart.bar.fill" size={20} color="white" />
                     <AppText className="text-white text-[10px] font-bold mt-1 uppercase">
-                      BÁO CÁO
+                      {t("group_detail.action_report")}
                     </AppText>
                   </View>
                 </PressableFeedback>
@@ -428,7 +430,7 @@ export default function GroupDetailScreen() {
             <View className="mb-8">
                <View className="flex-row items-center justify-between mb-3">
                  <AppText className="text-xl font-bold text-foreground">
-                   Gán Nợ Trung Gian
+                   {t("group_detail.debt_assignment_title")}
                  </AppText>
                  {isOwnerOrAdmin && activeAssignment?.status === 'active' && (
                     <Button 
@@ -437,7 +439,7 @@ export default function GroupDetailScreen() {
                         onPress={() => setIsDisableConfirmOpen(true)}
                         isDisabled={isDisablingAssignment}
                     >
-                        <Button.Label className="text-danger font-bold text-xs">Tắt tính năng</Button.Label>
+                        <Button.Label className="text-danger font-bold text-xs">{t("group_detail.disable_feature")}</Button.Label>
                     </Button>
                  )}
                </View>
@@ -473,8 +475,8 @@ export default function GroupDetailScreen() {
                  ) : (
                    <View className="flex-row items-center justify-between">
                      <View>
-                        <AppText className="font-semibold text-muted">Chưa gán người nhận nợ</AppText>
-                        <AppText className="text-xs text-muted mt-1">Gán một người để đơn giản hóa việc trả nợ</AppText>
+                        <AppText className="font-semibold text-muted">{t("group_detail.no_assignee")}</AppText>
+                        <AppText className="text-xs text-muted mt-1">{t("group_detail.assignee_hint")}</AppText>
                      </View>
                      {isOwnerOrAdmin ? (
                         <Button 
@@ -482,7 +484,7 @@ export default function GroupDetailScreen() {
                             variant="primary" 
                             onPress={() => setAssigneeSelectorVisible(true)}
                         >
-                            <Button.Label className="text-white font-bold">Thiết lập</Button.Label>
+                            <Button.Label className="text-white font-bold">{t("group_detail.setup")}</Button.Label>
                         </Button>
                      ) : (
                         <Button 
@@ -490,7 +492,7 @@ export default function GroupDetailScreen() {
                             variant="ghost"
                             onPress={() => setCreateRequestVisible(true)}
                         >
-                             <Button.Label className="text-primary font-bold">Đề xuất</Button.Label>
+                             <Button.Label className="text-primary font-bold">{t("group_detail.propose")}</Button.Label>
                         </Button>
                      )}
                    </View>
@@ -508,14 +510,14 @@ export default function GroupDetailScreen() {
                   <Tabs.Trigger value="expenses" className="flex-1 py-2.5 rounded-xl">
                     {({ isSelected }) => (
                       <Tabs.Label className={cn("text-sm font-bold", isSelected ? "text-foreground" : "text-muted")}>
-                        Khoản chi
+                        {t("group_detail.tab_expenses")}
                       </Tabs.Label>
                     )}
                   </Tabs.Trigger>
                   <Tabs.Trigger value="summary" className="flex-1 py-2.5 rounded-xl">
                     {({ isSelected }) => (
                       <Tabs.Label className={cn("text-sm font-bold", isSelected ? "text-foreground" : "text-muted")}>
-                        Tổng kết
+                        {t("group_detail.tab_summary")}
                       </Tabs.Label>
                     )}
                   </Tabs.Trigger>
@@ -526,7 +528,7 @@ export default function GroupDetailScreen() {
               <Tabs.Content value="expenses" className="mt-6">
                 <View className="flex-row items-center justify-between mb-6">
                   <AppText className="text-xl font-bold text-foreground">
-                    Khoản chi gần đây
+                    {t("group_detail.recent_expenses")}
                   </AppText>
                   <Button
                     size="sm"
@@ -534,7 +536,7 @@ export default function GroupDetailScreen() {
                     onPress={() => router.push(`/group/${id}/expenses` as any)}
                   >
                     <Button.Label className="text-foreground font-bold text-sm">
-                      Xem tất cả
+                      {t("group_detail.view_all")}
                     </Button.Label>
                   </Button>
                 </View>
@@ -542,7 +544,7 @@ export default function GroupDetailScreen() {
                 <View className="gap-4">
                   {groupData?.expenses?.length === 0 ? (
                     <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
-                      <AppText className="text-muted">Chưa có khoản chi nào</AppText>
+                      <AppText className="text-muted">{t("group_detail.no_expenses")}</AppText>
                     </View>
                   ) : (
                     groupData?.expenses?.slice(0, 5).map((expense: any) => (
@@ -565,7 +567,7 @@ export default function GroupDetailScreen() {
                 <View className="mb-6">
                   <View className="flex-row items-center justify-between mb-6">
                     <AppText className="text-xl font-bold text-foreground">
-                      {showDetailedDebts ? "Chi tiết nợ nần" : "Đề xuất thanh toán"}
+                      {showDetailedDebts ? t("group_detail.debt_details") : t("group_detail.settlement_suggestions")}
                     </AppText>
                     <Button 
                       size="sm" 
@@ -573,7 +575,7 @@ export default function GroupDetailScreen() {
                       onPress={() => setShowDetailedDebts(!showDetailedDebts)}
                     >
                       <Button.Label className="text-accent font-bold text-sm">
-                        {showDetailedDebts ? "Tóm tắt" : "Chi tiết"}
+                        {showDetailedDebts ? t("group_detail.summary_small") : t("group_detail.details_small")}
                       </Button.Label>
                     </Button>
                   </View>
@@ -582,7 +584,7 @@ export default function GroupDetailScreen() {
                     {showDetailedDebts ? (
                       individualDebts.length === 0 ? (
                         <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
-                          <AppText className="text-muted">Không có khoản nợ nào</AppText>
+                          <AppText className="text-muted">{t("group_detail.no_debts")}</AppText>
                         </View>
                       ) : (
                         individualDebts.map((debt: any) => {
@@ -606,11 +608,11 @@ export default function GroupDetailScreen() {
                                     <Avatar.Fallback><AppText className="text-[8px]">{fromMember?.name?.charAt(0)}</AppText></Avatar.Fallback>
                                   </Avatar>
                                   <AppText className="font-bold text-sm">
-                                    {debt.fromId === user?.id ? "Bạn" : fromMember?.name}
+                                    {debt.fromId === user?.id ? t("group_card.you") : fromMember?.name}
                                   </AppText>
-                                  <AppText className="text-danger font-bold mx-1 text-[10px]">NỢ</AppText>
+                                  <AppText className="text-danger font-bold mx-1 text-[10px]">{t("group_detail.owes")}</AppText>
                                   <AppText className="font-bold text-sm">
-                                    {debt.toId === user?.id ? "Bạn" : toMember?.name}
+                                    {debt.toId === user?.id ? t("group_card.you") : toMember?.name}
                                   </AppText>
                                 </View>
                                 <AppText className="font-bold text-danger">
@@ -619,10 +621,10 @@ export default function GroupDetailScreen() {
                               </View>
                               <View className="flex-row items-center justify-between">
                                 <AppText className="text-muted text-xs italic" numberOfLines={1}>
-                                  cho {debt.description}
+                                  {t("group_detail.for")} {debt.description}
                                 </AppText>
                                 <AppText className="text-muted text-[10px]">
-                                  {new Date(debt.date).toLocaleDateString("vi-VN")}
+                                  {new Date(debt.date).toLocaleDateString(locale === "vi" ? "vi-VN" : "en-US")}
                                 </AppText>
                               </View>
                             </Card>
@@ -632,7 +634,7 @@ export default function GroupDetailScreen() {
                     ) : (
                       optimizedDebts.length === 0 ? (
                         <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
-                          <AppText className="text-muted">Tất cả nợ đã được tất toán!</AppText>
+                          <AppText className="text-muted">{t("group_detail.all_settled")}</AppText>
                         </View>
                       ) : (
                         optimizedDebts.map((debt, index) => {
@@ -657,7 +659,7 @@ export default function GroupDetailScreen() {
                                       <Avatar.Fallback><AppText className="text-[8px]">{fromMember?.name?.charAt(0)}</AppText></Avatar.Fallback>
                                     </Avatar>
                                     <AppText className="text-[10px] font-bold text-foreground" numberOfLines={1}>
-                                      {debt.from === user?.id ? "Bạn" : fromMember?.name}
+                                      {debt.from === user?.id ? t("group_card.you") : fromMember?.name}
                                     </AppText>
                                   </View>
                                   
@@ -682,7 +684,7 @@ export default function GroupDetailScreen() {
                                       <Avatar.Fallback><AppText className="text-[8px]">{toMember?.name?.charAt(0)}</AppText></Avatar.Fallback>
                                     </Avatar>
                                     <AppText className="text-[10px] font-bold text-foreground" numberOfLines={1}>
-                                      {debt.to === user?.id ? "Bạn" : toMember?.name}
+                                      {debt.to === user?.id ? t("group_card.you") : toMember?.name}
                                     </AppText>
                                   </View>
                                 </View>
@@ -720,10 +722,10 @@ export default function GroupDetailScreen() {
       <ConfirmDialog
         isOpen={isDisableConfirmOpen}
         onOpenChange={setIsDisableConfirmOpen}
-        title="Tắt Gán Nợ Trung Gian"
-        description="Bạn có chắc chắn muốn tắt tính năng này? Các khoản nợ sẽ được tính toán lại theo cách tối ưu hóa thông thường."
-        confirmLabel="Tắt"
-        cancelLabel="Hủy"
+        title={t("group_detail.disable_assignment_title")}
+        description={t("group_detail.disable_assignment_desc")}
+        confirmLabel={t("group_detail.disable_feature")}
+        cancelLabel={t("cancel")}
         onConfirm={handleDisableAssignment}
         variant="danger"
         isLoading={isDisablingAssignment}

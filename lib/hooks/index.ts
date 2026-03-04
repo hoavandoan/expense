@@ -56,4 +56,5 @@ export {
   useRejectSettlement,
   useSettlements
 } from "./use-settlements";
+export { useTranslation } from "./use-translation";
 

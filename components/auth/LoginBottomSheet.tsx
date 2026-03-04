@@ -1,4 +1,4 @@
-import { useAuth } from '@/lib/hooks';
+import { useAuth, useTranslation } from '@/lib/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheet, Button, Divider, useThemeColor } from 'heroui-native';
 import React from 'react';
@@ -18,6 +18,7 @@ interface LoginBottomSheetProps {
  */
 export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps) => {
   const { setUser } = useAuth();
+  const { t } = useTranslation();
   const background = useThemeColor('background');
   const foreground = useThemeColor('foreground');
   const insets = useSafeAreaInsets();
@@ -59,9 +60,9 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
         >
           {/* Header */}
           <View className="items-center mb-8 mt-4">
-            <AppText className="text-black text-2xl font-bold mb-2">Chào mừng bạn!</AppText>
+            <AppText className="text-black text-2xl font-bold mb-2">{t('auth.login.welcome')}</AppText>
             <AppText className="text-muted text-center px-4">
-              Đăng nhập để đồng bộ dữ liệu chi tiêu và kết nối cùng bạn bè.
+              {t('auth.login.description')}
             </AppText>
           </View>
 
@@ -81,7 +82,7 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
                   className="font-bold text-[17px]"
                   style={{ color: '#FFFFFF' }}
                 >
-                  Tiếp tục với Apple
+                  {t('auth.login.continue_with_apple')}
                 </Button.Label>
               </View>
             </Button>
@@ -94,7 +95,7 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
               <View className="flex-row items-center gap-3">
                 <Ionicons name="logo-google" size={20} color={foreground} />
                 <Button.Label className="font-bold text-[17px]">
-                  Tiếp tục với Google
+                  {t('auth.login.continue_with_google')}
                 </Button.Label>
               </View>
             </Button>
@@ -104,7 +105,7 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
           <View className="mt-10 items-center">
             <Divider className="w-12 mb-6 opacity-30" />
             <AppText className="text-[11px] text-muted/50 text-center px-10 leading-4">
-              Bằng cách tiếp tục, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của chúng tôi.
+              {t('auth.login.terms_agreement')}
             </AppText>
           </View>
         </BottomSheet.Content>

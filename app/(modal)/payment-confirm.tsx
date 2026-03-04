@@ -1,5 +1,6 @@
 import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useTranslation } from '@/lib/hooks';
 import { useRouter } from 'expo-router';
 import { Button, useThemeColor } from 'heroui-native';
 import React, { useEffect } from 'react';
@@ -8,6 +9,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring } fro
 
 export default function PaymentConfirmScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const accent = useThemeColor('accent');
 
   const scale = useSharedValue(0);
@@ -37,9 +39,9 @@ export default function PaymentConfirmScreen() {
       </Animated.View>
 
       <Animated.View style={[animatedTextStyle]} className="items-center">
-        <AppText className="text-3xl font-bold text-center mb-2">Thành công!</AppText>
+        <AppText className="text-3xl font-bold text-center mb-2">{t('modal.payment_confirm.success')}</AppText>
         <AppText className="text-muted text-center text-lg mb-12">
-          Giao dịch đã được ghi nhận.{"\n"}Số dư nhóm đã cập nhật.
+          {t('modal.payment_confirm.desc')}
         </AppText>
 
         <Button
@@ -47,7 +49,7 @@ export default function PaymentConfirmScreen() {
           className="h-16 rounded-2xl bg-accent px-12 shadow-xl shadow-accent/20"
           onPress={() => router.dismissAll()}
         >
-          <Button.Label className="text-lg font-bold text-white">Quay về trang chủ</Button.Label>
+          <Button.Label className="text-lg font-bold text-white">{t('modal.payment_confirm.home_btn')}</Button.Label>
         </Button>
       </Animated.View>
     </View>

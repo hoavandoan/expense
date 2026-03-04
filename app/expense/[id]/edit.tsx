@@ -6,6 +6,7 @@ import { EXPENSE_CATEGORIES } from "@/constants";
 import {
   useExpense,
   useGroup,
+  useTranslation,
   useUpdateExpense,
 } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
@@ -36,17 +37,17 @@ import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
 import * as z from "zod";
 
-const expenseSchema = z.object({
-  title: z.string().min(1, "Vui lòng nhập mô tả chi tiêu"),
+const getExpenseSchema = (t: any) => z.object({
+  title: z.string().min(1, t('expense_edit.validation_title', { defaultValue: "Vui lòng nhập mô tả chi tiêu" })),
   amount: z
     .string()
-    .min(1, "Vui lòng nhập số tiền")
+    .min(1, t('expense_edit.validation_amount', { defaultValue: "Vui lòng nhập số tiền" }))
     .refine(
       (val) => {
         const num = parseInt(val.replace(/\D/g, ""));
         return num > 0;
       },
-      { message: "Số tiền phải lớn hơn 0" }
+      { message: t('expense_edit.validation_amount_positive', { defaultValue: "Số tiền phải lớn hơn 0" }) }
     ),
   category: z.enum([
     "food",
@@ -54,18 +55,20 @@ const expenseSchema = z.object({
     "shopping",
     "entertainment",
     "utilities",
+    "gift",
     "other",
   ]),
-  paidById: z.string().min(1, "Vui lòng chọn người trả tiền"),
+  paidById: z.string().min(1, t('expense_edit.validation_payer', { defaultValue: "Vui lòng chọn người trả tiền" })),
   participantIds: z
     .array(z.string())
-    .min(1, "Vui lòng chọn ít nhất một người tham gia"),
+    .min(1, t('expense_edit.validation_participants', { defaultValue: "Vui lòng chọn ít nhất một người tham gia" })),
   notes: z.string().optional(),
 });
 
-type ExpenseFormValues = z.infer<typeof expenseSchema>;
+type ExpenseFormValues = z.infer<ReturnType<typeof getExpenseSchema>>;
 
 export default function EditExpenseScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const muted = useThemeColor("muted");
@@ -84,6 +87,8 @@ export default function EditExpenseScreen() {
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
   const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
 
+  const schema = useMemo(() => getExpenseSchema(t), [t]);
+
   const {
     control,
     handleSubmit,
@@ -91,7 +96,7 @@ export default function EditExpenseScreen() {
     setValue,
     formState: { errors, isValid },
   } = useForm<ExpenseFormValues>({
-    resolver: zodResolver(expenseSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       participantIds: [],
     },
@@ -131,6 +136,7 @@ export default function EditExpenseScreen() {
           | "shopping"
           | "entertainment"
           | "utilities"
+          | "gift"
           | "other"
       );
       setValue("notes", expense.description || "");
@@ -221,28 +227,29 @@ export default function EditExpenseScreen() {
           | "shopping"
           | "entertainment"
           | "utilities"
-          | "other",
+          | "other"
+          | "gift",
         description: values.notes || undefined,
         receiptUrl,
         splits,
       });
 
       toast.show({
-        label: "Đã cập nhật",
-        description: "Thông tin chi tiêu đã được lưu thành công",
+        label: t('expense_edit.update_success_title', { defaultValue: "Đã cập nhật" }),
+        description: t('expense_edit.update_success_desc', { defaultValue: "Thông tin chi tiêu đã được lưu thành công" }),
         variant: "success",
         icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
-        actionLabel: "OK",
+        actionLabel: t('expense_edit.ok', { defaultValue: "OK" }),
         onActionPress: ({ hide }) => hide(),
       });
       router.back();
     } catch (error: any) {
       toast.show({
-        label: "Lỗi cập nhật",
-        description: error.message || "Đã có lỗi xảy ra khi lưu thay đổi",
+        label: t('expense_edit.update_error_title', { defaultValue: "Lỗi cập nhật" }),
+        description: error.message || t('expense_edit.update_error_desc', { defaultValue: "Đã có lỗi xảy ra khi lưu thay đổi" }),
         variant: "danger",
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: "Thử lại",
+        actionLabel: t('expense_edit.retry', { defaultValue: "Thử lại" }),
         onActionPress: ({ hide }) => hide(),
       });
     } finally {
@@ -264,7 +271,7 @@ export default function EditExpenseScreen() {
     return (
       <View className="flex-1 bg-background items-center justify-center p-6">
         <AppText className="text-lg font-bold">
-          Không tìm thấy khoản chi
+          {t('expense_edit.not_found', { defaultValue: "Không tìm thấy khoản chi" })}
         </AppText>
       </View>
     );
@@ -274,13 +281,13 @@ export default function EditExpenseScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ModalHeader title="Chỉnh sửa chi tiêu" variant="back" />
+      <ModalHeader title={t('expense_edit.title', { defaultValue: "Chỉnh sửa chi tiêu" })} variant="back" />
 
       <ScreenScrollView withKeyboardAvoidingView>
         <View className="p-6 gap-6">
           {/* Category Selection */}
           <TextField isRequired isInvalid={!!errors.category}>
-            <TextField.Label className="mb-3 ml-1">DANH MỤC</TextField.Label>
+            <TextField.Label className="mb-3 ml-1">{t('expense_edit.category', { defaultValue: "DANH MỤC" })}</TextField.Label>
             <View className="flex-row flex-wrap gap-3">
               {EXPENSE_CATEGORIES.map((category) => {
                 const isSelected = categoryValue === category.value;
@@ -336,9 +343,9 @@ export default function EditExpenseScreen() {
               name="title"
               render={({ field: { onChange, value } }) => (
                 <TextField isRequired isInvalid={!!errors.title}>
-                  <TextField.Label className="mb-3 ml-1">MÔ TẢ</TextField.Label>
+                  <TextField.Label className="mb-3 ml-1">{t('expense_edit.description_label', { defaultValue: "MÔ TẢ" })}</TextField.Label>
                   <TextField.Input
-                    placeholder="Nhập mô tả chi tiêu"
+                    placeholder={t('expense_edit.description_placeholder', { defaultValue: "Nhập mô tả chi tiêu" })}
                     value={value}
                     onChangeText={onChange}
                     className="bg-surface border border-divider/10 h-14 rounded-2xl px-4"
@@ -360,7 +367,7 @@ export default function EditExpenseScreen() {
               name="amount"
               render={({ field: { onChange, value } }) => (
                 <TextField isRequired isInvalid={!!errors.amount}>
-                  <TextField.Label className="mb-3 ml-1">SỐ TIỀN</TextField.Label>
+                  <TextField.Label className="mb-3 ml-1">{t('expense_edit.amount_label', { defaultValue: "SỐ TIỀN" })}</TextField.Label>
                   <View className="justify-center">
                     <TextField.Input
                       placeholder="0"
@@ -388,14 +395,14 @@ export default function EditExpenseScreen() {
             />
             {amountValue && participantIds.length > 0 && (
               <AppText className="text-muted text-xs mt-1 ml-1">
-                Chia đều: {formatCurrency(splitAmount, currency)} mỗi người
+                {t('expense_edit.split_equally', { amount: formatCurrency(splitAmount, currency), defaultValue: `Chia đều: ${formatCurrency(splitAmount, currency)} mỗi người` })}
               </AppText>
             )}
           </View>
 
           {/* Payer Selection */}
           <TextField isRequired isInvalid={!!errors.paidById}>
-            <TextField.Label className="mb-3 ml-1">NGƯỜI TRẢ TIỀN</TextField.Label>
+            <TextField.Label className="mb-3 ml-1">{t('expense_edit.payer_label', { defaultValue: "NGƯỜI TRẢ TIỀN" })}</TextField.Label>
             <Controller
               control={control}
               name="paidById"
@@ -403,7 +410,7 @@ export default function EditExpenseScreen() {
                 const selectedPayer = members.find((m) => m.id === value);
                 const payerOptions = members.map((m) => ({
                   value: m.id,
-                  label: m.id === user?.id ? "Bạn" : m.name,
+                  label: m.id === user?.id ? t('expense_edit.you', { defaultValue: "Bạn" }) : m.name,
                   initial: m.name.charAt(0),
                 }));
                 const currentPayerOption = payerOptions.find(
@@ -423,7 +430,7 @@ export default function EditExpenseScreen() {
                         </View>
                         <Select.Value
                           className="text-base font-medium"
-                          placeholder="Chọn người trả"
+                          placeholder={t('expense_edit.select_payer', { defaultValue: "Chọn người trả" })}
                         />
                       </View>
                       <IconSymbol
@@ -469,7 +476,7 @@ export default function EditExpenseScreen() {
           {/* Participants Selection */}
           <TextField isRequired isInvalid={!!errors.participantIds}>
             <TextField.Label className="mb-3 ml-1">
-              NGƯỜI THAM GIA ({participantIds.length})
+              {t('expense_edit.participants_label', { count: participantIds.length, defaultValue: `NGƯỜI THAM GIA (${participantIds.length})` })}
             </TextField.Label>
             <Card className="rounded-2xl border border-divider/10 bg-surface overflow-hidden">
               {members.map((member, index) => {
@@ -506,7 +513,7 @@ export default function EditExpenseScreen() {
                             !isSelected ? "text-muted opacity-50" : ""
                           }`}
                         >
-                          {member.id === user?.id ? "Bạn" : member.name}
+                          {member.id === user?.id ? t('expense_edit.you', { defaultValue: "Bạn" }) : member.name}
                         </AppText>
                       </View>
                       {isSelected && amountValue && (
@@ -536,9 +543,9 @@ export default function EditExpenseScreen() {
               name="notes"
               render={({ field: { onChange, value } }) => (
                 <TextField>
-                  <TextField.Label className="mb-3 ml-1">GHI CHÚ (TÙY CHỌN)</TextField.Label>
+                  <TextField.Label className="mb-3 ml-1">{t('expense_edit.notes_label', { defaultValue: "GHI CHÚ (TÙY CHỌN)" })}</TextField.Label>
                   <TextField.Input
-                    placeholder="Thêm ghi chú..."
+                    placeholder={t('expense_edit.notes_placeholder', { defaultValue: "Thêm ghi chú..." })}
                     value={value}
                     onChangeText={onChange}
                     multiline
@@ -553,7 +560,7 @@ export default function EditExpenseScreen() {
           {/* Receipt Upload */}
           <View>
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
-              ẢNH HÓA ĐƠN (TÙY CHỌN)
+              {t('expense_edit.receipt_label', { defaultValue: "ẢNH HÓA ĐƠN (TÙY CHỌN)" })}
             </AppText>
             {selectedReceipt ? (
               <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
@@ -581,7 +588,7 @@ export default function EditExpenseScreen() {
                   className="p-4 border-t border-divider/10"
                 >
                   <AppText className="text-accent text-center font-semibold">
-                    Thay đổi ảnh
+                    {t('expense_edit.change_image', { defaultValue: "Thay đổi ảnh" })}
                   </AppText>
                 </PressableFeedback>
               </Card>
@@ -592,10 +599,10 @@ export default function EditExpenseScreen() {
                     <IconSymbol name="camera.fill" size={32} color={accent} />
                   </View>
                   <AppText className="text-accent font-semibold text-base">
-                    Tải lên ảnh hóa đơn
+                    {t('expense_edit.upload_image', { defaultValue: "Tải lên ảnh hóa đơn" })}
                   </AppText>
                   <AppText className="text-muted text-xs mt-1">
-                    Chụp hoặc chọn từ thư viện
+                    {t('expense_edit.upload_desc', { defaultValue: "Chụp hoặc chọn từ thư viện" })}
                   </AppText>
                 </Card>
               </PressableFeedback>
@@ -617,7 +624,7 @@ export default function EditExpenseScreen() {
               <Spinner size="sm" color="white" />
             ) : (
               <Button.Label className="text-lg font-bold text-white">
-                Lưu thay đổi
+                {t('expense_edit.save', { defaultValue: "Lưu thay đổi" })}
               </Button.Label>
             )}
           </Button>

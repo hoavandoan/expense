@@ -5,19 +5,19 @@ import { ErrorState } from "@/components/ui/error-state";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
 import { CATEGORY_CONFIG } from "@/constants";
-import { useDeleteExpense, useExpense } from "@/lib/hooks";
+import { useDeleteExpense, useExpense, useTranslation } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatCurrency } from "@/lib/utils";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    Avatar,
-    Button,
-    Card,
-    Divider,
-    Spinner,
-    useThemeColor,
-    useToast,
+  Avatar,
+  Button,
+  Card,
+  Divider,
+  Spinner,
+  useThemeColor,
+  useToast,
 } from "heroui-native";
 import React, { useState } from "react";
 import { View } from "react-native";
@@ -43,6 +43,7 @@ const formatDate = (dateString: string): string => {
 };
 
 export default function ExpenseDetailScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const accent = useThemeColor("accent");
@@ -64,8 +65,8 @@ export default function ExpenseDetailScreen() {
         groupId: expense.groupId,
       });
       toast.show({
-        label: "Đã xóa",
-        description: "Khoản chi tiêu đã được gỡ bỏ khỏi nhóm",
+        label: t('expense_detail.delete_success_title', { defaultValue: "Đã xóa" }),
+        description: t('expense_detail.delete_success_desc', { defaultValue: "Khoản chi tiêu đã được gỡ bỏ khỏi nhóm" }),
         variant: "success",
         icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
         actionLabel: "OK",
@@ -74,11 +75,11 @@ export default function ExpenseDetailScreen() {
       router.back();
     } catch (error: any) {
       toast.show({
-        label: "Lỗi xóa",
-        description: error.message || "Không thể xóa khoản chi lúc này",
+        label: t('expense_detail.delete_error_title', { defaultValue: "Lỗi xóa" }),
+        description: error.message || t('expense_detail.delete_error_desc', { defaultValue: "Không thể xóa khoản chi lúc này" }),
         variant: "danger",
         icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: "Thử lại",
+        actionLabel: t('expense_edit.retry', { defaultValue: "Thử lại" }),
         onActionPress: ({ hide }) => hide(),
       });
     }
@@ -100,11 +101,11 @@ export default function ExpenseDetailScreen() {
   if (error || !expense) {
     return (
       <View className="flex-1 bg-background">
-        <StickyHeader title="Chi tiết chi tiêu" />
+        <StickyHeader title={t('expense_detail.title', { defaultValue: "Chi tiết chi tiêu" })} />
         <ErrorState
-          title="Không thể tải chi tiết"
+          title={t('expense_detail.error_title', { defaultValue: "Không thể tải chi tiết" })}
           message={
-            error instanceof Error ? error.message : "Khoản chi không tồn tại"
+            error instanceof Error ? error.message : t('expense_detail.error_not_found', { defaultValue: "Khoản chi không tồn tại" })
           }
           onRetry={() => refetch()}
         />
@@ -122,7 +123,7 @@ export default function ExpenseDetailScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <StickyHeader title="Chi tiết chi tiêu" />
+      <StickyHeader title={t('expense_detail.title', { defaultValue: "Chi tiết chi tiêu" })} />
 
       <ScreenScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         <View className="py-6 pb-8 items-center bg-background border-b border-divider/10">
@@ -167,9 +168,9 @@ export default function ExpenseDetailScreen() {
               </Avatar>
             )}
             <AppText className="text-xs font-medium">
-              Trả bởi{" "}
+              {t('expense_detail.paid_by', { defaultValue: 'Trả bởi' })}{" "}
               <AppText className="font-bold">
-                {paidByUser?.name || "Người dùng"}
+                {paidByUser?.name || t('expense_detail.default_user', { defaultValue: 'Người dùng' })}
               </AppText>{" "}
               • {formatDate(expense.createdAt)}
             </AppText>
@@ -180,7 +181,7 @@ export default function ExpenseDetailScreen() {
           {expense.description && (
             <View className="mb-10">
               <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
-                MÔ TẢ
+                {t('expense_detail.description', { defaultValue: 'MÔ TẢ' })}
               </AppText>
               <AppText className="text-base text-foreground/80 leading-relaxed px-1">
                 {expense.description}
@@ -191,7 +192,7 @@ export default function ExpenseDetailScreen() {
           {splits.length > 0 && (
             <View className="mb-10">
               <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
-                CHIA CHO {splits.length} NGƯỜI
+                {t('expense_detail.split_for', { count: splits.length, defaultValue: `CHIA CHO ${splits.length} NGƯỜI` })}
               </AppText>
               <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
                 {splits.map((split: any, idx: number) => {
@@ -223,7 +224,7 @@ export default function ExpenseDetailScreen() {
                             </Avatar>
                           )}
                           <AppText className="font-bold">
-                            {isMe ? "Bạn" : splitUser.name || "Thành viên"}
+                            {isMe ? t('expense_detail.you', { defaultValue: "Bạn" }) : splitUser.name || t('expense_detail.member', { defaultValue: "Thành viên" })}
                           </AppText>
                         </View>
                         <View className="items-end">
@@ -235,7 +236,7 @@ export default function ExpenseDetailScreen() {
                               isPaid ? "text-success" : "text-muted"
                             }`}
                           >
-                            {isPaid ? "Đã trả" : "Chưa trả"}
+                            {isPaid ? t('expense_detail.paid', { defaultValue: "Đã trả" }) : t('expense_detail.unpaid', { defaultValue: "Chưa trả" })}
                           </AppText>
                         </View>
                       </View>
@@ -252,7 +253,7 @@ export default function ExpenseDetailScreen() {
           {expense.receiptUrl && (
             <View className="mb-10">
               <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
-                ẢNH HÓA ĐƠN
+                {t('expense_detail.receipt', { defaultValue: 'ẢNH HÓA ĐƠN' })}
               </AppText>
               <Card className="h-60 rounded-2xl overflow-hidden bg-surface border border-divider/10 shadow-sm">
                 <Image
@@ -271,14 +272,14 @@ export default function ExpenseDetailScreen() {
                 onPress={handleEdit}
                 className="flex-1"
               >
-                  Chỉnh sửa
+                  {t('expense_detail.edit', { defaultValue: 'Chỉnh sửa' })}
               </Button>
               <Button
                 variant="danger"
                 onPress={() => setShowDeleteDialog(true)}
                 className="flex-1"
               >
-                  Xóa
+                  {t('expense_detail.delete', { defaultValue: 'Xóa' })}
               </Button>
             </View>
           )}
@@ -288,10 +289,10 @@ export default function ExpenseDetailScreen() {
       <ConfirmDialog
         isOpen={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
-        title="Xóa khoản chi"
-        description={`Bạn có chắc chắn muốn xóa khoản chi "${expense.title}"? Hành động này không thể hoàn tác.`}
-        confirmLabel="Xóa"
-        cancelLabel="Hủy"
+        title={t('expense_detail.delete_dialog_title', { defaultValue: 'Xóa khoản chi' })}
+        description={t('expense_detail.delete_dialog_desc', { title: expense.title, defaultValue: `Bạn có chắc chắn muốn xóa khoản chi "${expense.title}"? Hành động này không thể hoàn tác.` })}
+        confirmLabel={t('expense_detail.delete', { defaultValue: 'Xóa' })}
+        cancelLabel={t('expense_detail.cancel', { defaultValue: 'Hủy' })}
         variant="danger"
         isLoading={deleteExpense.isPending}
         onConfirm={handleDelete}

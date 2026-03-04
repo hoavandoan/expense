@@ -1,4 +1,5 @@
 import { AppText } from "@/components/app-text";
+import { useTranslation } from "@/lib/hooks/use-translation";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Avatar, Card, cn } from "heroui-native";
@@ -47,6 +48,7 @@ export const GroupCard: FC<GroupCardProps> = ({
   index = 0,
   scrollX,
 }) => {
+  const { t, locale } = useTranslation();
   const scale = useSharedValue(1);
   const { width } = useWindowDimensions();
 
@@ -132,9 +134,7 @@ export const GroupCard: FC<GroupCardProps> = ({
 
               <View>
                 <AppText 
-                  variant="heading" 
-                  weight="bold" 
-                  className="text-white text-2xl mb-3"
+                  className="text-white text-2xl font-bold mb-3"
                   numberOfLines={1}
                 >
                   {title}
@@ -162,7 +162,7 @@ export const GroupCard: FC<GroupCardProps> = ({
                             />
                           </Avatar.Image>
                           <Avatar.Fallback className="bg-accent/40">
-                            <AppText weight="bold" className="text-[10px] text-white">
+                            <AppText className="text-[10px] text-white font-bold">
                               {member.name.charAt(0)}
                             </AppText>
                           </Avatar.Fallback>
@@ -170,7 +170,7 @@ export const GroupCard: FC<GroupCardProps> = ({
                       ))}
                       {memberCount > 3 && (
                         <View className="size-8 rounded-full bg-white/20 border border-white/20 items-center justify-center -ml-3 z-0">
-                          <AppText weight="bold" className="text-[10px] text-white">
+                          <AppText className="text-[10px] text-white font-bold">
                             +{memberCount - 3}
                           </AppText>
                         </View>
@@ -180,15 +180,12 @@ export const GroupCard: FC<GroupCardProps> = ({
 
                   <View className="items-end bg-black/40 px-3.5 py-1.5 rounded-full border border-white/20">
                     <AppText
-                      weight="bold"
-                      className="text-white/60 text-[8px] uppercase tracking-widest mb-0.5"
+                      className="text-white/60 text-[8px] uppercase tracking-widest mb-0.5 font-bold"
                     >
-                      Tổng chi
+                      {t("group_card.total_spent")}
                     </AppText>
                     <AppText
-                      variant="heading"
-                      weight="bold"
-                      className={cn("text-sm", balanceColor)}
+                      className={cn("text-sm font-bold", balanceColor)}
                     >
                       {balanceText}
                     </AppText>
@@ -203,8 +200,12 @@ export const GroupCard: FC<GroupCardProps> = ({
   }
 
   const balanceDisplay = isPositive
-    ? `Bạn được trả: ${balance.toLocaleString()}đ`
-    : `Bạn nợ: ${Math.abs(balance).toLocaleString()}đ`;
+    ? t("group_card.you_are_owed", {
+        amount: balance.toLocaleString(locale === "vi" ? "vi-VN" : "en-US") + (locale === "vi" ? "đ" : ""),
+      })
+    : t("group_card.you_owe", {
+        amount: Math.abs(balance).toLocaleString(locale === "vi" ? "vi-VN" : "en-US") + (locale === "vi" ? "đ" : ""),
+      });
 
   return (
     <Animated.View style={animatedStyle}>
@@ -219,11 +220,11 @@ export const GroupCard: FC<GroupCardProps> = ({
           className="flex-row items-center justify-between"
         >
           <View className="flex-1 mr-4">
-            <AppText variant="heading" weight="bold" className="text-lg mb-1">
+            <AppText className="text-lg font-bold mb-1">
               {title}
             </AppText>
-            <AppText weight="medium" className="text-muted text-xs mb-3">
-              {memberCount} thành viên
+            <AppText className="text-muted text-xs mb-3 font-medium">
+              {t("group_card.member_count", { count: memberCount })}
             </AppText>
 
             <View className="flex-row items-center">
@@ -247,7 +248,7 @@ export const GroupCard: FC<GroupCardProps> = ({
                     </Avatar.Image>
                   ) : (
                     <Avatar.Fallback className="bg-accent/10">
-                      <AppText weight="bold" className="text-xs text-accent">
+                      <AppText className="text-xs text-accent font-bold">
                         {member.name.charAt(0)}
                       </AppText>
                     </Avatar.Fallback>
@@ -256,7 +257,7 @@ export const GroupCard: FC<GroupCardProps> = ({
               ))}
               {memberCount > 4 && (
                 <View className="w-8 h-8 rounded-full bg-surface-secondary border-2 border-surface items-center justify-center -ml-3">
-                  <AppText weight="bold" className="text-[10px] text-muted">
+                  <AppText className="text-[10px] text-muted font-bold">
                     +{memberCount - 4}
                   </AppText>
                 </View>
@@ -265,7 +266,7 @@ export const GroupCard: FC<GroupCardProps> = ({
           </View>
 
           <View className="items-end bg-accent-soft px-4 py-2 rounded-2xl">
-            <AppText weight="bold" className={cn("text-sm", balanceColor)}>
+            <AppText className={cn("text-sm font-bold", balanceColor)}>
               {balanceDisplay}
             </AppText>
           </View>

@@ -2,6 +2,7 @@ import { ActivityItem } from "@/components/activity-item";
 import { AppText } from "@/components/app-text";
 import { EmptyState } from "@/components/ui/empty-state";
 import { CATEGORY_CONFIG } from "@/constants";
+import { useTranslation } from "@/lib/hooks";
 import { formatCurrency } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
@@ -18,6 +19,7 @@ interface RecentActivityProps {
 
 export const RecentActivity = ({ expenses, isLoading, userId }: RecentActivityProps) => {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const renderItem = useCallback(({ item, index }: { item: any, index: number }) => {
     const categoryConfig = CATEGORY_CONFIG[item.category] || CATEGORY_CONFIG.other;
@@ -29,11 +31,11 @@ export const RecentActivity = ({ expenses, isLoading, userId }: RecentActivityPr
         className="mb-3"
       >
         <ActivityItem
-          userName={isMe ? "Bạn" : item.paid_by_user?.name || "Ai đó"}
+          userName={isMe ? t('home.you') : item.paid_by_user?.name || t('home.someone')}
           userAvatar={item.paid_by_user?.avatar_url || ""}
-          action="đã thêm"
+          action={t('home.recent_activity.added')}
           subject={item.title}
-          groupName={item.group?.name || "Nhóm"}
+          groupName={item.group?.name || t('home.recent_activity.group')}
           groupIcon="person.3.fill"
           amount={formatCurrency(
             item.amount,
@@ -47,7 +49,7 @@ export const RecentActivity = ({ expenses, isLoading, userId }: RecentActivityPr
         />
       </Animated.View>
     );
-  }, [userId]);
+  }, [userId, t]);
 
   if (isLoading) {
     return (
@@ -67,10 +69,10 @@ export const RecentActivity = ({ expenses, isLoading, userId }: RecentActivityPr
   return (
     <View className="px-6 mb-6" style={{ height: (expenses?.length || 0) > 0 ? (expenses!.length * 104) + 40 : 200 }}>
       <View className="flex-row items-center justify-between mb-4">
-        <AppText className="text-lg font-bold">Hoạt động gần đây</AppText>
+        <AppText className="text-lg font-bold">{t('home.recent_activity.title')}</AppText>
         <PressableFeedback onPress={() => router.push("/activity")}>
           <AppText className="text-foreground font-semibold text-sm">
-            Xem tất cả
+            {t('home.groups.view_all')}
           </AppText>
         </PressableFeedback>
       </View>
@@ -79,15 +81,17 @@ export const RecentActivity = ({ expenses, isLoading, userId }: RecentActivityPr
         <FlashList
           data={expenses}
           renderItem={renderItem}
+          // @ts-expect-error - estimatedItemSize exists on FlashList but sometimes has type issues
           estimatedItemSize={92}
           keyExtractor={(item) => item.id}
           scrollEnabled={false}
+          extraData={t}
         />
       ) : (
         <EmptyState
           icon="clock.fill"
-          title="Chưa có hoạt động nào"
-          description="Các hoạt động chi tiêu sẽ hiển thị ở đây"
+          title={t('home.recent_activity.empty_title')}
+          description={t('home.recent_activity.empty_description')}
         />
       )}
     </View>
