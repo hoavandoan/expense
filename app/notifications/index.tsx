@@ -154,7 +154,7 @@ export default function NotificationsScreen() {
       />
 
       <View className="px-6 py-4 flex-row justify-center">
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'all' | 'unread')} variant="pill" className="bg-surface-secondary rounded-full p-1">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'all' | 'unread')} variant="primary" className="bg-surface-secondary rounded-full p-1">
           <Tabs.List>
             <Tabs.Indicator className="bg-accent shadow-none" />
             <Tabs.Trigger value="all" className="px-6 py-2 rounded-full">

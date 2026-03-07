@@ -4,13 +4,13 @@ import { useTranslation } from "@/lib/hooks/use-translation";
 import { formatCurrency } from "@/lib/utils";
 import { getCategoryIcon } from "@/lib/utils/expense";
 import { Image } from "expo-image";
-import { Avatar, Card, cn, Divider } from "heroui-native";
+import { Avatar, Card, cn, Separator } from "heroui-native";
 import React, { FC } from "react";
 import { Pressable, View } from "react-native";
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
 } from "react-native-reanimated";
 
 interface ExpenseCardProps {
@@ -56,7 +56,7 @@ export const ExpenseCard: FC<ExpenseCardProps> = ({
   return (
     <AnimatedCard
       variant="default"
-      className={cn("p-4 rounded-2xl bg-surface border border-divider/10", className)}
+      className={cn("p-4 rounded-2xl bg-surface border border-border/10", className)}
       style={animatedStyle}
     >
       <Pressable
@@ -94,7 +94,7 @@ export const ExpenseCard: FC<ExpenseCardProps> = ({
           </View>
         </View>
 
-        <Divider className="bg-divider/5 mb-3" />
+        <Separator className="bg-border/5 mb-3" />
 
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center">

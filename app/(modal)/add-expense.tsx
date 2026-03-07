@@ -11,16 +11,17 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    Avatar,
-    Button,
-    Card,
-    Checkbox,
-    PressableFeedback,
-    Select,
-    Skeleton,
-    TextField,
-    useThemeColor,
-    useToast,
+  Avatar,
+  Button,
+  Card,
+  Checkbox,
+  Input,
+  PressableFeedback,
+  Select,
+  Skeleton,
+  TextField,
+  useThemeColor,
+  useToast
 } from "heroui-native";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -317,7 +318,7 @@ export default function AddExpenseScreen() {
     <View className="flex-1 bg-background">
       <ScreenScrollView withKeyboardAvoidingView>
         {hasPreselectedGroup && currentGroup && (
-          <View className="mb-6 p-4 bg-surface rounded-2xl border border-divider/10 mt-4">
+          <View className="mb-6 p-4 bg-surface rounded-2xl border border-border/10 mt-4">
             <View className="flex-row items-center">
               <View className="w-12 h-12 rounded-xl bg-accent/10 items-center justify-center mr-4">
                 <IconSymbol name="person.3.fill" size={24} color={accent} />
@@ -348,7 +349,7 @@ export default function AddExpenseScreen() {
                 value={groupOptions.find((g) => g.value === value) as any}
                 onValueChange={(opt: any) => opt && onChange(opt.value)}
               >
-                <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                <Select.Trigger className="h-12 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                   <View className="flex-row items-center gap-3">
                     <IconSymbol
                       name="person.3.fill"
@@ -370,8 +371,9 @@ export default function AddExpenseScreen() {
                 <Select.Portal>
                   <Select.Overlay className="bg-black/20" />
                   <Select.Content
+                    presentation="popover"
                     placement="bottom"
-                    className="rounded-2xl bg-surface border border-divider/10"
+                    className="rounded-2xl bg-surface border border-border/10"
                     width={300}
                   >
                     {groupOptions.map((group) => (
@@ -410,7 +412,7 @@ export default function AddExpenseScreen() {
               name="amount"
               render={({ field: { onChange, value } }) => (
                 <View className="justify-center">
-                  <TextField.Input
+                  <Input
                     placeholder="0"
                     value={value}
                     onChangeText={onChange}
@@ -442,11 +444,11 @@ export default function AddExpenseScreen() {
               control={control}
               name="title"
               render={({ field: { onChange, value } }) => (
-                <TextField.Input
+                <Input
                   placeholder={t("modal.add_expense.desc_placeholder")}
                   value={value}
                   onChangeText={onChange}
-                  className="bg-surface border border-divider/10 h-12 rounded-2xl px-4 text-base"
+                  className="bg-surface border border-border/10 h-12 rounded-2xl px-4 text-base"
                 />
               )}
             />
@@ -466,7 +468,7 @@ export default function AddExpenseScreen() {
                 value={EXPENSE_CATEGORIES.find((c) => c.value === value) as any}
                 onValueChange={(opt: any) => opt && onChange(opt.value || opt)}
               >
-                <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                <Select.Trigger className="h-12 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                   <View className="flex-row items-center gap-3">
                     <View
                       className="w-8 h-8 rounded-lg items-center justify-center"
@@ -503,8 +505,9 @@ export default function AddExpenseScreen() {
                 <Select.Portal>
                   <Select.Overlay className="bg-black/20" />
                   <Select.Content
+                    presentation="popover"
                     placement="bottom"
-                    className="rounded-2xl bg-surface border border-divider/10"
+                    className="rounded-2xl bg-surface border border-border/10"
                     width={300}
                   >
                     {EXPENSE_CATEGORIES.map((category) => (
@@ -560,7 +563,7 @@ export default function AddExpenseScreen() {
                   value={currentPayerOption as any}
                   onValueChange={(opt: any) => opt && onChange(opt.value)}
                 >
-                  <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                  <Select.Trigger className="h-12 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                     <View className="flex-row items-center gap-3">
                       <View className="w-8 h-8 rounded-full bg-accent/10 items-center justify-center">
                         <AppText className="font-bold text-accent text-sm">
@@ -582,8 +585,9 @@ export default function AddExpenseScreen() {
                   <Select.Portal>
                     <Select.Overlay className="bg-black/20" />
                     <Select.Content
+                      presentation="popover"
                       placement="bottom"
-                      className="rounded-2xl bg-surface border border-divider/10"
+                      className="rounded-2xl bg-surface border border-border/10"
                       width={300}
                     >
                       {payerOptions.map((option) => (
@@ -618,7 +622,7 @@ export default function AddExpenseScreen() {
           error={errors.participantIds?.message}
           className="mb-8"
         >
-          <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
+          <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
             {members.map((member, index) => {
               const isSelected = participantIds.includes(member.id);
               return (
@@ -663,7 +667,7 @@ export default function AddExpenseScreen() {
                     )}
                   </PressableFeedback>
                   {index < members.length - 1 && (
-                    <View className="h-[1px] bg-divider/10 mx-4" />
+                    <View className="h-[1px] bg-border/10 mx-4" />
                   )}
                 </View>
               );
@@ -680,13 +684,13 @@ export default function AddExpenseScreen() {
               control={control}
               name="notes"
               render={({ field: { onChange, value } }) => (
-                <TextField.Input
+                <Input
                   placeholder={t("modal.add_expense.notes_placeholder")}
                   value={value}
                   onChangeText={onChange}
                   multiline
                   numberOfLines={3}
-                  className="bg-surface border border-divider/10 rounded-2xl px-4 py-3 text-base min-h-[80px]"
+                  className="bg-surface border border-border/10 rounded-2xl px-4 py-3 text-base min-h-[80px]"
                 />
               )}
             />
@@ -697,7 +701,7 @@ export default function AddExpenseScreen() {
           label={t("modal.add_expense.receipt_label")}
         >
           {selectedReceipt ? (
-            <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
+            <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
               <View className="relative">
                 <Image
                   source={{ uri: selectedReceipt }}
@@ -719,7 +723,7 @@ export default function AddExpenseScreen() {
               </View>
               <PressableFeedback
                 onPress={pickReceipt}
-                className="p-4 border-t border-divider/10"
+                className="p-4 border-t border-border/10"
               >
                 <AppText className="text-accent text-center font-semibold">
                   {t("modal.add_expense.receipt_change")}
@@ -728,7 +732,7 @@ export default function AddExpenseScreen() {
             </Card>
           ) : (
             <PressableFeedback onPress={pickReceipt}>
-              <Card className="rounded-2xl border border-dashed border-divider/20 bg-surface-secondary p-8 items-center justify-center">
+              <Card className="rounded-2xl border border-dashed border-border/20 bg-surface-secondary p-8 items-center justify-center">
                 <View className="bg-accent/10 p-4 rounded-full mb-3">
                   <IconSymbol name="camera.fill" size={32} color={accent} />
                 </View>

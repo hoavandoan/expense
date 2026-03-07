@@ -24,6 +24,9 @@ import {
   Button,
   Card,
   Checkbox,
+  FieldError,
+  Input,
+  Label,
   PressableFeedback,
   Select,
   Skeleton,
@@ -287,7 +290,7 @@ export default function EditExpenseScreen() {
         <View className="p-6 gap-6">
           {/* Category Selection */}
           <TextField isRequired isInvalid={!!errors.category}>
-            <TextField.Label className="mb-3 ml-1">{t('expense_edit.category', { defaultValue: "DANH MỤC" })}</TextField.Label>
+            <Label className="mb-3 ml-1">{t('expense_edit.category', { defaultValue: "DANH MỤC" })}</Label>
             <View className="flex-row flex-wrap gap-3">
               {EXPENSE_CATEGORIES.map((category) => {
                 const isSelected = categoryValue === category.value;
@@ -301,7 +304,7 @@ export default function EditExpenseScreen() {
                       className={`p-4 rounded-2xl border ${
                         isSelected
                           ? "border-accent bg-accent/5"
-                          : "border-divider/10 bg-surface"
+                          : "border-border/10 bg-surface"
                       }`}
                     >
                       <View className="items-center gap-2">
@@ -330,9 +333,9 @@ export default function EditExpenseScreen() {
               })}
             </View>
             {errors.category && (
-              <TextField.ErrorMessage className="ml-1 mt-1">
+              <FieldError className="ml-1 mt-1">
                 {errors.category.message}
-              </TextField.ErrorMessage>
+              </FieldError>
             )}
           </TextField>
 
@@ -343,17 +346,17 @@ export default function EditExpenseScreen() {
               name="title"
               render={({ field: { onChange, value } }) => (
                 <TextField isRequired isInvalid={!!errors.title}>
-                  <TextField.Label className="mb-3 ml-1">{t('expense_edit.description_label', { defaultValue: "MÔ TẢ" })}</TextField.Label>
-                  <TextField.Input
+                  <Label className="mb-3 ml-1">{t('expense_edit.description_label', { defaultValue: "MÔ TẢ" })}</Label>
+                  <Input
                     placeholder={t('expense_edit.description_placeholder', { defaultValue: "Nhập mô tả chi tiêu" })}
                     value={value}
                     onChangeText={onChange}
-                    className="bg-surface border border-divider/10 h-14 rounded-2xl px-4"
+                    className="bg-surface border border-border/10 h-14 rounded-2xl px-4"
                   />
                   {errors.title && (
-                    <TextField.ErrorMessage className="ml-1 mt-1">
+                    <FieldError className="ml-1 mt-1">
                         {errors.title.message}
-                    </TextField.ErrorMessage>
+                    </FieldError>
                   )}
                 </TextField>
               )}
@@ -367,9 +370,9 @@ export default function EditExpenseScreen() {
               name="amount"
               render={({ field: { onChange, value } }) => (
                 <TextField isRequired isInvalid={!!errors.amount}>
-                  <TextField.Label className="mb-3 ml-1">{t('expense_edit.amount_label', { defaultValue: "SỐ TIỀN" })}</TextField.Label>
+                  <Label className="mb-3 ml-1">{t('expense_edit.amount_label', { defaultValue: "SỐ TIỀN" })}</Label>
                   <View className="justify-center">
-                    <TextField.Input
+                    <Input
                       placeholder="0"
                       value={value}
                       onChangeText={(text: string) => {
@@ -377,7 +380,7 @@ export default function EditExpenseScreen() {
                         onChange(formatted);
                       }}
                       keyboardType="numeric"
-                      className="bg-surface border border-divider/10 h-14 rounded-2xl px-4 pr-16"
+                      className="bg-surface border border-border/10 h-14 rounded-2xl px-4 pr-16"
                     />
                     <View className="absolute right-4 top-0 bottom-0 justify-center">
                       <AppText className="text-muted font-semibold">
@@ -386,9 +389,9 @@ export default function EditExpenseScreen() {
                     </View>
                   </View>
                   {errors.amount && (
-                    <TextField.ErrorMessage className="ml-1 mt-1">
+                    <FieldError className="ml-1 mt-1">
                         {errors.amount.message}
-                    </TextField.ErrorMessage>
+                    </FieldError>
                   )}
                 </TextField>
               )}
@@ -402,7 +405,7 @@ export default function EditExpenseScreen() {
 
           {/* Payer Selection */}
           <TextField isRequired isInvalid={!!errors.paidById}>
-            <TextField.Label className="mb-3 ml-1">{t('expense_edit.payer_label', { defaultValue: "NGƯỜI TRẢ TIỀN" })}</TextField.Label>
+            <Label className="mb-3 ml-1">{t('expense_edit.payer_label', { defaultValue: "NGƯỜI TRẢ TIỀN" })}</Label>
             <Controller
               control={control}
               name="paidById"
@@ -414,14 +417,14 @@ export default function EditExpenseScreen() {
                   initial: m.name.charAt(0),
                 }));
                 const currentPayerOption = payerOptions.find(
-                  (p) => p.value === value
+                  (p: { value: string }) => p.value === value
                 );
                 return (
                   <Select
                     value={currentPayerOption as any}
                     onValueChange={(opt: any) => opt && onChange(opt.value)}
                   >
-                    <Select.Trigger className="h-14 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                    <Select.Trigger className="h-14 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                       <View className="flex-row items-center gap-3">
                         <View className="w-8 h-8 rounded-full bg-accent/10 items-center justify-center">
                           <AppText className="font-bold text-accent text-sm">
@@ -443,11 +446,12 @@ export default function EditExpenseScreen() {
                     <Select.Portal>
                       <Select.Overlay className="bg-black/20" />
                       <Select.Content
+                        presentation="popover"
                         placement="bottom"
-                        className="rounded-2xl bg-surface border border-divider/10"
+                        className="rounded-2xl bg-surface border border-border/10"
                         width={300}
                       >
-                        {payerOptions.map((option) => (
+                        {payerOptions.map((option: { value: string; label: string; initial: string }) => (
                           <Select.Item
                             key={option.value}
                             value={option.value}
@@ -475,10 +479,10 @@ export default function EditExpenseScreen() {
 
           {/* Participants Selection */}
           <TextField isRequired isInvalid={!!errors.participantIds}>
-            <TextField.Label className="mb-3 ml-1">
+            <Label className="mb-3 ml-1">
               {t('expense_edit.participants_label', { count: participantIds.length, defaultValue: `NGƯỜI THAM GIA (${participantIds.length})` })}
-            </TextField.Label>
-            <Card className="rounded-2xl border border-divider/10 bg-surface overflow-hidden">
+            </Label>
+            <Card className="rounded-2xl border border-border/10 bg-surface overflow-hidden">
               {members.map((member, index) => {
                 const isSelected = participantIds.includes(member.id);
                 return (
@@ -523,16 +527,16 @@ export default function EditExpenseScreen() {
                       )}
                     </PressableFeedback>
                     {index < members.length - 1 && (
-                      <View className="h-[1px] bg-divider/10 mx-4" />
+                      <View className="h-[1px] bg-border/10 mx-4" />
                     )}
                   </View>
                 );
               })}
             </Card>
             {errors.participantIds && (
-              <TextField.ErrorMessage className="ml-1 mt-1">
+              <FieldError className="ml-1 mt-1">
                 {errors.participantIds.message}
-              </TextField.ErrorMessage>
+              </FieldError>
             )}
           </TextField>
 
@@ -543,14 +547,14 @@ export default function EditExpenseScreen() {
               name="notes"
               render={({ field: { onChange, value } }) => (
                 <TextField>
-                  <TextField.Label className="mb-3 ml-1">{t('expense_edit.notes_label', { defaultValue: "GHI CHÚ (TÙY CHỌN)" })}</TextField.Label>
-                  <TextField.Input
+                  <Label className="mb-3 ml-1">{t('expense_edit.notes_label', { defaultValue: "GHI CHÚ (TÙY CHỌN)" })}</Label>
+                  <Input
                     placeholder={t('expense_edit.notes_placeholder', { defaultValue: "Thêm ghi chú..." })}
                     value={value}
                     onChangeText={onChange}
                     multiline
                     numberOfLines={4}
-                    className="min-h-[100px] py-4 bg-surface border border-divider/10 rounded-2xl px-4"
+                    className="min-h-[100px] py-4 bg-surface border border-border/10 rounded-2xl px-4"
                   />
                 </TextField>
               )}
@@ -563,7 +567,7 @@ export default function EditExpenseScreen() {
               {t('expense_edit.receipt_label', { defaultValue: "ẢNH HÓA ĐƠN (TÙY CHỌN)" })}
             </AppText>
             {selectedReceipt ? (
-              <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
+              <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
                 <View className="relative">
                   <Image
                     source={{ uri: selectedReceipt }}
@@ -585,7 +589,7 @@ export default function EditExpenseScreen() {
                 </View>
                 <PressableFeedback
                   onPress={pickReceipt}
-                  className="p-4 border-t border-divider/10"
+                  className="p-4 border-t border-border/10"
                 >
                   <AppText className="text-accent text-center font-semibold">
                     {t('expense_edit.change_image', { defaultValue: "Thay đổi ảnh" })}
@@ -594,7 +598,7 @@ export default function EditExpenseScreen() {
               </Card>
             ) : (
               <PressableFeedback onPress={pickReceipt}>
-                <Card className="rounded-2xl border border-dashed border-divider/20 bg-surface-secondary p-8 items-center justify-center">
+                <Card className="rounded-2xl border border-dashed border-border/20 bg-surface-secondary p-8 items-center justify-center">
                   <View className="bg-accent/10 p-4 rounded-full mb-3">
                     <IconSymbol name="camera.fill" size={32} color={accent} />
                   </View>

@@ -1,6 +1,6 @@
 import { useAuth, useTranslation } from '@/lib/hooks';
 import { Ionicons } from '@expo/vector-icons';
-import { BottomSheet, Button, Divider, useThemeColor } from 'heroui-native';
+import { BottomSheet, Button, Separator, useThemeColor } from 'heroui-native';
 import React from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -50,12 +50,13 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
   return (
     <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange}>
       <BottomSheet.Portal>
-        <BottomSheetBlurOverlay />
+        {/*<BottomSheetBlurOverlay />*/}
+        <BottomSheet.Overlay/>
         <BottomSheet.Content
           detached={true}
           className="mx-4"
           backgroundClassName="rounded-3xl"
-          handleIndicatorClassName="bg-divider/20 w-12"
+          handleIndicatorClassName="bg-border/20 w-12"
           bottomInset={insets.bottom}
         >
           {/* Header */}
@@ -103,7 +104,7 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
 
           {/* Footer Info */}
           <View className="mt-10 items-center">
-            <Divider className="w-12 mb-6 opacity-30" />
+            <Separator className="w-12 mb-6 opacity-30" />
             <AppText className="text-[11px] text-muted/50 text-center px-10 leading-4">
               {t('auth.login.terms_agreement')}
             </AppText>

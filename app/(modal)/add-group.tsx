@@ -13,6 +13,7 @@ import { useRouter } from "expo-router";
 import {
   Avatar,
   Button,
+  Input,
   PressableFeedback,
   Select,
   TextField,
@@ -141,11 +142,11 @@ export default function AddGroupScreen() {
                 control={control}
                 name="name"
                 render={({ field: { onChange, value } }) => (
-                  <TextField.Input
+                  <Input
                     placeholder={t("modal.add_group.name_placeholder")}
                     value={value}
                     onChangeText={onChange}
-                    className="bg-surface border border-divider/10 h-12 rounded-2xl px-4 text-base"
+                    className="bg-surface border border-border/10 h-12 rounded-2xl px-4 text-base"
                   />
                 )}
               />
@@ -161,11 +162,11 @@ export default function AddGroupScreen() {
                 control={control}
                 name="description"
                 render={({ field: { onChange, value } }) => (
-                  <TextField.Input
+                  <Input
                     placeholder={t("modal.add_group.desc_placeholder")}
                     value={value}
                     onChangeText={onChange}
-                    className="bg-surface border border-divider/10 h-12 rounded-2xl px-4 text-base"
+                    className="bg-surface border border-border/10 h-12 rounded-2xl px-4 text-base"
                   />
                 )}
               />
@@ -187,7 +188,7 @@ export default function AddGroupScreen() {
                       value={GROUP_TYPES.find((t) => t.value === value) as any}
                       onValueChange={(opt: any) => opt && onChange(opt.value)}
                     >
-                      <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                      <Select.Trigger className="h-12 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                         <View className="flex-row items-center gap-3">
                           <IconSymbol
                             name={
@@ -212,8 +213,9 @@ export default function AddGroupScreen() {
                       <Select.Portal>
                         <Select.Overlay className="bg-black/20" />
                         <Select.Content
+                          presentation="popover"
                           placement="bottom"
-                          className="rounded-2xl bg-surface border border-divider/10"
+                          className="rounded-2xl bg-surface border border-border/10"
                           width={250}
                         >
                           {GROUP_TYPES.map((type) => (
@@ -256,7 +258,7 @@ export default function AddGroupScreen() {
                       value={CURRENCIES.find((c) => c.value === value) as any}
                       onValueChange={(opt: any) => opt && onChange(opt.value)}
                     >
-                      <Select.Trigger className="h-12 border border-divider/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                      <Select.Trigger className="h-12 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
                         <View className="flex-row items-center gap-3">
                           <AppText className="font-bold text-accent text-lg">
                             {CURRENCIES.find((c) => c.value === value)?.symbol}
@@ -276,8 +278,9 @@ export default function AddGroupScreen() {
                       <Select.Portal>
                         <Select.Overlay className="bg-black/20" />
                         <Select.Content
+                          presentation="popover"
                           placement="bottom"
-                          className="rounded-2xl bg-surface border border-divider/10"
+                          className="rounded-2xl bg-surface border border-border/10"
                           width={250}
                         >
                           {CURRENCIES.map((curr) => (

@@ -7,6 +7,7 @@ import {
   Button,
   cn,
   Dialog,
+  Input,
   TextField,
 } from 'heroui-native';
 import React, { useState } from 'react';
@@ -61,7 +62,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
         <Dialog.Content className="max-w-md w-[90%] self-center">
           <View className="flex-row justify-between items-center mb-2">
             <Dialog.Title className="text-xl font-bold">{t('debt_assignment.create_request.title')}</Dialog.Title>
-            <Dialog.Close asChild>
+            <Dialog.Close>
               <Button isIconOnly variant="ghost" size="sm">
                 <IconSymbol name="xmark" size={24} color="gray" />
               </Button>
@@ -84,7 +85,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                       "p-3 rounded-2xl border flex-row items-center justify-between h-auto",
                       selectedUserId === member.userId
                         ? "border-primary bg-primary/10"
-                        : "border-divider/10"
+                        : "border-border/10"
                     )}
                     onPress={() => setSelectedUserId(member.userId)}
                   >
@@ -121,7 +122,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
           <View className="mb-6">
             <TextField>
               <AppText className="text-sm font-medium mb-3 ml-1">{t('debt_assignment.create_request.reason_label')}</AppText>
-              <TextField.Input
+              <Input
                 placeholder={t('debt_assignment.create_request.reason_placeholder')}
                 value={reason}
                 onChangeText={setReason}
@@ -133,7 +134,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
           </View>
 
           <View className="flex-row gap-3">
-            <Dialog.Close asChild>
+            <Dialog.Close>
               <Button variant="ghost" className="flex-1">
                 <Button.Label>{t('common.cancel')}</Button.Label>
               </Button>

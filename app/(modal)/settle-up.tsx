@@ -184,7 +184,7 @@ export default function SettleUpScreen() {
         <View className="mb-8">
           <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">{t('modal.settle_up.details_title')}</AppText>
           {debts.length === 0 ? (
-            <View className="p-6 bg-surface rounded-2xl border border-divider/10 items-center">
+            <View className="p-6 bg-surface rounded-2xl border border-border/10 items-center">
               <IconSymbol name="checkmark.circle.fill" size={40} color={accent} />
               <AppText className="text-foreground font-semibold mt-3">{t('modal.settle_up.no_debt_title')}</AppText>
               <AppText className="text-muted text-sm text-center mt-1">
@@ -192,7 +192,7 @@ export default function SettleUpScreen() {
               </AppText>
             </View>
           ) : (
-            <Card variant="default" className="rounded-2xl border border-divider/10 overflow-hidden">
+            <Card variant="default" className="rounded-2xl border border-border/10 overflow-hidden">
               {debts.map((debt, idx) => (
                 <PressableFeedback 
                   key={debt.id}

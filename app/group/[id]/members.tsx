@@ -161,7 +161,7 @@ export default function GroupMembersScreen() {
             </View>
             <View className="flex-row gap-2">
               <PressableFeedback
-                className="w-12 h-12 rounded-xl bg-surface items-center justify-center border border-divider/10"
+                className="w-12 h-12 rounded-xl bg-surface items-center justify-center border border-border/10"
                 onPress={handleCopyInviteCode}
               >
                 <IconSymbol name="link" size={20} color={accent} />
@@ -191,7 +191,7 @@ export default function GroupMembersScreen() {
     <View className="p-5 pb-20">
       <Button
         variant="secondary"
-        className="h-14 rounded-2xl border border-divider/10 bg-surface/5"
+        className="h-14 rounded-2xl border border-border/10 bg-surface/5"
         onPress={handleShareInvite}
       >
         <View className="flex-row items-center gap-2">

@@ -1,9 +1,8 @@
-import { AppText } from "@/components/app-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useTranslation } from "@/lib/hooks";
 import { Stack, useRouter } from "expo-router";
 
-import { Button, PressableFeedback, useThemeColor } from "heroui-native";
+import { Button, useThemeColor } from "heroui-native";
 
 export default function ModalLayout() {
   const { t } = useTranslation();
@@ -41,22 +40,12 @@ export default function ModalLayout() {
         name="add-expense"
         options={{
           title: t('modal_layout.add_expense_title', { defaultValue: "Thêm chi tiêu" }),
-          headerRight: () => (
-            <PressableFeedback onPress={() => router.back()} className="mr-4">
-              <AppText className="text-accent font-bold text-base">{t('modal_layout.save_btn', { defaultValue: "Lưu" })}</AppText>
-            </PressableFeedback>
-          ),
         }}
       />
       <Stack.Screen
         name="add-group"
         options={{
           title: t('modal_layout.create_group_title', { defaultValue: "Tạo nhóm mới" }),
-          headerRight: () => (
-            <PressableFeedback onPress={() => router.back()} className="mr-4">
-              <AppText className="text-accent font-bold text-base">{t('modal_layout.create_btn', { defaultValue: "Tạo" })}</AppText>
-            </PressableFeedback>
-          ),
         }}
       />
       <Stack.Screen name="join-group" options={{ title: t('modal_layout.join_group_title', { defaultValue: "Tham gia nhóm" }) }} />

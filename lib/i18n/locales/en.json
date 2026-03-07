@@ -416,7 +416,8 @@
             "groups": "Groups",
             "users": "Users"
         },
-        "default_user": "User"
+        "default_user": "User",
+        "recent": "RECENT"
     },
     "profile": {
         "edit_title": "Edit Profile",

@@ -31,12 +31,12 @@ const getSlides = (t: any): Slide[] => [
     description: t('onboarding.tutorial.slide1.description'),
     image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=600',
     renderOverlay: (accent) => (
-      <View className="absolute bottom-10 left-6 right-6 bg-surface p-4 rounded-2xl flex-row items-center gap-3 border border-divider/10 shadow-lg">
+      <View className="absolute bottom-10 left-6 right-6 bg-surface p-4 rounded-2xl flex-row items-center gap-3 border border-border/10 shadow-lg">
         <View className="w-10 h-10 rounded-2xl bg-accent items-center justify-center">
           <IconSymbol name="house.fill" size={20} color="white" />
         </View>
         <View className="flex-1">
-          <AppText weight="bold" className="text-sm">{t('onboarding.tutorial.slide1.overlay_title')}</AppText>
+          <AppText className="text-sm font-bold">{t('onboarding.tutorial.slide1.overlay_title')}</AppText>
           <AppText className="text-xs text-muted">{t('onboarding.tutorial.slide1.overlay_desc')}</AppText>
         </View>
         <View className="flex-row -space-x-3">
@@ -47,7 +47,7 @@ const getSlides = (t: any): Slide[] => [
             <Avatar.Image source={{ uri: "https://i.pravatar.cc/100?u=b" }} />
           </Avatar>
           <View className="w-6 h-6 rounded-full bg-accent items-center justify-center border border-surface">
-            <AppText weight="bold" className="text-[8px] text-white">+2</AppText>
+            <AppText className="text-[8px] font-bold text-white">+2</AppText>
           </View>
         </View>
       </View>
@@ -60,11 +60,11 @@ const getSlides = (t: any): Slide[] => [
     description: t('onboarding.tutorial.slide2.description'),
     image: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?q=80&w=600',
     renderOverlay: (accent) => (
-      <View className="absolute inset-x-8 top-1/4 bg-surface p-4 rounded-2xl shadow-2xl border border-divider/10">
+      <View className="absolute inset-x-8 top-1/4 bg-surface p-4 rounded-2xl shadow-2xl border border-border/10">
         <View className="flex-row items-center justify-between mb-4">
           <View>
-            <AppText weight="bold" className="text-[10px] text-muted uppercase">{t('onboarding.tutorial.slide2.overlay_group_title')}</AppText>
-            <AppText weight="bold" className="text-base">{t('onboarding.tutorial.slide2.overlay_group_name')}</AppText>
+            <AppText className="text-[10px] font-bold text-muted uppercase">{t('onboarding.tutorial.slide2.overlay_group_title')}</AppText>
+            <AppText className="text-base font-bold">{t('onboarding.tutorial.slide2.overlay_group_name')}</AppText>
           </View>
           <View className="flex-row items-center gap-1 bg-surface-secondary p-1 rounded-full px-2">
             <Avatar size="sm" alt="User L">
@@ -86,8 +86,8 @@ const getSlides = (t: any): Slide[] => [
               <View className="w-8 h-8 rounded-xl bg-accent-soft items-center justify-center">
                 <IconSymbol name={item.icon as any} size={14} color={accent} />
               </View>
-              <AppText weight="medium" className="flex-1 text-sm">{item.label}</AppText>
-              <AppText weight="bold" className={item.color}>{item.amount}</AppText>
+              <AppText className="flex-1 text-sm">{item.label}</AppText>
+              <AppText className="text-sm font-bold">{item.amount}</AppText>
             </View>
           ))}
         </View>
@@ -107,32 +107,32 @@ const getSlides = (t: any): Slide[] => [
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600',
     renderOverlay: (accent) => (
       <View className="absolute inset-x-6 bottom-1/4 gap-4">
-        <View className="bg-surface p-4 rounded-2xl border border-divider/10 shadow-lg">
+        <View className="bg-surface p-4 rounded-2xl border border-border/10 shadow-lg">
           <View className="flex-row items-center justify-between mb-2">
             <View className="flex-row items-center gap-2">
               <View className="w-8 h-8 rounded-xl bg-accent-soft items-center justify-center">
                 <IconSymbol name="creditcard.fill" size={14} color={accent} />
               </View>
-              <AppText weight="bold" className="text-xs text-muted uppercase">{t('onboarding.tutorial.slide3.overlay_collected')}</AppText>
+              <AppText className="text-xs font-bold text-muted uppercase">{t('onboarding.tutorial.slide3.overlay_collected')}</AppText>
             </View>
-            <AppText weight="bold" className="text-xs">85%</AppText>
+            <AppText className="text-xs font-bold">85%</AppText>
           </View>
           <View className="h-2 bg-divider rounded-full overflow-hidden">
             <View className="h-full bg-accent w-[85%]" />
           </View>
         </View>
 
-        <View className="bg-surface p-4 rounded-2xl border border-divider/10 shadow-xl flex-row items-center gap-4">
+        <View className="bg-surface p-4 rounded-2xl border border-border/10 shadow-xl flex-row items-center gap-4">
           <View className="w-12 h-12 rounded-2xl bg-accent items-center justify-center">
             <IconSymbol name="chart.bar.fill" size={24} color="white" />
           </View>
           <View className="flex-1">
-            <AppText weight="bold" className="text-[10px] text-muted uppercase">{t('onboarding.tutorial.slide3.overlay_monthly')}</AppText>
-            <AppText weight="bold" className="text-xl">4.250.000đ</AppText>
+            <AppText className="text-[10px] font-bold text-muted uppercase">{t('onboarding.tutorial.slide3.overlay_monthly')}</AppText>
+            <AppText className="text-xl font-bold">4.250.000đ</AppText>
           </View>
           <View className="bg-accent-soft px-2 py-1 rounded-full flex-row items-center gap-1">
             <IconSymbol name="arrow.down" size={10} color={accent} />
-            <AppText weight="bold" className="text-accent text-[10px]">5%</AppText>
+            <AppText className="text-accent text-[10px] font-bold">5%</AppText>
           </View>
         </View>
       </View>
@@ -152,20 +152,20 @@ const getSlides = (t: any): Slide[] => [
              <IconSymbol name="checkmark" size={16} color="white" />
           </View>
         </View>
-        <View className="bg-surface px-6 py-3 rounded-2xl border border-divider/10 shadow-lg flex-row gap-4 items-center">
+        <View className="bg-surface px-6 py-3 rounded-2xl border border-border/10 shadow-lg flex-row gap-4 items-center">
           <View className="items-center">
-            <AppText weight="bold" className="text-[10px] text-muted">{t('onboarding.tutorial.slide4.overlay_food')}</AppText>
-            <AppText weight="bold">45%</AppText>
+            <AppText className="text-[10px] font-bold text-muted">{t('onboarding.tutorial.slide4.overlay_food')}</AppText>
+            <AppText className="font-bold">45%</AppText>
           </View>
           <View className="w-px h-6 bg-divider/20" />
           <View className="items-center">
-            <AppText weight="bold" className="text-[10px] text-muted">{t('onboarding.tutorial.slide4.overlay_travel')}</AppText>
-            <AppText weight="bold">30%</AppText>
+            <AppText className="text-[10px] font-bold text-muted">{t('onboarding.tutorial.slide4.overlay_travel')}</AppText>
+            <AppText className="font-bold">30%</AppText>
           </View>
           <View className="w-px h-6 bg-divider/20" />
           <View className="items-center">
-            <AppText weight="bold" className="text-[10px] text-muted">{t('onboarding.tutorial.slide4.overlay_other')}</AppText>
-            <AppText weight="bold">25%</AppText>
+            <AppText className="text-[10px] font-bold text-muted">{t('onboarding.tutorial.slide4.overlay_other')}</AppText>
+            <AppText className="font-bold">25%</AppText>
           </View>
         </View>
       </View>
@@ -183,13 +183,13 @@ const getSlides = (t: any): Slide[] => [
           <View className="w-24 h-24 bg-accent/10 rounded-full items-center justify-center mb-6">
             <IconSymbol name="shield" size={48} color={accent} />
           </View>
-          <AppText weight="bold" className="text-xl mb-2">{t('onboarding.tutorial.slide5.overlay_encrypted')}</AppText>
+          <AppText className="text-xl font-bold mb-2">{t('onboarding.tutorial.slide5.overlay_encrypted')}</AppText>
           <AppText className="text-sm text-muted text-center leading-5">
             {t('onboarding.tutorial.slide5.overlay_desc')}
           </AppText>
           <View className="mt-8 flex-row items-center gap-2 bg-success-soft px-4 py-2 rounded-full">
             <IconSymbol name="checkmark.circle.fill" size={16} color="#10b981" />
-            <AppText weight="bold" className="text-[#10b981] text-xs">{t('onboarding.tutorial.slide5.overlay_verify')}</AppText>
+            <AppText className="text-[#10b981] text-xs font-bold">{t('onboarding.tutorial.slide5.overlay_verify')}</AppText>
           </View>
         </View>
       </View>
@@ -233,7 +233,7 @@ export default function TutorialScreen() {
       <View className="flex-1 justify-between py-12 px-6">
         <View style={{ paddingTop: insets.top }} className="flex-row justify-end">
           <PressableFeedback onPress={handleSkip}>
-            <AppText weight="bold" className="text-muted">{t('onboarding.tutorial.skip')}</AppText>
+            <AppText className="text-muted font-bold">{t('onboarding.tutorial.skip')}</AppText>
           </PressableFeedback>
         </View>
 
@@ -260,9 +260,9 @@ export default function TutorialScreen() {
 
           <View className="mt-12 items-center px-4 w-full h-32">
             <Animated.View key={currentSlide} entering={FadeInUp.duration(600)} exiting={FadeOut}>
-              <AppText variant="heading" weight="bold" className="text-3xl text-center leading-tight mb-4">
+              <AppText className="text-3xl text-center leading-tight mb-4 font-bold">
                 {slide.title}
-                <AppText variant="heading" weight="bold" className="text-accent">{slide.accent}</AppText>
+                <AppText className="text-accent font-bold">{slide.accent}</AppText>
               </AppText>
               <AppText className="text-muted text-center leading-relaxed">
                 {slide.description}
@@ -287,7 +287,7 @@ export default function TutorialScreen() {
             onPress={nextSlide}
           >
             <View className="flex-row items-center gap-2">
-              <AppText weight="bold" className="text-lg text-white">
+              <AppText className="text-lg text-white font-bold">
                 {currentSlide === slides.length - 1 ? t('onboarding.tutorial.start_now') : t('onboarding.tutorial.continue')}
               </AppText>
               {currentSlide === slides.length - 1 ? (

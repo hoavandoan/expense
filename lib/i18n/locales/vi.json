@@ -416,7 +416,8 @@
             "groups": "Nhóm",
             "users": "Người dùng"
         },
-        "default_user": "Người dùng"
+        "default_user": "Người dùng",
+        "recent": "GẦN ĐÂY"
     },
     "profile": {
         "edit_title": "Chỉnh sửa hồ sơ",

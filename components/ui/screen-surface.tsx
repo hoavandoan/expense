@@ -1,9 +1,9 @@
 import { cn, Surface } from 'heroui-native';
 import React, { FC, PropsWithChildren } from 'react';
-import { SafeAreaView, ViewProps } from 'react-native';
+import { ViewProps } from 'react-native';
 
 interface Props extends ViewProps {
-  variant?: 'default' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent';
+  variant?: 'default' | 'secondary' | 'tertiary' | 'transparent';
   className?: string;
 }
 
@@ -19,11 +19,9 @@ export const ScreenSurface: FC<PropsWithChildren<Props>> = ({
 }) => {
   return (
     <Surface variant={variant} className={cn('flex-1', className)} {...props}>
-      <SafeAreaView className="flex-1">
-        <Surface variant="transparent" className="flex-1 px-6">
-          {children}
-        </Surface>
-      </SafeAreaView>
+      <Surface variant="transparent" className="flex-1 px-6">
+        {children}
+      </Surface>
     </Surface>
   );
 };

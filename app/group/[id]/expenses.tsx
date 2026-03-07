@@ -11,6 +11,7 @@ import { formatDate } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
+  Input,
   PressableFeedback,
   Select,
   Spinner,
@@ -188,11 +189,11 @@ export default function GroupExpensesScreen() {
       <StickyHeader title={t('search.header.expenses', { defaultValue: "Khoản chi" })} />
 
       {/* Filters */}
-      <View className="px-6 py-4 bg-surface border-b border-divider/10 gap-4">
+      <View className="px-6 py-4 bg-surface border-b border-border/10 gap-4">
         {/* Search */}
-        <TextField className="bg-surface-secondary border border-divider/10 rounded-xl">
+        <TextField className="bg-surface-secondary border border-border/10 rounded-xl">
           <View className="justify-center">
-            <TextField.Input
+            <Input
               placeholder={t('search.placeholder', { defaultValue: "Tìm kiếm khoản chi..." })}
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -227,12 +228,12 @@ export default function GroupExpensesScreen() {
             }
             className="flex-1"
           >
-            <Select.Trigger className="h-12 border border-divider/10 bg-surface-secondary rounded-xl px-4">
+            <Select.Trigger className="h-12 border border-border/10 bg-surface-secondary rounded-xl px-4">
               <Select.Value placeholder={t('common.category', { defaultValue: "Danh mục" })} />
             </Select.Trigger>
             <Select.Portal>
               <Select.Overlay />
-              <Select.Content placement="bottom" width={200} className="rounded-xl bg-surface border border-divider/10">
+              <Select.Content presentation="popover" placement="bottom" width={200} className="rounded-xl bg-surface border border-border/10">
                 <Select.Item value={null} label={t('common.all_categories', { defaultValue: "Tất cả danh mục" })} className="p-4">
                   <Select.ItemLabel />
                   <Select.ItemIndicator />
@@ -263,12 +264,12 @@ export default function GroupExpensesScreen() {
             }
             className="flex-1"
           >
-            <Select.Trigger className="h-12 border border-divider/10 bg-surface-secondary rounded-xl px-4">
+            <Select.Trigger className="h-12 border border-border/10 bg-surface-secondary rounded-xl px-4">
               <Select.Value placeholder={t('search.default_user', { defaultValue: "Thành viên" })} />
             </Select.Trigger>
             <Select.Portal>
               <Select.Overlay />
-              <Select.Content placement="bottom" width={200} className="rounded-xl bg-surface border border-divider/10">
+              <Select.Content presentation="popover" placement="bottom" width={200} className="rounded-xl bg-surface border border-border/10">
                 <Select.Item value={null} label={t('common.all_members', { defaultValue: "Tất cả thành viên" })} className="p-4">
                   <Select.ItemLabel />
                   <Select.ItemIndicator />
@@ -294,7 +295,7 @@ export default function GroupExpensesScreen() {
           <Tabs
             value={sortBy}
             onValueChange={(v) => setSortBy(v as "date" | "amount")}
-            variant="pill"
+            variant="primary"
           >
             <Tabs.List>
               <Tabs.Indicator className="bg-accent shadow-none" />

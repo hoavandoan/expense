@@ -39,7 +39,7 @@ export const ActivityItem = React.memo(({
   const muted = useThemeColor("muted");
 
   return (
-    <PressableFeedback className="bg-surface p-4 rounded-2xl border border-divider/10">
+    <PressableFeedback className="bg-surface p-4 rounded-2xl border border-border/10">
       <View className="flex-row items-center">
         <View className="relative">
           <Avatar size="lg" alt={userName} className="w-14 h-14">

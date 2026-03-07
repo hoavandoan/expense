@@ -14,7 +14,7 @@ import {
   Avatar,
   Button,
   Card,
-  Divider,
+  Separator,
   Spinner,
   useThemeColor,
   useToast,
@@ -126,7 +126,7 @@ export default function ExpenseDetailScreen() {
       <StickyHeader title={t('expense_detail.title', { defaultValue: "Chi tiết chi tiêu" })} />
 
       <ScreenScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        <View className="py-6 pb-8 items-center bg-background border-b border-divider/10">
+        <View className="py-6 pb-8 items-center bg-background border-b border-border/10">
           <View
             className={`w-16 h-16 rounded-2xl items-center justify-center mb-4 ${categoryConfig.bg}`}
           >
@@ -194,7 +194,7 @@ export default function ExpenseDetailScreen() {
               <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
                 {t('expense_detail.split_for', { count: splits.length, defaultValue: `CHIA CHO ${splits.length} NGƯỜI` })}
               </AppText>
-              <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
+              <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
                 {splits.map((split: any, idx: number) => {
                   const splitUser = split.user || {};
                   const isPaid = split.is_paid;
@@ -241,7 +241,7 @@ export default function ExpenseDetailScreen() {
                         </View>
                       </View>
                       {idx < splits.length - 1 && (
-                        <Divider className="mx-4 bg-divider/10" />
+                        <Separator className="mx-4 bg-border/10" />
                       )}
                     </View>
                   );
@@ -255,7 +255,7 @@ export default function ExpenseDetailScreen() {
               <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
                 {t('expense_detail.receipt', { defaultValue: 'ẢNH HÓA ĐƠN' })}
               </AppText>
-              <Card className="h-60 rounded-2xl overflow-hidden bg-surface border border-divider/10 shadow-sm">
+              <Card className="h-60 rounded-2xl overflow-hidden bg-surface border border-border/10 shadow-sm">
                 <Image
                   source={{ uri: expense.receiptUrl }}
                   style={{ width: "100%", height: "100%" }}

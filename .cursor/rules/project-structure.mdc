@@ -54,7 +54,7 @@ This document defines the project structure, technical stack, and development wo
 - **Feedback**: Use `PressableFeedback` for all interactive elements.
 - **Standard Layout**: Use `ScreenSurface` or `ScreenScrollView` as the base for all screens.
 - **Spacing Standards**: Use `px-6` (24px) for horizontal padding of main content.
-- **Border Standards**: Use `border-divider/10` as the default border for cards and containers.
+- **Border Standards**: Use `border-border/10` as the default border for cards and containers.
 - **Component Consistency**: Use `Card` for interactive list items or bounded data sections. Use `Surface` for general background surfaces.
 - **Mobile Responsiveness**:
   - Use `adjustsFontSizeToFit` and `numberOfLines={1}` for currency and large numerical displays to prevent overflow on small screens.

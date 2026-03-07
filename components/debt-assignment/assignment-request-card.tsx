@@ -5,7 +5,7 @@ import {
   Avatar,
   Button,
   Card,
-  Divider,
+  Separator,
 } from 'heroui-native';
 import React from 'react';
 import { View } from 'react-native';
@@ -62,7 +62,7 @@ export const AssignmentRequestCard: React.FC<AssignmentRequestCardProps> = ({
   );
 
   return (
-    <Card className="w-full mb-3 p-4 rounded-2xl bg-surface border border-divider/10 shadow-none">
+    <Card className="w-full mb-3 p-4 rounded-2xl bg-surface border border-border/10 shadow-none">
       <View className="gap-3">
         <View className="flex-row items-center justify-between">
           <AppText className="text-[10px] font-bold text-muted uppercase tracking-widest">
@@ -87,7 +87,7 @@ export const AssignmentRequestCard: React.FC<AssignmentRequestCardProps> = ({
 
         {canReview && (
           <>
-            <Divider className="opacity-10" />
+            <Separator className="opacity-10" />
             <View className="flex-row gap-2 justify-end">
               <Button
                 size="sm"

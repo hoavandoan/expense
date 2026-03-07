@@ -101,7 +101,7 @@ export default function GroupStatsScreen() {
       <ScreenScrollView contentContainerStyle={{ padding: 20 }}>
         <View className="mb-8">
           <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">{t("group_stats.overview_label")}</AppText>
-          <Card className="p-6 rounded-3xl border border-divider/10">
+          <Card className="p-6 rounded-3xl border border-border/10">
             <AppText className="text-muted text-xs uppercase font-bold mb-1">{t("group_stats.total_spent")}</AppText>
             <AppText className="text-3xl font-bold mb-4">
               {formatCurrency(stats.totalAmount, group?.currency)}
@@ -123,7 +123,7 @@ export default function GroupStatsScreen() {
 
         <View className="mb-8">
           <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">{t("group_stats.category_split_label")}</AppText>
-          <Card className="p-6 rounded-3xl border border-divider/10">
+          <Card className="p-6 rounded-3xl border border-border/10">
             <View className="items-center justify-center mb-6">
               <PieChart
                 data={stats.pieData}

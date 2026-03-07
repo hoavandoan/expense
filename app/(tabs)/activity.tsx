@@ -8,7 +8,7 @@ import { useRecentActivity, useTranslation } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatCurrency } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
-import { cn, Spinner, Tabs, TextField, useThemeColor } from "heroui-native";
+import { cn, Input, Spinner, Tabs, TextField, useThemeColor } from "heroui-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
@@ -359,12 +359,12 @@ export default function ActivityScreen() {
         <View className="px-6 mb-6">
           <TextField className="bg-default/5 rounded-2xl overflow-hidden">
             <View className="justify-center">
-              <TextField.Input
-                placeholder={t("activity.search_placeholder")}
-                className="text-base pl-12 h-14"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
+            <Input
+              placeholder={t("activity.search_placeholder")}
+              className="text-base pl-12 h-14"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
               <View className="absolute left-4" pointerEvents="none">
                 <IconSymbol name="magnifyingglass" size={20} color={muted} />
               </View>
@@ -376,7 +376,7 @@ export default function ActivityScreen() {
           <Tabs
             value={activeFilter}
             onValueChange={setActiveFilter}
-            variant="pill"
+            variant="primary"
           >
             <Tabs.List>
               <Tabs.Indicator className="bg-accent shadow-none" />

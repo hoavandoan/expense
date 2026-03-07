@@ -33,8 +33,8 @@ import {
   Button,
   Card,
   cn,
-  Divider,
   PressableFeedback,
+  Separator,
   Skeleton,
   Tabs,
   useThemeColor,
@@ -293,7 +293,7 @@ export default function GroupDetailScreen() {
         <View className="px-6 pt-4 bg-background">
           {/* Info Badges */}
           <View className="flex-row gap-3 mb-8">
-            <View className="bg-surface-secondary px-4 py-2 rounded-full border border-divider/10">
+            <View className="bg-surface-secondary px-4 py-2 rounded-full border border-border/10">
               <AppText className="text-muted text-[10px] font-bold uppercase tracking-widest">
                 {t("group_detail.members_label", { count: groupData?.group_members?.length || 0 })}
               </AppText>
@@ -358,7 +358,7 @@ export default function GroupDetailScreen() {
                     )}
                   </AppText>
                 </View>
-                <Divider orientation="vertical" className="bg-white/20" />
+                <Separator orientation="vertical" className="bg-white/20" />
                 <View className="flex-1">
                   <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">
                     {userStats.balance >= 0 ? t("group_detail.you_receive") : t("group_detail.you_owe_label")}
@@ -444,7 +444,7 @@ export default function GroupDetailScreen() {
                  )}
                </View>
 
-               <Card className="p-4 rounded-2xl bg-surface border border-divider/10">
+               <Card className="p-4 rounded-2xl bg-surface border border-border/10">
                  {activeAssignment?.status === 'active' ? (
                    <View className="flex-row items-center">
                      <Avatar size="md" className="mr-3" alt={assigneeUser?.name || 'Assignee'}>
@@ -503,7 +503,7 @@ export default function GroupDetailScreen() {
 
           {/* Tabs Navigation */}
           <View className="mb-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab} variant="pill">
+            <Tabs value={activeTab} onValueChange={setActiveTab} variant="primary">
               <Tabs.List className="bg-surface-secondary/50 p-1 rounded-2xl">
                 <Tabs.ScrollView>
                   <Tabs.Indicator className="bg-background shadow-sm" />
@@ -543,7 +543,7 @@ export default function GroupDetailScreen() {
 
                 <View className="gap-4">
                   {groupData?.expenses?.length === 0 ? (
-                    <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                    <View className="p-6 rounded-2xl bg-surface border border-border/10 items-center">
                       <AppText className="text-muted">{t("group_detail.no_expenses")}</AppText>
                     </View>
                   ) : (
@@ -583,7 +583,7 @@ export default function GroupDetailScreen() {
                   <View className="gap-4">
                     {showDetailedDebts ? (
                       individualDebts.length === 0 ? (
-                        <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                        <View className="p-6 rounded-2xl bg-surface border border-border/10 items-center">
                           <AppText className="text-muted">{t("group_detail.no_debts")}</AppText>
                         </View>
                       ) : (
@@ -595,7 +595,7 @@ export default function GroupDetailScreen() {
                             <Card
                               key={debt.id}
                               variant="default"
-                              className="p-4 rounded-2xl bg-surface border border-divider/10"
+                              className="p-4 rounded-2xl bg-surface border border-border/10"
                             >
                               <View className="flex-row items-center justify-between mb-2">
                                 <View className="flex-row items-center flex-1">
@@ -633,7 +633,7 @@ export default function GroupDetailScreen() {
                       )
                     ) : (
                       optimizedDebts.length === 0 ? (
-                        <View className="p-6 rounded-2xl bg-surface border border-divider/10 items-center">
+                        <View className="p-6 rounded-2xl bg-surface border border-border/10 items-center">
                           <AppText className="text-muted">{t("group_detail.all_settled")}</AppText>
                         </View>
                       ) : (
@@ -645,7 +645,7 @@ export default function GroupDetailScreen() {
                             <Card
                               key={index}
                               variant="default"
-                              className="p-4 rounded-2xl bg-surface border border-divider/10"
+                              className="p-4 rounded-2xl bg-surface border border-border/10"
                             >
                               <View className="flex-row items-center justify-between">
                                 <View className="flex-row items-center flex-1">

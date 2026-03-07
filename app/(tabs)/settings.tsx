@@ -17,8 +17,8 @@ import {
   Avatar,
   Button,
   Card,
-  Divider,
   PressableFeedback,
+  Separator,
   Switch,
   useThemeColor,
 } from "heroui-native";
@@ -53,7 +53,7 @@ export default function SettingsScreen() {
   const SETTINGS_HEADER_HEIGHT = 360;
 
   const renderTopNavBarComponent = () => (
-    <HeaderNavBar useBlur={true} tint="light" intensity={80} className="border-b border-divider/10">
+    <HeaderNavBar useBlur={true} tint="light" intensity={80} className="border-b border-border/10">
       <View className="flex-row items-center h-full w-full">
         <View className="flex-1 items-start">
           <Button
@@ -124,7 +124,7 @@ export default function SettingsScreen() {
           {isAuthenticated ? user?.name : t('settings.not_logged_in')}
         </AppText>
         {isAuthenticated ? (
-          <View className="bg-surface px-4 py-1 rounded-full mt-2 border border-divider/10">
+          <View className="bg-surface px-4 py-1 rounded-full mt-2 border border-border/10">
             <AppText className="text-muted text-sm font-medium">
               {user?.email}
             </AppText>
@@ -190,20 +190,20 @@ export default function SettingsScreen() {
             </AppText>
             <Card
               variant="default"
-              className="overflow-hidden border border-divider/10 rounded-2xl"
+              className="overflow-hidden border border-border/10 rounded-2xl"
             >
               <SettingsItem
                 icon="creditcard"
                 iconBgColor="#17C964"
                 label={t('settings.account.payment_method')}
               />
-              <Divider className="my-3" />
+              <Separator className="my-3" />
               <SettingsItem
                 icon="lock"
                 iconBgColor="#F5A623"
                 label={t('settings.account.change_password')}
               />
-              <Divider className="my-3" />
+              <Separator className="my-3" />
               <SettingsItem
                 icon="shield"
                 iconBgColor="#0070F3"
@@ -219,7 +219,7 @@ export default function SettingsScreen() {
             </AppText>
             <Card
               variant="default"
-              className="overflow-hidden border border-divider/10 rounded-2xl"
+              className="overflow-hidden border border-border/10 rounded-2xl"
             >
               <SettingsItem
                 icon="moon.fill"
@@ -271,7 +271,7 @@ export default function SettingsScreen() {
                   </Switch>
                 }
               />
-              <Divider className="my-3" />
+              <Separator className="my-3" />
               <SettingsItem
                 icon="bell"
                 iconBgColor="#9455D3"
@@ -286,7 +286,7 @@ export default function SettingsScreen() {
                   </Switch>
                 }
               />
-              <Divider className="my-3" />
+              <Separator className="my-3" />
               <SettingsItem
                 icon="globe"
                 iconBgColor="#17C964"
@@ -298,7 +298,7 @@ export default function SettingsScreen() {
                   </AppText>
                 }
               />
-              <Divider className="my-3" />
+              <Separator className="my-3" />
               <SettingsItem
                 icon="dongsign"
                 iconBgColor="#F5A623"
@@ -319,20 +319,20 @@ export default function SettingsScreen() {
             </AppText>
             <Card
               variant="default"
-              className="overflow-hidden border border-divider/10 rounded-2xl"
+              className="overflow-hidden border border-border/10 rounded-2xl"
             >
               <SettingsItem
                 icon="heart"
                 iconBgColor="#F31260"
                 label={t('settings.support.invite_friends')}
               />
-              <Divider className="my-3" />
+              <Separator className="my-3" />
               <SettingsItem
                 icon="questionmark.circle"
                 iconBgColor="#0070F3"
                 label={t('settings.support.help')}
               />
-              <Divider className="my-3" />
+              <Separator className="my-3" />
               <SettingsItem
                 icon="info.circle"
                 iconBgColor="#06B6D4"

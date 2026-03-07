@@ -5,7 +5,7 @@ import { signInWithApple, signInWithGoogle } from '@/lib/auth/oauth';
 import { useAuth, useTranslation } from '@/lib/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Button, PressableFeedback, TextField, useThemeColor, useToast } from 'heroui-native';
+import { Button, Input, PressableFeedback, TextField, useThemeColor, useToast } from 'heroui-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 
@@ -152,7 +152,7 @@ export default function LoginScreen() {
           {isSignUp && (
             <TextField isRequired className="mb-4">
               <AppText className="text-sm font-medium mb-2 ml-1">{t('onboarding.login.name_label')}</AppText>
-              <TextField.Input
+              <Input
                 value={name}
                 onChangeText={setName}
                 placeholder={t('onboarding.login.name_placeholder')}
@@ -163,7 +163,7 @@ export default function LoginScreen() {
 
           <TextField isRequired className="mb-4">
             <AppText className="text-sm font-medium mb-2 ml-1">{t('onboarding.login.email_label')}</AppText>
-            <TextField.Input
+            <Input
               value={email}
               onChangeText={setEmail}
               placeholder="name@example.com"
@@ -174,7 +174,7 @@ export default function LoginScreen() {
 
           <TextField isRequired className="mb-6">
             <AppText className="text-sm font-medium mb-2 ml-1">{t('onboarding.login.password_label')}</AppText>
-            <TextField.Input
+            <Input
               value={password}
               onChangeText={setPassword}
               placeholder="••••••••"
@@ -225,7 +225,7 @@ export default function LoginScreen() {
 
           <Button
             variant="secondary"
-            className="h-14 rounded-2xl border border-divider/10"
+            className="h-14 rounded-2xl border border-border/10"
             onPress={handleGoogleLogin}
           >
             <View className="flex-row items-center gap-3">

@@ -8,7 +8,7 @@ import * as Sharing from "expo-sharing";
 import {
 	BottomSheet,
 	Button,
-	Divider,
+	Separator,
 	useThemeColor,
 	useToast,
 } from "heroui-native";
@@ -135,7 +135,7 @@ export function ShareQRSheet({
 							{t("share_qr.description", { name: groupName })}
 						</AppText>
 
-						<View className="bg-white p-6 rounded-3xl shadow-sm border border-divider/10 mb-8">
+						<View className="bg-white p-6 rounded-3xl shadow-sm border border-border/10 mb-8">
 							<QRCode
 								value={qrValue}
 								size={220}
@@ -153,7 +153,7 @@ export function ShareQRSheet({
 							</AppText>
 						</View>
 
-						<Divider className="mb-6 w-full opacity-10" />
+						<Separator className="mb-6 w-full opacity-10" />
 
 						<View className="flex-row gap-4 w-full">
 							<Button

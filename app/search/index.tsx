@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import {
   Avatar,
   Card,
+  Input,
   PressableFeedback,
   Spinner,
   TextField,
@@ -134,7 +135,7 @@ export default function SearchScreen() {
         const user = item.data;
         return (
           <View className="mb-2">
-            <Card className="rounded-2xl border border-divider/10 bg-surface p-4">
+            <Card className="rounded-2xl border border-border/10 bg-surface p-4">
               <View className="flex-row items-center gap-3">
                 {user.avatar_url ? (
                   <Avatar size="md" alt={user.name}>
@@ -179,7 +180,7 @@ export default function SearchScreen() {
               <PressableFeedback
                 key={idx}
                 onPress={() => setSearchQuery(item)}
-                className="flex-row items-center justify-between py-4 border-b border-divider/10"
+                className="flex-row items-center justify-between py-4 border-b border-border/10"
               >
                 <View className="flex-row items-center gap-3">
                   <IconSymbol name="clock" size={16} color={muted} />
@@ -210,12 +211,12 @@ export default function SearchScreen() {
       <View className="px-6 py-4">
         <TextField>
           <View className="justify-center">
-            <TextField.Input
+            <Input
               placeholder={t('search.placeholder', { defaultValue: 'Tìm nhóm, bạn bè, khoản chi...' })}
               placeholderTextColor={muted}
               value={searchQuery}
               onChangeText={setSearchQuery}
-              className="bg-surface border border-divider/10 rounded-2xl pl-12 h-16 text-foreground"
+              className="bg-surface border border-border/10 rounded-2xl pl-12 h-16 text-foreground"
               autoFocus
             />
             <View className="absolute left-4" pointerEvents="none">

@@ -57,7 +57,7 @@ export const AssigneeSelector: React.FC<AssigneeSelectorProps> = ({
         <Dialog.Content className="max-w-md w-[90%] self-center">
           <View className="flex-row justify-between items-center mb-2">
             <Dialog.Title className="text-xl font-bold">{t('debt_assignment.assignee_selector.title')}</Dialog.Title>
-            <Dialog.Close asChild>
+            <Dialog.Close>
               <Button isIconOnly variant="ghost" size="sm">
                 <IconSymbol name="xmark" size={24} color="gray" />
               </Button>
@@ -78,7 +78,7 @@ export const AssigneeSelector: React.FC<AssigneeSelectorProps> = ({
                     "p-3 rounded-2xl border flex-row items-center justify-between h-auto",
                     selectedUserId === member.userId
                       ? "border-primary bg-primary/10"
-                      : "border-divider/10"
+                      : "border-border/10"
                   )}
                   onPress={() => setSelectedUserId(member.userId)}
                 >
@@ -110,7 +110,7 @@ export const AssigneeSelector: React.FC<AssigneeSelectorProps> = ({
           </ScrollView>
 
           <View className="flex-row gap-3">
-            <Dialog.Close asChild>
+            <Dialog.Close>
               <Button 
                 variant="ghost" 
                 className="flex-1"

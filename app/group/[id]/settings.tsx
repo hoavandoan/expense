@@ -15,8 +15,9 @@ import {
     Avatar,
     Button,
     Card,
-    Divider,
+    Input,
     PressableFeedback,
+    Separator,
     Skeleton,
     Spinner,
     TextField,
@@ -36,6 +37,7 @@ export default function GroupSettingsScreen() {
   const success = useThemeColor("success");
   const warning = useThemeColor("warning");
   const { user } = useAuthStore();
+  const surface = useThemeColor("surface");
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
@@ -148,12 +150,12 @@ export default function GroupSettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
               {t("group_settings.info_label")}
             </AppText>
-            <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
+            <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
               <View className="p-4">
                 {isEditingName && canEdit ? (
                   <View className="gap-3">
-                    <TextField className="bg-surface-secondary border border-divider/10 rounded-xl">
-                      <TextField.Input
+                    <TextField className="bg-surface-secondary border border-border/10 rounded-xl">
+                      <Input
                         value={editedName}
                         onChangeText={setEditedName}
                         placeholder={t("group_settings.name_label")}
@@ -214,7 +216,7 @@ export default function GroupSettingsScreen() {
                   </View>
                 )}
               </View>
-              <Divider className="bg-divider/10" />
+              <Separator className="bg-border/10" />
               <View className="p-4">
                 <AppText className="text-muted text-xs mb-1">{t("group_settings.invite_code_label")}</AppText>
                 <View className="flex-row items-center justify-between">
@@ -250,10 +252,10 @@ export default function GroupSettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
               {t("group_settings.share_label")}
             </AppText>
-            <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
+            <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
               <PressableFeedback onPress={() => setIsShareSheetOpen(true)}>
                 <View className="p-4 flex-row items-center gap-4">
-                  <View className="bg-white p-2 rounded-xl border border-divider/10">
+                  <View className="bg-white p-2 rounded-xl border border-border/10">
                     <QRCode
                       value={`expense://join-group/${groupData.invite_code}`}
                       size={60}
@@ -292,7 +294,7 @@ export default function GroupSettingsScreen() {
                 </PressableFeedback>
               )}
             </View>
-            <Card className="rounded-2xl border border-divider/10 overflow-hidden bg-surface">
+            <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
               {members.length === 0 ? (
                 <View className="p-6">
                   <EmptyState
@@ -376,7 +378,7 @@ export default function GroupSettingsScreen() {
                         )}
                       </View>
                       {idx < members.length - 1 && (
-                        <Divider className="bg-divider/10" />
+                        <Separator className="bg-border/10" />
                       )}
                     </View>
                   );
@@ -388,7 +390,7 @@ export default function GroupSettingsScreen() {
           {/* Danger Zone */}
           <View>
             <Button variant="danger" onPress={() => setShowLeaveDialog(true)}>
-              <IconSymbol name="arrow.right.square" size={20} color={useThemeColor("surface")} />
+              <IconSymbol name="arrow.right.square" size={20} color={surface} />
               <Button.Label>{t("group_settings.leave_btn")}</Button.Label>
             </Button>
           </View>

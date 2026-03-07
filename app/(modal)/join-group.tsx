@@ -7,12 +7,13 @@ import * as Clipboard from "expo-clipboard";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import {
-    Button,
-    PressableFeedback,
-    Spinner,
-    TextField,
-    useThemeColor,
-    useToast
+  Button,
+  Input,
+  PressableFeedback,
+  Spinner,
+  TextField,
+  useThemeColor,
+  useToast
 } from "heroui-native";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
@@ -160,7 +161,7 @@ export default function JoinGroupScreen() {
   if (!permission.granted) {
     return (
       <View className="flex-1 bg-background items-center justify-center p-6">
-        <View className="bg-surface p-8 rounded-3xl border border-divider/10 items-center w-full">
+        <View className="bg-surface p-8 rounded-3xl border border-border/10 items-center w-full">
           <View className="w-20 h-20 bg-accent/10 rounded-full items-center justify-center mb-6">
             <IconSymbol name="camera.fill" size={40} color={accent} />
           </View>
@@ -251,9 +252,9 @@ export default function JoinGroupScreen() {
         </View>
 
         <View className="flex-row items-center gap-4 mb-8">
-          <View className="flex-1 h-[1px] bg-divider/10" />
+          <View className="flex-1 h-[1px] bg-border/10" />
           <AppText className="text-muted font-bold text-xs tracking-widest uppercase">{t('modal.join_group.or')}</AppText>
-          <View className="flex-1 h-[1px] bg-divider/10" />
+          <View className="flex-1 h-[1px] bg-border/10" />
         </View>
 
         <View className="mb-8">
@@ -266,9 +267,9 @@ export default function JoinGroupScreen() {
                 {t('modal.join_group.enter_code_desc')}
               </AppText>
               <View className="justify-center">
-                <TextField.Input
+                <Input
                   placeholder={t('modal.join_group.code_placeholder')}
-                  className="bg-surface border border-divider/10 h-16 rounded-2xl pl-12 pr-20 text-foreground"
+                  className="bg-surface border border-border/10 h-16 rounded-2xl pl-12 pr-20 text-foreground"
                   placeholderTextColor="gray"
                   value={inviteCode}
                   onChangeText={(text: string) => setInviteCode(text.toUpperCase())}
@@ -279,7 +280,7 @@ export default function JoinGroupScreen() {
                 </View>
                 <View className="absolute right-4">
                   <PressableFeedback
-                    className="bg-surface-secondary px-4 py-2 rounded-xl border border-divider/10"
+                    className="bg-surface-secondary px-4 py-2 rounded-xl border border-border/10"
                     onPress={handlePaste}
                   >
                     <View className="flex-row items-center gap-1.5">

@@ -18,7 +18,7 @@ export default function TabLayout() {
   const surface = useThemeColor('surface');
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const divider = useThemeColor('divider');
+  const border = useThemeColor('border');
 
   if (isLoading) {
     return null;
@@ -38,7 +38,7 @@ export default function TabLayout() {
         <NativeTabs
           backgroundColor={accent}
           indicatorColor={accent}
-          shadowColor={divider}
+          shadowColor={border}
           minimizeBehavior="onScrollDown"
         >
           <NativeTabs.Trigger name="index">
