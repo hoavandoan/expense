@@ -1,6 +1,5 @@
 import { AppText } from "@/components/app-text";
 import { ScreenScrollView } from "@/components/screen-scroll-view";
-import { FormSection } from "@/components/ui/form-section";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { EXPENSE_CATEGORIES } from "@/constants";
 import { useCreateExpense, useGroup, useGroups, useTranslation } from "@/lib/hooks";
@@ -14,11 +13,16 @@ import {
   Avatar,
   Button,
   Card,
-  Checkbox,
+  ControlField,
+  Description,
+  FieldError,
   Input,
+  InputGroup,
+  Label,
   PressableFeedback,
   Select,
   Skeleton,
+  TextArea,
   TextField,
   useThemeColor,
   useToast
@@ -335,12 +339,12 @@ export default function AddExpenseScreen() {
           </View>
         )}
 
-        <FormSection
-          label={t("modal.add_expense.group_label")}
+        <TextField
           isRequired
-          error={errors.groupId?.message}
+          isInvalid={!!errors.groupId}
           className={hasPreselectedGroup ? "hidden" : "mb-6 mt-4"}
         >
+          <Label>{t("modal.add_expense.group_label")}</Label>
           <Controller
             control={control}
             name="groupId"
@@ -349,7 +353,7 @@ export default function AddExpenseScreen() {
                 value={groupOptions.find((g) => g.value === value) as any}
                 onValueChange={(opt: any) => opt && onChange(opt.value)}
               >
-                <Select.Trigger className="h-12 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                <Select.Trigger>
                   <View className="flex-row items-center gap-3">
                     <IconSymbol
                       name="person.3.fill"
@@ -360,20 +364,14 @@ export default function AddExpenseScreen() {
                       className="text-base font-medium"
                       placeholder={t("modal.add_expense.group_placeholder")}
                     />
+                  <Select.TriggerIndicator />
                   </View>
-                  <IconSymbol
-                    name="chevron.right"
-                    size={16}
-                    color={muted}
-                    className="rotate-90"
-                  />
                 </Select.Trigger>
                 <Select.Portal>
                   <Select.Overlay className="bg-black/20" />
                   <Select.Content
                     presentation="popover"
                     placement="bottom"
-                    className="rounded-2xl bg-surface border border-border/10"
                     width={300}
                   >
                     {groupOptions.map((group) => (
@@ -399,67 +397,68 @@ export default function AddExpenseScreen() {
               </Select>
             )}
           />
-        </FormSection>
+          <FieldError>{errors.groupId?.message}</FieldError>
+        </TextField>
         
-        <FormSection
-          label={t("modal.add_expense.amount_label")}
+        <TextField
           isRequired
-          error={errors.amount?.message}
+          isInvalid={!!errors.amount}
+          className="mb-6"
         >
-          <TextField isRequired isInvalid={!!errors.amount}>
-            <Controller
-              control={control}
-              name="amount"
-              render={({ field: { onChange, value } }) => (
-                <View className="justify-center">
-                  <Input
-                    placeholder="0"
-                    value={value}
-                    onChangeText={onChange}
-                    keyboardType="numeric"
-                    className="bg-surface h-16 rounded-2xl px-4 text-2xl font-bold text-center"
-                  />
-                  <View className="absolute right-4" pointerEvents="none">
-                    <AppText className="text-muted text-xl font-bold">
-                      {currency === "VND"
-                        ? "₫"
-                        : currency === "USD"
-                        ? "$"
-                        : "€"}
-                    </AppText>
-                  </View>
-                </View>
-              )}
-            />
-          </TextField>
-        </FormSection>
-
-        <FormSection
-          label={t("modal.add_expense.desc_label")}
-          isRequired
-          error={errors.title?.message}
-        >
-          <TextField isRequired isInvalid={!!errors.title}>
-            <Controller
-              control={control}
-              name="title"
-              render={({ field: { onChange, value } }) => (
-                <Input
-                  placeholder={t("modal.add_expense.desc_placeholder")}
+          <Label>{t("modal.add_expense.amount_label")}</Label>
+          <Controller
+            control={control}
+            name="amount"
+            render={({ field: { onChange, value } }) => (
+              <InputGroup>
+                <InputGroup.Input
+                  placeholder="0"
                   value={value}
                   onChangeText={onChange}
-                  className="bg-surface border border-border/10 h-12 rounded-2xl px-4 text-base"
+                  keyboardType="numeric"
+                  className="bg-surface h-16 rounded-2xl px-4 text-2xl font-bold text-center"
                 />
-              )}
-            />
-          </TextField>
-        </FormSection>
+                <InputGroup.Suffix isDecorative className="mr-4">
+                  <AppText className="text-muted text-xl font-bold">
+                    {currency === "VND"
+                      ? "₫"
+                      : currency === "USD"
+                      ? "$"
+                      : "€"}
+                  </AppText>
+                </InputGroup.Suffix>
+              </InputGroup>
+            )}
+          />
+          <FieldError>{errors.amount?.message}</FieldError>
+        </TextField>
 
-        <FormSection
-          label={t("modal.add_expense.category_label")}
+        <TextField
           isRequired
-          error={errors.category?.message}
+          isInvalid={!!errors.title}
+          className="mb-6"
         >
+          <Label>{t("modal.add_expense.desc_label")}</Label>
+          <Controller
+            control={control}
+            name="title"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder={t("modal.add_expense.desc_placeholder")}
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
+          />
+          <FieldError>{errors.title?.message}</FieldError>
+        </TextField>
+
+        <TextField
+          isRequired
+          isInvalid={!!errors.category}
+          className="mb-6"
+        >
+          <Label>{t("modal.add_expense.category_label")}</Label>
           <Controller
             control={control}
             name="category"
@@ -468,7 +467,7 @@ export default function AddExpenseScreen() {
                 value={EXPENSE_CATEGORIES.find((c) => c.value === value) as any}
                 onValueChange={(opt: any) => opt && onChange(opt.value || opt)}
               >
-                <Select.Trigger className="h-12 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                <Select.Trigger >
                   <View className="flex-row items-center gap-3">
                     <View
                       className="w-8 h-8 rounded-lg items-center justify-center"
@@ -494,20 +493,15 @@ export default function AddExpenseScreen() {
                       className="text-base font-medium"
                       placeholder={t("modal.add_expense.category_placeholder")}
                     />
+                  <Select.TriggerIndicator />
+
                   </View>
-                  <IconSymbol
-                    name="chevron.right"
-                    size={16}
-                    color={muted}
-                    className="rotate-90"
-                  />
                 </Select.Trigger>
                 <Select.Portal>
                   <Select.Overlay className="bg-black/20" />
                   <Select.Content
                     presentation="popover"
                     placement="bottom"
-                    className="rounded-2xl bg-surface border border-border/10"
                     width={300}
                   >
                     {EXPENSE_CATEGORIES.map((category) => (
@@ -515,10 +509,8 @@ export default function AddExpenseScreen() {
                         key={category.value}
                         value={category.value}
                         label={category.label}
-                        className="p-4"
                       >
-                        <View className="flex-row items-center gap-3">
-                          <View
+                        <View
                             className="w-8 h-8 rounded-lg items-center justify-center"
                             style={{ backgroundColor: category.bg }}
                           >
@@ -528,8 +520,7 @@ export default function AddExpenseScreen() {
                               color={category.color as any}
                             />
                           </View>
-                          <Select.ItemLabel className="text-base" />
-                        </View>
+                        <Select.ItemLabel/>
                         <Select.ItemIndicator />
                       </Select.Item>
                     ))}
@@ -538,13 +529,15 @@ export default function AddExpenseScreen() {
               </Select>
             )}
           />
-        </FormSection>
+          <FieldError>{errors.category?.message}</FieldError>
+        </TextField>
 
-        <FormSection
-          label={t("modal.add_expense.payer_label")}
+        <TextField
           isRequired
-          error={errors.paidById?.message}
+          isInvalid={!!errors.paidById}
+          className="mb-6"
         >
+          <Label>{t("modal.add_expense.payer_label")}</Label>
           <Controller
             control={control}
             name="paidById"
@@ -563,7 +556,7 @@ export default function AddExpenseScreen() {
                   value={currentPayerOption as any}
                   onValueChange={(opt: any) => opt && onChange(opt.value)}
                 >
-                  <Select.Trigger className="h-12 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                  <Select.Trigger>
                     <View className="flex-row items-center gap-3">
                       <View className="w-8 h-8 rounded-full bg-accent/10 items-center justify-center">
                         <AppText className="font-bold text-accent text-sm">
@@ -574,20 +567,14 @@ export default function AddExpenseScreen() {
                         className="text-base font-medium"
                         placeholder={t("modal.add_expense.payer_placeholder")}
                       />
+                    <Select.TriggerIndicator />
                     </View>
-                    <IconSymbol
-                      name="chevron.right"
-                      size={16}
-                      color={muted}
-                      className="rotate-90"
-                    />
                   </Select.Trigger>
                   <Select.Portal>
                     <Select.Overlay className="bg-black/20" />
                     <Select.Content
                       presentation="popover"
                       placement="bottom"
-                      className="rounded-2xl bg-surface border border-border/10"
                       width={300}
                     >
                       {payerOptions.map((option) => (
@@ -595,17 +582,18 @@ export default function AddExpenseScreen() {
                           key={option.value}
                           value={option.value}
                           label={option.label}
-                          className="p-4"
+                          className="p-2"
                         >
-                          <View className="flex-row items-center gap-3">
+                          <View className="flex-row items-center gap-2">
                             <View className="w-8 h-8 rounded-full bg-accent/10 items-center justify-center">
                               <AppText className="font-bold text-accent text-sm">
                                 {option.initial}
                               </AppText>
                             </View>
                             <Select.ItemLabel className="text-base" />
-                          </View>
                           <Select.ItemIndicator />
+
+                          </View>
                         </Select.Item>
                       ))}
                     </Select.Content>
@@ -614,25 +602,26 @@ export default function AddExpenseScreen() {
               );
             }}
           />
-        </FormSection>
+          <FieldError>{errors.paidById?.message}</FieldError>
+        </TextField>
 
-        <FormSection
-          label={t("modal.add_expense.split_label")}
+        <TextField
           isRequired
-          error={errors.participantIds?.message}
+          isInvalid={!!errors.participantIds}
           className="mb-8"
         >
+          <Label>{t("modal.add_expense.split_label")}</Label>
           <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
             {members.map((member, index) => {
               const isSelected = participantIds.includes(member.id);
               return (
                 <View key={member.id}>
-                  <PressableFeedback
-                    onPress={() => toggleParticipant(member.id)}
-                    className="flex-row items-center p-4"
+                  <ControlField
+                    isSelected={isSelected}
+                    onSelectedChange={() => toggleParticipant(member.id)}
+                    className="flex-row items-center p-2"
                   >
-                    <Checkbox isSelected={isSelected} />
-                    <Avatar size="sm" alt={member.name} className="ml-3 mr-3">
+                    <Avatar size="sm" alt={member.name} className="ml-2 mr-2 size-8">
                       {member.avatarUrl ? (
                         <Avatar.Image
                           source={{ uri: member.avatarUrl }}
@@ -652,20 +641,21 @@ export default function AddExpenseScreen() {
                       )}
                     </Avatar>
                     <View className="flex-1">
-                      <AppText
+                      <Label
                         className={`font-bold text-base ${
                           !isSelected ? "text-muted opacity-50" : ""
                         }`}
                       >
                         {member.id === user?.id ? t("activity.you") : member.name}
-                      </AppText>
+                      </Label>
                     </View>
                     {isSelected && totalAmount > 0 && (
                       <AppText className="font-bold text-accent mr-1">
                         {formatCurrency(splitAmount, currency)}
                       </AppText>
                     )}
-                  </PressableFeedback>
+                    <ControlField.Indicator variant="checkbox" />
+                  </ControlField>
                   {index < members.length - 1 && (
                     <View className="h-[1px] bg-border/10 mx-4" />
                   )}
@@ -673,79 +663,78 @@ export default function AddExpenseScreen() {
               );
             })}
           </Card>
-        </FormSection>
+          <FieldError>{errors.participantIds?.message}</FieldError>
+        </TextField>
 
-        <FormSection
-          label={t("modal.add_expense.notes_label")}
-          error={errors.notes?.message}
+        <TextField
+          isInvalid={!!errors.notes}
+          className="mb-6"
         >
-          <TextField isInvalid={!!errors.notes}>
-            <Controller
-              control={control}
-              name="notes"
-              render={({ field: { onChange, value } }) => (
-                <Input
-                  placeholder={t("modal.add_expense.notes_placeholder")}
-                  value={value}
-                  onChangeText={onChange}
-                  multiline
-                  numberOfLines={3}
-                  className="bg-surface border border-border/10 rounded-2xl px-4 py-3 text-base min-h-[80px]"
-                />
-              )}
-            />
-          </TextField>
-        </FormSection>
+          <Label>{t("modal.add_expense.notes_label")}</Label>
+          <Controller
+            control={control}
+            name="notes"
+            render={({ field: { onChange, value } }) => (
+              <TextArea
+                placeholder={t("modal.add_expense.notes_placeholder")}
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
+          />
+          <FieldError>{errors.notes?.message}</FieldError>
+        </TextField>
 
-        <FormSection
-          label={t("modal.add_expense.receipt_label")}
-        >
-          {selectedReceipt ? (
-            <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
-              <View className="relative">
-                <Image
-                  source={{ uri: selectedReceipt }}
-                  style={{ width: "100%", height: 200 }}
-                  contentFit="cover"
-                />
-                <Button
-                  onPress={removeReceipt}
-                  variant="ghost"
-                  isIconOnly
-                  className="absolute top-2 right-2 bg-black/50 rounded-full size-8"
-                >
-                  <IconSymbol
-                    name="xmark"
-                    size={16}
-                    color="white"
+        <TextField className="mb-8">
+          <Label>{t("modal.add_expense.receipt_label")}</Label>
+          <View className="mt-2">
+            {selectedReceipt ? (
+              <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
+                <View className="relative">
+                  <Image
+                    source={{ uri: selectedReceipt }}
+                    style={{ width: "100%", height: 200 }}
+                    contentFit="cover"
                   />
-                </Button>
-              </View>
-              <PressableFeedback
-                onPress={pickReceipt}
-                className="p-4 border-t border-border/10"
-              >
-                <AppText className="text-accent text-center font-semibold">
-                  {t("modal.add_expense.receipt_change")}
-                </AppText>
-              </PressableFeedback>
-            </Card>
-          ) : (
-            <PressableFeedback onPress={pickReceipt}>
-              <Card className="rounded-2xl border border-dashed border-border/20 bg-surface-secondary p-8 items-center justify-center">
-                <View className="bg-accent/10 p-4 rounded-full mb-3">
-                  <IconSymbol name="camera.fill" size={32} color={accent} />
+                  <Button
+                    onPress={removeReceipt}
+                    variant="ghost"
+                    isIconOnly
+                    className="absolute top-2 right-2 bg-black/50 rounded-full size-8"
+                  >
+                    <IconSymbol
+                      name="xmark"
+                      size={16}
+                      color="white"
+                    />
+                  </Button>
                 </View>
-                <AppText className="text-accent font-semibold text-base">
-                  {t("modal.add_expense.receipt_upload")}
-                </AppText>
-                <AppText className="text-muted text-xs mt-1">
-                  {t("modal.add_expense.receipt_hint")}
-                </AppText>
+                <PressableFeedback
+                  onPress={pickReceipt}
+                  className="p-4 border-t border-border/10"
+                >
+                  <AppText className="text-accent text-center font-semibold">
+                    {t("modal.add_expense.receipt_change")}
+                  </AppText>
+                </PressableFeedback>
               </Card>
-            </PressableFeedback>
-          )}
-        </FormSection>
+            ) : (
+              <PressableFeedback onPress={pickReceipt}>
+                <Card className="rounded-2xl border border-dashed border-border/20 bg-surface-secondary p-8 items-center justify-center">
+                  <View className="bg-accent/10 p-4 rounded-full mb-3">
+                    <IconSymbol name="camera.fill" size={32} color={accent} />
+                  </View>
+                  <AppText className="text-accent font-semibold text-base">
+                    {t("modal.add_expense.receipt_upload")}
+                  </AppText>
+                  <Description className="text-center mt-1">
+                    {t("modal.add_expense.receipt_hint")}
+                  </Description>
+                </Card>
+              </PressableFeedback>
+            )}
+          </View>
+        </TextField>
 
         <Button
           variant="primary"
