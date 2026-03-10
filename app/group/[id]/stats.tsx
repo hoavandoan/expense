@@ -74,7 +74,7 @@ export default function GroupStatsScreen() {
         <StickyHeader title={t("group_stats.title")} />
         <View className="flex-1 items-center justify-center">
           <Spinner size="lg" color={accent} />
-          <AppText className="mt-4 text-muted">{t("loading")}</AppText>
+          <AppText className="mt-4 text-muted">{t("common.loading")}</AppText>
         </View>
       </View>
     );
@@ -98,7 +98,7 @@ export default function GroupStatsScreen() {
   return (
     <View className="flex-1 bg-background">
       <StickyHeader title={t("group_stats.title")} />
-      <ScreenScrollView contentContainerStyle={{ padding: 20 }}>
+      <ScreenScrollView contentContainerStyle={{ padding: 20 }} onRefresh={() => {}}>
         <View className="mb-8">
           <AppText className="text-sm font-bold text-muted uppercase tracking-widest mb-4 ml-1">{t("group_stats.overview_label")}</AppText>
           <Card className="p-6 rounded-3xl border border-border/10">

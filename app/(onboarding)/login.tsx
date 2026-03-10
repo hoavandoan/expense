@@ -5,7 +5,7 @@ import { signInWithApple, signInWithGoogle } from '@/lib/auth/oauth';
 import { useAuth, useTranslation } from '@/lib/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Button, Input, PressableFeedback, TextField, useThemeColor, useToast } from 'heroui-native';
+import { Button, FieldError, Input, InputGroup, Label, PressableFeedback, TextField, useThemeColor, useToast } from 'heroui-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 
@@ -150,19 +150,20 @@ export default function LoginScreen() {
         {/* Form */}
         <View className="gap-4 my-6">
           {isSignUp && (
-            <TextField isRequired className="mb-4">
-              <AppText className="text-sm font-medium mb-2 ml-1">{t('onboarding.login.name_label')}</AppText>
+            <TextField isRequired>
+              <Label>{t('onboarding.login.name_label')}</Label>
               <Input
                 value={name}
                 onChangeText={setName}
                 placeholder={t('onboarding.login.name_placeholder')}
                 autoCapitalize="words"
               />
+              <FieldError />
             </TextField>
           )}
 
-          <TextField isRequired className="mb-4">
-            <AppText className="text-sm font-medium mb-2 ml-1">{t('onboarding.login.email_label')}</AppText>
+          <TextField isRequired>
+            <Label>{t('onboarding.login.email_label')}</Label>
             <Input
               value={email}
               onChangeText={setEmail}
@@ -170,16 +171,20 @@ export default function LoginScreen() {
               keyboardType="email-address"
               autoCapitalize="none"
             />
+            <FieldError />
           </TextField>
 
-          <TextField isRequired className="mb-6">
-            <AppText className="text-sm font-medium mb-2 ml-1">{t('onboarding.login.password_label')}</AppText>
-            <Input
-              value={password}
-              onChangeText={setPassword}
-              placeholder="••••••••"
-              secureTextEntry
-            />
+          <TextField isRequired>
+            <Label>{t('onboarding.login.password_label')}</Label>
+            <InputGroup>
+              <InputGroup.Input
+                value={password}
+                onChangeText={setPassword}
+                placeholder="••••••••"
+                secureTextEntry
+              />
+            </InputGroup>
+            <FieldError />
           </TextField>
 
           <Button

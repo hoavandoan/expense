@@ -192,7 +192,7 @@ export default function GroupDetailScreen() {
   )?.user;
 
   return (
-    <View className="flex-1 bg-black">
+    <View className="flex-1">
       <AnimatedScrollView
         showsVerticalScrollIndicator={false}
         headerMaxHeight={300}
@@ -269,7 +269,7 @@ export default function GroupDetailScreen() {
         renderOveralComponent={() => (
           <AnimatedScrollViewTitleWrapper className="px-6 pb-6">
             <AnimatedScrollViewTitle
-              size={42}
+              size={32}
               className="text-white font-bold tracking-tighter"
             >
               {group?.name}
@@ -325,9 +325,9 @@ export default function GroupDetailScreen() {
           <View className="mb-10">
             <Card
               variant="default"
-              className="p-8 rounded-2xl shadow-xl overflow-hidden bg-accent"
+              className="p-6 rounded-2xl shadow-xl overflow-hidden bg-accent"
             >
-              <View className="mb-6">
+              <View className="mb-4">
                 <View className="flex-row items-center justify-between mb-2">
                   <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest">
                     {t("group_detail.total_group_spent")}
@@ -344,7 +344,7 @@ export default function GroupDetailScreen() {
                 </AppText>
               </View>
 
-              <View className="h-[1px] bg-white/10 w-full mb-6" />
+              <View className="h-[1px] bg-white/10 w-full mb-4" />
 
               <View className="flex-row gap-4">
                 <View className="flex-1">
@@ -363,7 +363,7 @@ export default function GroupDetailScreen() {
                   <AppText className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">
                     {userStats.balance >= 0 ? t("group_detail.you_receive") : t("group_detail.you_owe_label")}
                   </AppText>
-                  <AppText className={cn("text-xl font-bold", userStats.balance >= 0 ? "text-success" : "text-danger")} adjustsFontSizeToFit numberOfLines={1}>
+                  <AppText className={cn("text-xl font-bold", "text-danger/80")} adjustsFontSizeToFit numberOfLines={1}>
                     {formatCurrency(
                       Math.abs(userStats.balance),
                       group?.currency || "VND"
@@ -372,7 +372,7 @@ export default function GroupDetailScreen() {
                 </View>
               </View>
 
-              <View className="mt-8 flex-row gap-2">
+              <View className="mt-4 flex-row gap-2">
                 <PressableFeedback
                   className="flex-1"
                   onPress={() =>

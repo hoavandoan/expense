@@ -63,12 +63,6 @@ const getExpenseSchema = (t: any) => z.object({
 
 type ExpenseFormValues = z.infer<ReturnType<typeof getExpenseSchema>>;
 
-interface GroupOption {
-  id: string;
-  name: string;
-  currency: string;
-}
-
 interface MemberOption {
   id: string;
   name: string;
@@ -339,10 +333,11 @@ export default function AddExpenseScreen() {
           </View>
         )}
 
-        <TextField
+        <View className="gap-4">
+<TextField
           isRequired
           isInvalid={!!errors.groupId}
-          className={hasPreselectedGroup ? "hidden" : "mb-6 mt-4"}
+          className={hasPreselectedGroup ? "hidden" : "mt-4"}
         >
           <Label>{t("modal.add_expense.group_label")}</Label>
           <Controller
@@ -388,8 +383,8 @@ export default function AddExpenseScreen() {
                             color={accent}
                           />
                           <Select.ItemLabel className="text-base" />
-                        </View>
                         <Select.ItemIndicator />
+                        </View>
                       </Select.Item>
                     ))}
                   </Select.Content>
@@ -403,7 +398,6 @@ export default function AddExpenseScreen() {
         <TextField
           isRequired
           isInvalid={!!errors.amount}
-          className="mb-6"
         >
           <Label>{t("modal.add_expense.amount_label")}</Label>
           <Controller
@@ -436,7 +430,6 @@ export default function AddExpenseScreen() {
         <TextField
           isRequired
           isInvalid={!!errors.title}
-          className="mb-6"
         >
           <Label>{t("modal.add_expense.desc_label")}</Label>
           <Controller
@@ -456,7 +449,6 @@ export default function AddExpenseScreen() {
         <TextField
           isRequired
           isInvalid={!!errors.category}
-          className="mb-6"
         >
           <Label>{t("modal.add_expense.category_label")}</Label>
           <Controller
@@ -535,7 +527,6 @@ export default function AddExpenseScreen() {
         <TextField
           isRequired
           isInvalid={!!errors.paidById}
-          className="mb-6"
         >
           <Label>{t("modal.add_expense.payer_label")}</Label>
           <Controller
@@ -557,7 +548,7 @@ export default function AddExpenseScreen() {
                   onValueChange={(opt: any) => opt && onChange(opt.value)}
                 >
                   <Select.Trigger>
-                    <View className="flex-row items-center gap-3">
+                    <View className="flex-row items-center gap-2">
                       <View className="w-8 h-8 rounded-full bg-accent/10 items-center justify-center">
                         <AppText className="font-bold text-accent text-sm">
                           {selectedPayer?.name?.charAt(0) || "?"}
@@ -608,7 +599,6 @@ export default function AddExpenseScreen() {
         <TextField
           isRequired
           isInvalid={!!errors.participantIds}
-          className="mb-8"
         >
           <Label>{t("modal.add_expense.split_label")}</Label>
           <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
@@ -668,7 +658,6 @@ export default function AddExpenseScreen() {
 
         <TextField
           isInvalid={!!errors.notes}
-          className="mb-6"
         >
           <Label>{t("modal.add_expense.notes_label")}</Label>
           <Controller
@@ -685,9 +674,9 @@ export default function AddExpenseScreen() {
           <FieldError>{errors.notes?.message}</FieldError>
         </TextField>
 
-        <TextField className="mb-8">
+        <TextField className="mb-6">
           <Label>{t("modal.add_expense.receipt_label")}</Label>
-          <View className="mt-2">
+          <View>
             {selectedReceipt ? (
               <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
                 <View className="relative">
@@ -735,6 +724,7 @@ export default function AddExpenseScreen() {
             )}
           </View>
         </TextField>
+          </View>
 
         <Button
           variant="primary"

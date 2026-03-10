@@ -1,6 +1,5 @@
 import { AppText } from "@/components/app-text";
 import { ScreenScrollView } from "@/components/screen-scroll-view";
-import { FormSection } from "@/components/ui/form-section";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { CURRENCIES, GROUP_TYPES } from "@/constants";
 import { useCreateGroup, useTranslation } from "@/lib/hooks";
@@ -13,7 +12,9 @@ import { useRouter } from "expo-router";
 import {
   Avatar,
   Button,
+  FieldError,
   Input,
+  Label,
   PressableFeedback,
   Select,
   TextField,
@@ -131,55 +132,50 @@ export default function AddGroupScreen() {
           </AppText>
         </View>
 
-        <View className="gap-2 px-4">
-          <FormSection
-            label={t("modal.add_group.name_label")}
+        <View className="gap-4">
+          <TextField
             isRequired
-            error={errors.name?.message}
+            isInvalid={!!errors.name}
           >
-            <TextField isRequired isInvalid={!!errors.name}>
-              <Controller
-                control={control}
-                name="name"
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    placeholder={t("modal.add_group.name_placeholder")}
-                    value={value}
-                    onChangeText={onChange}
-                    className="bg-surface border border-border/10 h-12 rounded-2xl px-4 text-base"
-                  />
-                )}
-              />
-            </TextField>
-          </FormSection>
+            <Label>{t("modal.add_group.name_label")}</Label>
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder={t("modal.add_group.name_placeholder")}
+                  value={value}
+                  onChangeText={onChange}
+                />
+              )}
+            />
+            <FieldError>{errors.name?.message}</FieldError>
+          </TextField>
 
-          <FormSection
-            label={t("modal.add_group.desc_label")}
-            error={errors.description?.message}
-          >
-            <TextField isInvalid={!!errors.description}>
-              <Controller
-                control={control}
-                name="description"
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    placeholder={t("modal.add_group.desc_placeholder")}
-                    value={value}
-                    onChangeText={onChange}
-                    className="bg-surface border border-border/10 h-12 rounded-2xl px-4 text-base"
-                  />
-                )}
-              />
-            </TextField>
-          </FormSection>
+          <TextField isInvalid={!!errors.description}>
+            <Label>{t("modal.add_group.desc_label")}</Label>
+            <Controller
+              control={control}
+              name="description"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder={t("modal.add_group.desc_placeholder")}
+                  value={value}
+                  onChangeText={onChange}
+                />
+              )}
+            />
+            <FieldError>{errors.description?.message}</FieldError>
+          </TextField>
 
           <View className="flex-row gap-4">
             <View className="flex-1">
-              <FormSection
-                label={t("modal.add_group.type_label")}
+            <View className="flex-1">
+              <TextField
                 isRequired
-                error={errors.groupType?.message}
+                isInvalid={!!errors.groupType}
               >
+                <Label>{t("modal.add_group.type_label")}</Label>
                 <Controller
                   control={control}
                   name="groupType"
@@ -188,7 +184,7 @@ export default function AddGroupScreen() {
                       value={GROUP_TYPES.find((t) => t.value === value) as any}
                       onValueChange={(opt: any) => opt && onChange(opt.value)}
                     >
-                      <Select.Trigger className="h-12 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                      <Select.Trigger>
                         <View className="flex-row items-center gap-3">
                           <IconSymbol
                             name={
@@ -202,20 +198,14 @@ export default function AddGroupScreen() {
                             className="text-[15px] font-medium"
                             placeholder={t("modal.add_group.type_label")}
                           />
+                          <Select.TriggerIndicator />
                         </View>
-                        <IconSymbol
-                          name="chevron.right"
-                          size={16}
-                          color={muted}
-                          className="rotate-90"
-                        />
                       </Select.Trigger>
                       <Select.Portal>
                         <Select.Overlay className="bg-black/20" />
                         <Select.Content
                           presentation="popover"
                           placement="bottom"
-                          className="rounded-2xl bg-surface border border-border/10"
                           width={250}
                         >
                           {GROUP_TYPES.map((type) => (
@@ -223,7 +213,6 @@ export default function AddGroupScreen() {
                               key={type.value}
                               value={type.value}
                               label={t(`group_types.${type.value}`)}
-                              className="p-4"
                             >
                               <View className="flex-row items-center gap-3">
                                 <IconSymbol
@@ -232,8 +221,8 @@ export default function AddGroupScreen() {
                                   color={accent}
                                 />
                                 <Select.ItemLabel className="text-base" />
+                                <Select.ItemIndicator />
                               </View>
-                              <Select.ItemIndicator />
                             </Select.Item>
                           ))}
                         </Select.Content>
@@ -241,15 +230,18 @@ export default function AddGroupScreen() {
                     </Select>
                   )}
                 />
-              </FormSection>
+                <FieldError>{errors.groupType?.message}</FieldError>
+              </TextField>
+            </View>
             </View>
 
             <View className="flex-1">
-              <FormSection
-                label={t("modal.add_group.currency_label")}
+            <View className="flex-1">
+              <TextField
                 isRequired
-                error={errors.currency?.message}
+                isInvalid={!!errors.currency}
               >
+                <Label>{t("modal.add_group.currency_label")}</Label>
                 <Controller
                   control={control}
                   name="currency"
@@ -258,22 +250,17 @@ export default function AddGroupScreen() {
                       value={CURRENCIES.find((c) => c.value === value) as any}
                       onValueChange={(opt: any) => opt && onChange(opt.value)}
                     >
-                      <Select.Trigger className="h-12 border border-border/10 bg-surface rounded-2xl px-4 flex-row items-center justify-between">
+                      <Select.Trigger>
                         <View className="flex-row items-center gap-3">
-                          <AppText className="font-bold text-accent text-lg">
+                          <AppText className="font-bold text-accent">
                             {CURRENCIES.find((c) => c.value === value)?.symbol}
                           </AppText>
                           <Select.Value
                             className="text-[15px] font-medium"
                             placeholder={t("modal.add_group.currency_label")}
                           />
+                          <Select.TriggerIndicator />
                         </View>
-                        <IconSymbol
-                          name="chevron.right"
-                          size={16}
-                          color={muted}
-                          className="rotate-90"
-                        />
                       </Select.Trigger>
                       <Select.Portal>
                         <Select.Overlay className="bg-black/20" />
@@ -288,15 +275,14 @@ export default function AddGroupScreen() {
                               key={curr.value}
                               value={curr.value}
                               label={curr.label}
-                              className="p-4"
                             >
                               <View className="flex-row items-center gap-3">
                                 <AppText className="font-bold text-accent text-lg w-6">
                                   {curr.symbol}
                                 </AppText>
                                 <Select.ItemLabel className="text-base" />
+                                <Select.ItemIndicator />
                               </View>
-                              <Select.ItemIndicator />
                             </Select.Item>
                           ))}
                         </Select.Content>
@@ -304,7 +290,9 @@ export default function AddGroupScreen() {
                     </Select>
                   )}
                 />
-              </FormSection>
+                <FieldError>{errors.currency?.message}</FieldError>
+              </TextField>
+            </View>
             </View>
           </View>
         </View>

@@ -16,7 +16,7 @@ import React, { useRef } from "react";
 import { View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { BottomSheetBlurOverlay } from "../bottom-sheet-blur-overlay";
+// import { BottomSheetBlurOverlay } from "../bottom-sheet-blur-overlay";
 
 interface ShareQRSheetProps {
 	isOpen: boolean;
@@ -118,7 +118,7 @@ export function ShareQRSheet({
 	return (
 		<BottomSheet isOpen={isOpen} onOpenChange={onOpenChange}>
 			<BottomSheet.Portal>
-				<BottomSheetBlurOverlay />
+				<BottomSheet.Overlay />
 				<BottomSheet.Content
 					enableDynamicSizing={true}
 					detached={true}

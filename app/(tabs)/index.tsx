@@ -15,8 +15,9 @@ import {
   useUnreadNotificationsCount,
 } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
+import { useThemeColor } from "heroui-native";
 import React, { useState } from "react";
-import { View } from "react-native";
+import { RefreshControl, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
@@ -27,23 +28,33 @@ export default function HomeScreen() {
   const { user, isAuthenticated } = useAuthStore();
 
   // Fetch data with React Query hooks
-  const { data: groups, isLoading: isLoadingGroups } = useGroups();
-  const { data: recentExpenses, isLoading: isLoadingExpenses } = useRecentExpenses(10);
-  const { data: unreadCount } = useUnreadNotificationsCount();
+  const { data: groups, isPending: isLoadingGroups, refetch: refetchGroups } = useGroups();
+  const { data: recentExpenses, isPending: isLoadingExpenses, refetch: refetchExpenses } = useRecentExpenses(10);
+  const { data: unreadCount, isPending: isLoadingUnreadCount, refetch: refetchUnreadCount } = useUnreadNotificationsCount();
 
   // Balance statistics logic
   const balanceStats = useTotalBalanceAcrossGroups(groups, user?.id || null);
+  const accent = useThemeColor("accent");
 
   const handleToggleBalance = () => setShowBalance((prev) => !prev);
+  const handleRefresh = () => {
+    refetchGroups();
+    refetchExpenses();
+    refetchUnreadCount();
+  }
+
+  const isRefreshing = isLoadingGroups || isLoadingExpenses || isLoadingUnreadCount;
 
   const HOME_HEADER_HEIGHT = 140;
 
   return (
     <View className="flex-1 bg-background">
-      <SkiaOnboardingBackground primaryColor="accent-soft" secondaryColor="background"/>
+      <SkiaOnboardingBackground primaryColor="success-soft-foreground" secondaryColor="background"/>
       <AnimatedScrollView
         headerMaxHeight={HOME_HEADER_HEIGHT}
         disableScale={true}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor={accent} />}
         renderTopNavBarComponent={() => (
           <HomeNavbar
             user={user}

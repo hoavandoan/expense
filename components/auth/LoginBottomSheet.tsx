@@ -5,7 +5,6 @@ import React from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../app-text';
-import { BottomSheetBlurOverlay } from '../bottom-sheet-blur-overlay';
 
 interface LoginBottomSheetProps {
   isOpen: boolean;
@@ -70,7 +69,8 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
           {/* Login Options */}
           <View className="gap-4">
             <Button
-              className="w-full h-14 rounded-2xl bg-black dark:bg-white"
+              size="lg"
+              className="bg-black dark:bg-white"
               onPress={handleAppleLogin}
             >
               <View className="flex-row items-center gap-3">
@@ -90,7 +90,7 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
 
             <Button
               variant="secondary"
-              className="w-full h-14 rounded-2xl border border-black/10 bg-surface/5"
+              size="lg"
               onPress={handleGoogleLogin}
             >
               <View className="flex-row items-center gap-3">

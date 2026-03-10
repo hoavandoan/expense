@@ -11,7 +11,8 @@
         "success": "Success",
         "close": "Close",
         "retry": "Retry",
-        "member": "Member"
+        "member": "Member",
+        "copied": "Copied"
     },
     "settings": {
         "title": "Settings",

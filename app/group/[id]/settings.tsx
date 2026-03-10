@@ -12,17 +12,17 @@ import { useAuthStore } from "@/lib/stores/auth-store";
 import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    Avatar,
-    Button,
-    Card,
-    Input,
-    PressableFeedback,
-    Separator,
-    Skeleton,
-    Spinner,
-    TextField,
-    useThemeColor,
-    useToast,
+  Avatar,
+  Button,
+  Card,
+  Input,
+  PressableFeedback,
+  Separator,
+  Skeleton,
+  Spinner,
+  TextField,
+  useThemeColor,
+  useToast,
 } from "heroui-native";
 import React, { useState } from "react";
 import { View } from "react-native";
@@ -144,28 +144,27 @@ export default function GroupSettingsScreen() {
       <ModalHeader title={t("group_settings.title")} variant="back" />
 
       <ScreenScrollView withKeyboardAvoidingView>
-        <View className="gap-8">
+        <View className="gap-6">
           {/* Group Info */}
           <View>
-            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-2 ml-1">
               {t("group_settings.info_label")}
             </AppText>
             <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
               <View className="p-4">
                 {isEditingName && canEdit ? (
                   <View className="gap-3">
-                    <TextField className="bg-surface-secondary border border-border/10 rounded-xl">
+                    <TextField>
                       <Input
                         value={editedName}
                         onChangeText={setEditedName}
                         placeholder={t("group_settings.name_label")}
-                        className="h-12"
                         autoFocus
                       />
                     </TextField>
                     <View className="flex-row gap-3">
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         className="flex-1"
                         onPress={() => {
                           setIsEditingName(false);
@@ -173,7 +172,7 @@ export default function GroupSettingsScreen() {
                         }}
                       >
                         <Button.Label className="font-semibold">
-                          {t("cancel")}
+                          {t("common.cancel")}
                         </Button.Label>
                       </Button>
                       <Button
@@ -185,7 +184,7 @@ export default function GroupSettingsScreen() {
                         {updateGroup.isPending ? (
                           <Spinner size="sm" color="white" />
                         ) : (
-                          <Button.Label className="font-bold">{t("save")}</Button.Label>
+                          <Button.Label className="font-bold">{t("common.save")}</Button.Label>
                         )}
                       </Button>
                     </View>
@@ -228,11 +227,11 @@ export default function GroupSettingsScreen() {
                       if (!groupData.invite_code) return;
                       await Clipboard.setStringAsync(groupData.invite_code);
                       toast.show({
-                        label: t("copied"),
+                        label: t("common.copied"),
                         description: t("group_members.copy_success"),
                         variant: "success",
                         icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
-                        actionLabel: t("close"),
+                        actionLabel: t("common.close"),
                         onActionPress: ({ hide }) => hide(),
                       });
                     }}
@@ -249,7 +248,7 @@ export default function GroupSettingsScreen() {
 
           {/* QR Share Section */}
           <View>
-            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">
+            <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-2 ml-1">
               {t("group_settings.share_label")}
             </AppText>
             <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
@@ -273,7 +272,7 @@ export default function GroupSettingsScreen() {
 
           {/* Members */}
           <View>
-            <View className="flex-row items-center justify-between mb-4">
+            <View className="flex-row items-center justify-between mb-2">
               <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest ml-1">
                 {t("group_settings.members_label", { count: members.length })}
               </AppText>
@@ -369,9 +368,9 @@ export default function GroupSettingsScreen() {
                                 icon: <IconSymbol name="exclamationmark.triangle.fill" size={20} color={warning} />,
                               });
                             }}
-                            variant="ghost"
+                            variant="danger-soft"
                             isIconOnly
-                            className="size-9"
+                            className="size-8"
                           >
                             <IconSymbol name="trash" size={18} color={danger} />
                           </Button>

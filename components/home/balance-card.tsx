@@ -29,11 +29,11 @@ export const BalanceCard = ({
   return (
     <Animated.View
       entering={FadeInUp.delay(200).duration(800).springify()}
-      className="px-6 mt-6"
+      className="px-6 mt-4"
     >
       <Surface
         variant="default"
-        className="p-8 rounded-[32px] shadow-2xl overflow-hidden bg-accent relative"
+        className="p-6 rounded-[32px] shadow-2xl overflow-hidden bg-accent relative"
       >
         <LinearGradient
           colors={["rgba(0,0,0,0.5)", "transparent"]}

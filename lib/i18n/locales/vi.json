@@ -11,7 +11,8 @@
         "success": "Thành công",
         "close": "Đóng",
         "retry": "Thử lại",
-        "member": "Thành viên"
+        "member": "Thành viên",
+        "copied": "Đã sao chép"
     },
     "settings": {
         "title": "Cài đặt",

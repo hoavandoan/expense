@@ -178,11 +178,10 @@ export default function ActivityScreen() {
   const muted = useThemeColor("muted");
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuthStore();
   const { t } = useTranslation();
 
-  const { data: activities, isLoading, error, refetch } = useRecentActivity(50);
+  const { data: activities, isLoading, error, refetch, isRefetching } = useRecentActivity(50);
 
   const flattenedActivities = useMemo(() => {
     if (!activities) return [];
@@ -262,12 +261,6 @@ export default function ActivityScreen() {
 
     return flattened;
   }, [activities, activeFilter, searchQuery]);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await refetch();
-    setRefreshing(false);
-  }, [refetch]);
 
   const renderItem = useCallback(({ item, index }: { item: ActivityListItem; index: number }) => {
     if (item.type === "header") {
@@ -415,8 +408,8 @@ export default function ActivityScreen() {
           // @ts-expect-error - FlashList types lack full support
           estimatedItemSize={100}
           getItemType={(item) => item.type}
-          onRefresh={onRefresh}
-          refreshing={refreshing}
+          onRefresh={refetch}
+          refreshing={isRefetching}
           extraData={t}
           className="px-6"
           ListEmptyComponent={
