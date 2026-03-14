@@ -5,7 +5,7 @@ import { signInWithApple, signInWithGoogle } from '@/lib/auth/oauth';
 import { useAuth, useTranslation } from '@/lib/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Button, FieldError, Input, InputGroup, Label, PressableFeedback, TextField, useThemeColor, useToast } from 'heroui-native';
+import { Button, useThemeColor, useToast } from 'heroui-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 
@@ -120,35 +120,21 @@ export default function LoginScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ScreenScrollView withKeyboardAvoidingView contentContainerStyle={{ paddingVertical: 20 }}>
+      <ScreenScrollView withKeyboardAvoidingView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingVertical: 40 }}>
         {/* Header */}
-        <View>
-          <Button
-            variant="secondary"
-            className="w-12 h-12 rounded-full p-0"
-            onPress={() => router.back()}
-          >
-            <IconSymbol name="chevron.left" size={24} color={foreground} />
-          </Button>
-
-          <View className="mt-8">
-            <View className="w-16 h-16 bg-accent/10 items-center justify-center rounded-2xl mb-6 border border-accent/20">
-              <IconSymbol name="person.3.fill" size={32} color={accent} />
-            </View>
-
-            <AppText className="text-3xl font-bold text-foreground mb-2">
-              {isSignUp ? t('onboarding.login.create_account') : t('onboarding.login.welcome')}
-            </AppText>
-            <AppText className="text-base text-muted leading-relaxed">
-              {isSignUp
-                ? t('onboarding.login.signup_desc')
-                : t('onboarding.login.login_desc')}
-            </AppText>
-          </View>
+        <View className="items-center px-4">
+          <AppText className="text-3xl font-bold text-foreground mb-2 text-center">
+            {isSignUp ? t('onboarding.login.create_account') : t('onboarding.login.welcome')}
+          </AppText>
+          <AppText className="text-base text-muted leading-relaxed text-center">
+            {isSignUp
+              ? t('onboarding.login.signup_desc')
+              : t('onboarding.login.login_desc')}
+          </AppText>
         </View>
 
         {/* Form */}
-        <View className="gap-4 my-6">
+        {/* <View className="gap-4 my-6">
           {isSignUp && (
             <TextField isRequired>
               <Label>{t('onboarding.login.name_label')}</Label>
@@ -206,15 +192,15 @@ export default function LoginScreen() {
               </AppText>
             </AppText>
           </PressableFeedback>
-        </View>
+        </View> */}
 
         {/* Social Logins */}
-        <View className="gap-4">
-          <View className="flex-row items-center gap-4">
+        <View className="gap-4 mt-8 px-4">
+          {/* <View className="flex-row items-center gap-4">
             <View className="flex-1 h-px bg-divider/20" />
             <AppText className="text-muted text-sm">{t('onboarding.login.or')}</AppText>
             <View className="flex-1 h-px bg-divider/20" />
-          </View>
+          </View> */}
 
           <Button
             className="h-14 rounded-2xl bg-black dark:bg-white"

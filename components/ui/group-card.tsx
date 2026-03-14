@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Avatar, Card, cn } from "heroui-native";
 import React, { FC } from "react";
-import { Pressable, StyleSheet, View, useWindowDimensions } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   SharedValue,
   interpolate,
@@ -50,7 +50,6 @@ export const GroupCard: FC<GroupCardProps> = ({
 }) => {
   const { t, locale } = useTranslation();
   const scale = useSharedValue(1);
-  const { width } = useWindowDimensions();
 
   const handlePressIn = () => {
     scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
@@ -127,13 +126,13 @@ export const GroupCard: FC<GroupCardProps> = ({
               colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.4)", "rgba(0,0,0,0.85)"]}
               style={StyleSheet.absoluteFill}
             />
-            
+
             <View className="flex-1 justify-between p-6">
               {/* Top Row could have a badge or something, currently empty to focus on bottom */}
               <View />
 
               <View>
-                <AppText 
+                <AppText
                   className="text-white text-2xl font-bold mb-3"
                   numberOfLines={1}
                 >
@@ -201,17 +200,17 @@ export const GroupCard: FC<GroupCardProps> = ({
 
   const balanceDisplay = isPositive
     ? t("group_card.you_are_owed", {
-        amount: balance.toLocaleString(locale === "vi" ? "vi-VN" : "en-US") + (locale === "vi" ? "đ" : ""),
-      })
+      amount: balance.toLocaleString(locale === "vi" ? "vi-VN" : "en-US") + (locale === "vi" ? "đ" : ""),
+    })
     : t("group_card.you_owe", {
-        amount: Math.abs(balance).toLocaleString(locale === "vi" ? "vi-VN" : "en-US") + (locale === "vi" ? "đ" : ""),
-      });
+      amount: Math.abs(balance).toLocaleString(locale === "vi" ? "vi-VN" : "en-US") + (locale === "vi" ? "đ" : ""),
+    });
 
   return (
     <Animated.View style={animatedStyle}>
       <Card
         variant="default"
-        className={cn("mb-4 p-5 rounded-3xl border border-border/10 bg-surface", className)}
+        className={cn("mb-2 p-4 rounded-2xl border border-border/10 bg-surface", className)}
       >
         <Pressable
           onPress={onPress}
@@ -233,10 +232,11 @@ export const GroupCard: FC<GroupCardProps> = ({
                   key={member.id}
                   size="sm"
                   alt={member.name}
-                  className={cn(
-                    idx !== 0 && "-ml-3",
-                    "w-8 h-8 rounded-full border-2 border-surface"
-                  )}
+                  className={cn("size-8 border-black/20 border-2")}
+                  style={{
+                    marginLeft: idx > 0 ? -12 : 0,
+                    zIndex: 10 - idx,
+                  }}
                 >
                   {member.avatarUrl ? (
                     <Avatar.Image source={{ uri: member.avatarUrl }} asChild>
@@ -265,11 +265,11 @@ export const GroupCard: FC<GroupCardProps> = ({
             </View>
           </View>
 
-          <View className="items-end bg-accent-soft px-4 py-2 rounded-2xl">
+          {/* <View className="items-end bg-accent-soft px-4 py-2 rounded-2xl">
             <AppText className={cn("text-sm font-bold", balanceColor)}>
               {balanceDisplay}
             </AppText>
-          </View>
+          </View> */}
         </Pressable>
       </Card>
     </Animated.View>

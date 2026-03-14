@@ -58,11 +58,14 @@ export const ScreenScrollView: FC<PropsWithChildren<Props>> = ({
         style={{ flex: 1 }}
         bottomOffset={bottomPadding}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingTop: 8,
-          paddingBottom: bottomPadding,
-          paddingHorizontal: 24,
-        }}
+        contentContainerStyle={[
+          {
+            paddingTop: 8,
+            paddingBottom: bottomPadding,
+            paddingHorizontal: 24,
+          },
+          props.contentContainerStyle as any,
+        ]}
         refreshControl={refreshControl}
       >
         {children}

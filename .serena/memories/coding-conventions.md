@@ -1,7 +1,23 @@
-# Coding Conventions
+# Coding Conventions & UI Standards
 
-> **Canonical sources**:
-> - `.agent/rules/02-coding-standards.md` — All coding rules
-> - `.agent/rules/03-ui-ux-patterns.md` — UI/UX patterns
-> This Serena memory is a synced cache. Update the canonical files first, then sync here.
+> **Canonical source**: `.agent/rules/02-coding-standards.md` & `.agent/rules/03-ui-ux-patterns.md`
+
+## Core Principles
+- Immutability, non-destructive, declarative.
+- Descriptive naming (isLoading, hasError).
+- Early returns with guard clauses.
+- No `switch` statements; use objects for lookup.
+- No `let`/`var`; use `const` + expressions.
+
+## UI/UX Best Practices
+- Component Library: HeroUI Native (always preferred).
+- Styling: Uniwind (Tailwind classNames).
+- List Rendering: `@shopify/flash-list` for long lists (provide `estimatedItemSize`).
+- Feedback: `PressableFeedback` for touch interaction.
+
+## Prohibited Practices
+- Nested `if` with `else if`.
+- Sequential loops (`for`, `while`); use `map`, `filter`, `reduce`.
+- Destructive array operations.
+- Recursion as loop alternative.
 

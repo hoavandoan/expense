@@ -6,7 +6,6 @@ import {
   HeaderNavBar,
 } from "@/components/parallax-header";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { SettingsItem } from "@/components/ui/settings-item";
 import { SkiaOnboardingBackground } from "@/components/ui/skia-onboarding-background";
 import { useAppTheme } from "@/contexts/app-theme-context";
 import { useAuth, useTranslation } from "@/lib/hooks";
@@ -17,6 +16,7 @@ import {
   Avatar,
   Button,
   Card,
+  ListGroup,
   PressableFeedback,
   Separator,
   Switch,
@@ -145,7 +145,7 @@ export default function SettingsScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <SkiaOnboardingBackground primaryColor="accent-soft" secondaryColor="background"/>
+      <SkiaOnboardingBackground primaryColor="accent-soft" secondaryColor="background" />
       <AnimatedScrollView
         headerMaxHeight={SETTINGS_HEADER_HEIGHT}
         disableScale={true}
@@ -188,28 +188,43 @@ export default function SettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
               {t('settings.section.account')}
             </AppText>
-            <Card
-              variant="default"
-              className="overflow-hidden border border-border/10 rounded-2xl"
-            >
-              <SettingsItem
-                icon="creditcard"
-                iconBgColor="#17C964"
-                label={t('settings.account.payment_method')}
-              />
-              <Separator className="my-3" />
-              <SettingsItem
-                icon="lock"
-                iconBgColor="#F5A623"
-                label={t('settings.account.change_password')}
-              />
-              <Separator className="my-3" />
-              <SettingsItem
-                icon="shield"
-                iconBgColor="#0070F3"
-                label={t('settings.account.privacy')}
-              />
-            </Card>
+            <ListGroup>
+              <ListGroup.Item>
+                <ListGroup.ItemPrefix>
+                  <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#17C96420' }}>
+                    <IconSymbol name="creditcard" size={22} color="#17C964" />
+                  </View>
+                </ListGroup.ItemPrefix>
+                <ListGroup.ItemContent>
+                  <ListGroup.ItemTitle>{t('settings.account.payment_method')}</ListGroup.ItemTitle>
+                </ListGroup.ItemContent>
+                <ListGroup.ItemSuffix />
+              </ListGroup.Item>
+              <Separator className="mx-4" />
+              <ListGroup.Item>
+                <ListGroup.ItemPrefix>
+                  <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#F5A62320' }}>
+                    <IconSymbol name="lock" size={22} color="#F5A623" />
+                  </View>
+                </ListGroup.ItemPrefix>
+                <ListGroup.ItemContent>
+                  <ListGroup.ItemTitle>{t('settings.account.change_password')}</ListGroup.ItemTitle>
+                </ListGroup.ItemContent>
+                <ListGroup.ItemSuffix />
+              </ListGroup.Item>
+              <Separator className="mx-4" />
+              <ListGroup.Item>
+                <ListGroup.ItemPrefix>
+                  <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#0070F320' }}>
+                    <IconSymbol name="shield" size={22} color="#0070F3" />
+                  </View>
+                </ListGroup.ItemPrefix>
+                <ListGroup.ItemContent>
+                  <ListGroup.ItemTitle>{t('settings.account.privacy')}</ListGroup.ItemTitle>
+                </ListGroup.ItemContent>
+                <ListGroup.ItemSuffix />
+              </ListGroup.Item>
+            </ListGroup>
           </View>
 
           {/* General Settings Section */}
@@ -217,17 +232,17 @@ export default function SettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
               {t('settings.section.general')}
             </AppText>
-            <Card
-              variant="default"
-              className="overflow-hidden border border-border/10 rounded-2xl"
-            >
-              <SettingsItem
-                icon="moon.fill"
-                iconBgColor="#3F3F46"
-                label={t('settings.general.dark_mode')}
-                showChevron={false}
-                onPress={toggleTheme}
-                rightElement={
+            <ListGroup>
+              <ListGroup.Item onPress={toggleTheme}>
+                <ListGroup.ItemPrefix>
+                  <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#3F3F4620' }}>
+                    <IconSymbol name="moon.fill" size={22} color="#3F3F46" />
+                  </View>
+                </ListGroup.ItemPrefix>
+                <ListGroup.ItemContent>
+                  <ListGroup.ItemTitle>{isDark ? t('settings.general.light_mode') : t('settings.general.dark_mode')}</ListGroup.ItemTitle>
+                </ListGroup.ItemContent>
+                <ListGroup.ItemSuffix>
                   <Switch
                     isSelected={isDark}
                     className="w-[56px] h-8"
@@ -269,47 +284,64 @@ export default function SettingsScreen() {
                       )}
                     </Switch.EndContent>
                   </Switch>
-                }
-              />
-              <Separator className="my-3" />
-              <SettingsItem
-                icon="bell"
-                iconBgColor="#9455D3"
-                label={t('settings.general.notifications')}
-                showChevron={false}
-                rightElement={
+                </ListGroup.ItemSuffix>
+              </ListGroup.Item>
+              <Separator className="mx-4" />
+              <ListGroup.Item>
+                <ListGroup.ItemPrefix>
+                  <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#9455D320' }}>
+                    <IconSymbol name="bell" size={22} color="#9455D3" />
+                  </View>
+                </ListGroup.ItemPrefix>
+                <ListGroup.ItemContent>
+                  <ListGroup.ItemTitle>{t('settings.general.notifications')}</ListGroup.ItemTitle>
+                </ListGroup.ItemContent>
+                <ListGroup.ItemSuffix>
                   <Switch
                     isSelected={notifications}
                     onSelectedChange={setNotifications}
                   >
                     <Switch.Thumb />
                   </Switch>
-                }
-              />
-              <Separator className="my-3" />
-              <SettingsItem
-                icon="globe"
-                iconBgColor="#17C964"
-                label={t("settings.language")}
-                onPress={handleLanguageChange}
-                rightElement={
-                  <AppText className="text-muted text-sm font-medium">
-                    {locale.includes('vi') ? t('settings.language_vietnamese') : t('settings.language_english')}
-                  </AppText>
-                }
-              />
-              <Separator className="my-3" />
-              <SettingsItem
-                icon="dongsign"
-                iconBgColor="#F5A623"
-                label={t('settings.general.currency')}
-                rightElement={
-                  <AppText className="text-muted text-sm font-medium">
-                    VNĐ (₫)
-                  </AppText>
-                }
-              />
-            </Card>
+                </ListGroup.ItemSuffix>
+              </ListGroup.Item>
+              <Separator className="mx-4" />
+              <ListGroup.Item onPress={handleLanguageChange}>
+                <ListGroup.ItemPrefix>
+                  <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#17C96420' }}>
+                    <IconSymbol name="globe" size={22} color="#17C964" />
+                  </View>
+                </ListGroup.ItemPrefix>
+                <ListGroup.ItemContent>
+                  <ListGroup.ItemTitle>{t("settings.language")}</ListGroup.ItemTitle>
+                </ListGroup.ItemContent>
+                <ListGroup.ItemSuffix>
+                  <View className="flex-row items-center gap-2">
+                    <AppText className="text-muted text-sm font-medium">
+                      {locale.includes('vi') ? t('settings.language_vietnamese') : t('settings.language_english')}
+                    </AppText>
+                  </View>
+                </ListGroup.ItemSuffix>
+              </ListGroup.Item>
+              <Separator className="mx-4" />
+              <ListGroup.Item>
+                <ListGroup.ItemPrefix>
+                  <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#F5A62320' }}>
+                    <IconSymbol name="dongsign" size={22} color="#F5A623" />
+                  </View>
+                </ListGroup.ItemPrefix>
+                <ListGroup.ItemContent>
+                  <ListGroup.ItemTitle>{t('settings.general.currency')}</ListGroup.ItemTitle>
+                </ListGroup.ItemContent>
+                <ListGroup.ItemSuffix>
+                  <View className="flex-row items-center gap-2">
+                    <AppText className="text-muted text-sm font-medium">
+                      VNĐ (₫)
+                    </AppText>
+                  </View>
+                </ListGroup.ItemSuffix>
+              </ListGroup.Item>
+            </ListGroup>
           </View>
 
           {/* Support Section */}
@@ -317,28 +349,43 @@ export default function SettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">
               {t('settings.section.support')}
             </AppText>
-            <Card
-              variant="default"
-              className="overflow-hidden border border-border/10 rounded-2xl"
-            >
-              <SettingsItem
-                icon="heart"
-                iconBgColor="#F31260"
-                label={t('settings.support.invite_friends')}
-              />
-              <Separator className="my-3" />
-              <SettingsItem
-                icon="questionmark.circle"
-                iconBgColor="#0070F3"
-                label={t('settings.support.help')}
-              />
-              <Separator className="my-3" />
-              <SettingsItem
-                icon="info.circle"
-                iconBgColor="#06B6D4"
-                label={t('settings.support.about_us')}
-              />
-            </Card>
+            <ListGroup>
+              <ListGroup.Item>
+                <ListGroup.ItemPrefix>
+                  <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#F3126020' }}>
+                    <IconSymbol name="heart" size={22} color="#F31260" />
+                  </View>
+                </ListGroup.ItemPrefix>
+                <ListGroup.ItemContent>
+                  <ListGroup.ItemTitle>{t('settings.support.invite_friends')}</ListGroup.ItemTitle>
+                </ListGroup.ItemContent>
+                <ListGroup.ItemSuffix />
+              </ListGroup.Item>
+              <Separator className="mx-4" />
+              <ListGroup.Item>
+                <ListGroup.ItemPrefix>
+                  <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#0070F320' }}>
+                    <IconSymbol name="questionmark.circle" size={22} color="#0070F3" />
+                  </View>
+                </ListGroup.ItemPrefix>
+                <ListGroup.ItemContent>
+                  <ListGroup.ItemTitle>{t('settings.support.help')}</ListGroup.ItemTitle>
+                </ListGroup.ItemContent>
+                <ListGroup.ItemSuffix />
+              </ListGroup.Item>
+              <Separator className="mx-4" />
+              <ListGroup.Item>
+                <ListGroup.ItemPrefix>
+                  <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#06B6D420' }}>
+                    <IconSymbol name="info.circle" size={22} color="#06B6D4" />
+                  </View>
+                </ListGroup.ItemPrefix>
+                <ListGroup.ItemContent>
+                  <ListGroup.ItemTitle>{t('settings.support.about_us')}</ListGroup.ItemTitle>
+                </ListGroup.ItemContent>
+                <ListGroup.ItemSuffix />
+              </ListGroup.Item>
+            </ListGroup>
           </View>
 
           {/* Auth Section */}

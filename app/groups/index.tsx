@@ -19,9 +19,9 @@ export default function GroupsListScreen() {
   const { data: groups, isLoading, refetch } = useGroups();
 
   const renderItem = useCallback(({ item, index }: { item: any; index: number }) => (
-    <Animated.View 
+    <Animated.View
       className="mb-4"
-      entering={FadeInUp.delay(index * 60).duration(300).springify().damping(15)}
+      entering={FadeInUp.delay(index * 50).duration(500)}
       exiting={FadeOut.duration(200)}
     >
       <GroupCard
@@ -43,8 +43,8 @@ export default function GroupsListScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <StickyHeader 
-        title={t('groups.title', { defaultValue: 'Tất cả nhóm' })} 
+      <StickyHeader
+        title={t('groups.title', { defaultValue: 'Tất cả nhóm' })}
         rightContent={
           <Button
             isIconOnly
@@ -57,7 +57,7 @@ export default function GroupsListScreen() {
           </Button>
         }
       />
-      
+
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
           <Spinner size="lg" color={accent} />
@@ -81,10 +81,10 @@ export default function GroupsListScreen() {
               onAction={() => router.push("/add-group")}
             />
           }
-          contentContainerStyle={{ 
-            paddingHorizontal: 20, 
+          contentContainerStyle={{
+            paddingHorizontal: 20,
             paddingTop: 20,
-            paddingBottom: insets.bottom + 100 
+            paddingBottom: insets.bottom + 100
           }}
         />
       )}

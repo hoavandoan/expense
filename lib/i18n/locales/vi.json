@@ -39,6 +39,7 @@
         },
         "general": {
             "dark_mode": "Chế độ tối",
+            "light_mode": "Chế độ sáng",
             "notifications": "Thông báo",
             "currency": "Tiền tệ"
         },
@@ -159,7 +160,9 @@
                 "participants_required": "Vui lòng chọn ít nhất một người tham gia",
                 "title_required": "Vui lòng nhập mô tả chi tiêu",
                 "amount_required": "Vui lòng nhập số tiền",
-                "amount_min": "Số tiền phải lớn hơn 0"
+                "amount_min": "Số tiền phải lớn hơn 0",
+                "amount_min_value": "Số tiền tối thiểu là %{amount}",
+                "amount_max": "Số tiền tối đa là %{amount}"
             }
         },
         "payment_confirm": {

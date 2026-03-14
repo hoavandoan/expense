@@ -6,7 +6,7 @@ import { useTranslation } from '@/lib/hooks';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { Avatar, Button, PressableFeedback, useThemeColor } from 'heroui-native';
+import { Avatar, Button, cn, useThemeColor } from 'heroui-native';
 import React, { useMemo, useRef, useState } from 'react';
 import { Dimensions, View } from 'react-native';
 import Animated, { FadeInUp, FadeOut } from 'react-native-reanimated';
@@ -149,7 +149,7 @@ const getSlides = (t: any): Slide[] => [
         <View className="w-48 h-48 bg-surface rounded-full items-center justify-center shadow-2xl border-4 border-accent/10">
           <IconSymbol name="chart.pie.fill" size={80} color={accent} />
           <View className="absolute -top-2 -right-2 bg-success p-2 rounded-full border-4 border-surface shadow-lg">
-             <IconSymbol name="checkmark" size={16} color="white" />
+            <IconSymbol name="checkmark" size={16} color="white" />
           </View>
         </View>
         <View className="bg-surface px-6 py-3 rounded-2xl border border-border/10 shadow-lg flex-row gap-4 items-center">
@@ -227,14 +227,14 @@ export default function TutorialScreen() {
   const slide = slides[currentSlide];
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1">
       <SkiaOnboardingBackground />
 
       <View className="flex-1 justify-between py-12 px-6">
         <View style={{ paddingTop: insets.top }} className="flex-row justify-end">
-          <PressableFeedback onPress={handleSkip}>
+          <Button variant='ghost' onPress={handleSkip}>
             <AppText className="text-muted font-bold">{t('onboarding.tutorial.skip')}</AppText>
-          </PressableFeedback>
+          </Button>
         </View>
 
         <View className="flex-1 items-center justify-center my-8">
@@ -245,11 +245,11 @@ export default function TutorialScreen() {
             onPageSelected={(e) => setCurrentSlide(e.nativeEvent.position)}
           >
             {slides.map((slideItem) => (
-              <View key={slideItem.id} className="flex-1">
-                <View className="w-full h-full bg-surface/30 rounded-[40px] overflow-hidden shadow-2xl relative border border-white/20">
+              <View key={slideItem.id} className="flex-1 rounded-[40px] overflow-hidden relative border border-white/20 bg-transparent">
+                <View className="w-full h-full shadow-2xl ">
                   <Image
                     source={{ uri: slideItem.image }}
-                    style={{ width: '100%', height: '100%', opacity: 0.1 }}
+                    style={{ width: '100%', height: '100%', backgroundColor: 'transparent' }}
                     contentFit="cover"
                   />
                   {slideItem.renderOverlay(accent)}
@@ -276,14 +276,15 @@ export default function TutorialScreen() {
             {slides.map((_, idx) => (
               <View
                 key={idx}
-                className={`h-2 rounded-full transition-all duration-300 ${currentSlide === idx ? 'w-8 bg-accent' : 'w-2 bg-divider'}`}
+                className={cn(`h-2 rounded-full transition-all duration-300`, currentSlide === idx ? 'w-8 bg-accent' : 'w-2 bg-separator')}
               />
             ))}
           </View>
 
           <Button
             size="lg"
-            className="h-16 rounded-2xl bg-accent shadow-xl shadow-accent/20"
+            variant='primary'
+            className="rounded-2xl shadow-xl shadow-accent/20"
             onPress={nextSlide}
           >
             <View className="flex-row items-center gap-2">

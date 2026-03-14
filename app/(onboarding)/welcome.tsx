@@ -5,7 +5,7 @@ import { useTranslation } from '@/lib/hooks';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { Avatar, Button, PressableFeedback, useThemeColor } from 'heroui-native';
+import { Avatar, Button, useThemeColor } from 'heroui-native';
 import React from 'react';
 import { View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
@@ -26,24 +26,16 @@ export default function WelcomeScreen() {
   return (
     <View className="flex-1 bg-background">
       <SkiaOnboardingBackground />
-      
+
       <View className="flex-1 items-center justify-between py-12 px-6">
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(200).duration(800)}
-          style={{ paddingTop: insets.top }} 
+          style={{ paddingTop: insets.top }}
           className="w-full flex-row justify-between items-center"
         >
-          <View className="bg-surface px-4 py-2 rounded-full border border-border/10 flex-row items-center gap-2">
-            <IconSymbol name="person.3.fill" size={16} color="#10b981" />
-            <AppText className="text-xs font-bold uppercase tracking-wider">SplitSmart</AppText>
-          </View>
-
-          <PressableFeedback onPress={handleSkipToLogin}>
-            <AppText className="text-muted font-bold">{t('onboarding.welcome.skip', { defaultValue: 'Bỏ qua' })}</AppText>
-          </PressableFeedback>
         </Animated.View>
 
-        <Animated.View 
+        <Animated.View
           entering={FadeInUp.delay(400).duration(1000)}
           className="relative w-full aspect-square items-center justify-center"
         >
@@ -59,7 +51,7 @@ export default function WelcomeScreen() {
               <View className="flex-row gap-2 mt-8 bg-surface p-4 rounded-2xl border border-border/10 shadow-lg items-center">
                 <View className="flex-row -space-x-3">
                   <Avatar size="sm" alt="User 1">
-                    <Avatar.Image source={{ uri: "https://i.pravatar.cc/100?u=1" }} />
+                    <Avatar.Image source={{ uri: "https://i.pravatar.cc/100?u=2" }} />
                   </Avatar>
                   <Avatar size="sm" alt="User 2">
                     <Avatar.Image source={{ uri: "https://i.pravatar.cc/100?u=2" }} />
@@ -80,7 +72,7 @@ export default function WelcomeScreen() {
           </View>
         </Animated.View>
 
-        <Animated.View 
+        <Animated.View
           entering={FadeInUp.delay(600).duration(800)}
           className="w-full items-center"
         >
@@ -94,15 +86,10 @@ export default function WelcomeScreen() {
         </Animated.View>
 
         <View className="w-full gap-4" style={{ marginBottom: insets.bottom }}>
-          <View className="flex-row justify-center gap-2 mb-4">
-            <View className="w-8 h-2 bg-accent rounded-full" />
-            <View className="w-2 h-2 bg-divider rounded-full" />
-            <View className="w-2 h-2 bg-divider rounded-full" />
-          </View>
-
           <Button
             size="lg"
-            className="h-16 rounded-2xl bg-accent shadow-xl shadow-accent/20"
+            variant='primary'
+            className="rounded-2xl bg-accent shadow-xl shadow-accent/20"
             onPress={() => router.push('/(onboarding)/tutorial')}
           >
             <View className="flex-row items-center gap-2">
@@ -111,11 +98,14 @@ export default function WelcomeScreen() {
             </View>
           </Button>
 
-          <PressableFeedback onPress={handleSkipToLogin}>
-            <View className="h-16 rounded-2xl border border-border/10 bg-surface/50 items-center justify-center">
-              <AppText className="text-foreground font-semibold">{t('onboarding.welcome.login')}</AppText>
-            </View>
-          </PressableFeedback>
+          <Button
+            size="lg"
+            variant='outline'
+            onPress={handleSkipToLogin}
+            className='rounded-2xl bg-surface/50 font-semibold'
+          >
+            {t('onboarding.welcome.login')}
+          </Button>
         </View>
       </View>
     </View>

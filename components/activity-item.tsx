@@ -21,19 +21,19 @@ export interface ActivityItemProps {
 }
 
 export const ActivityItem = React.memo(({
-                                userName,
-                                userAvatar,
-                                action,
-                                subject,
-                                groupName,
-                                groupIcon,
-                                amount,
-                                status,
-                                typeIcon,
-                                typeColor,
-                                iconColor,
-                                isMe,
-                              }: ActivityItemProps) => {
+  userName,
+  userAvatar,
+  action,
+  subject,
+  groupName,
+  groupIcon,
+  amount,
+  status,
+  typeIcon,
+  typeColor,
+  iconColor,
+  isMe,
+}: ActivityItemProps) => {
   const { t } = useTranslation();
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
@@ -90,7 +90,7 @@ export const ActivityItem = React.memo(({
           {amount && (
             <AppText
               className={cn(
-                "text-lg font-bold",
+                "text-base font-semibold",
                 amount.startsWith("+")
                   ? "text-success"
                   : status

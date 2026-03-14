@@ -14,6 +14,7 @@ import {
   Avatar,
   Button,
   Card,
+  cn,
   Separator,
   Spinner,
   useThemeColor,
@@ -232,9 +233,7 @@ export default function ExpenseDetailScreen() {
                             {formatCurrency(split.amount, groupCurrency)}
                           </AppText>
                           <AppText
-                            className={`text-[10px] ${
-                              isPaid ? "text-success" : "text-muted"
-                            }`}
+                            className={cn("text-[10px]", isPaid ? "text-success" : "text-muted")}
                           >
                             {isPaid ? t('expense_detail.paid', { defaultValue: "Đã trả" }) : t('expense_detail.unpaid', { defaultValue: "Chưa trả" })}
                           </AppText>
@@ -272,14 +271,14 @@ export default function ExpenseDetailScreen() {
                 onPress={handleEdit}
                 className="flex-1"
               >
-                  {t('expense_detail.edit', { defaultValue: 'Chỉnh sửa' })}
+                {t('expense_detail.edit', { defaultValue: 'Chỉnh sửa' })}
               </Button>
               <Button
                 variant="danger"
                 onPress={() => setShowDeleteDialog(true)}
                 className="flex-1"
               >
-                  {t('expense_detail.delete', { defaultValue: 'Xóa' })}
+                {t('expense_detail.delete', { defaultValue: 'Xóa' })}
               </Button>
             </View>
           )}

@@ -170,129 +170,129 @@ export default function AddGroupScreen() {
 
           <View className="flex-row gap-4">
             <View className="flex-1">
-            <View className="flex-1">
-              <TextField
-                isRequired
-                isInvalid={!!errors.groupType}
-              >
-                <Label>{t("modal.add_group.type_label")}</Label>
-                <Controller
-                  control={control}
-                  name="groupType"
-                  render={({ field: { onChange, value } }) => (
-                    <Select
-                      value={GROUP_TYPES.find((t) => t.value === value) as any}
-                      onValueChange={(opt: any) => opt && onChange(opt.value)}
-                    >
-                      <Select.Trigger>
-                        <View className="flex-row items-center gap-3">
-                          <IconSymbol
-                            name={
-                              GROUP_TYPES.find((t) => t.value === value)
-                                ?.icon as any
-                            }
-                            size={20}
-                            color={accent}
-                          />
-                          <Select.Value
-                            className="text-[15px] font-medium"
-                            placeholder={t("modal.add_group.type_label")}
-                          />
-                          <Select.TriggerIndicator />
-                        </View>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Overlay className="bg-black/20" />
-                        <Select.Content
-                          presentation="popover"
-                          placement="bottom"
-                          width={250}
-                        >
-                          {GROUP_TYPES.map((type) => (
-                            <Select.Item
-                              key={type.value}
-                              value={type.value}
-                              label={t(`group_types.${type.value}`)}
-                            >
-                              <View className="flex-row items-center gap-3">
-                                <IconSymbol
-                                  name={type.icon as any}
-                                  size={18}
-                                  color={accent}
-                                />
-                                <Select.ItemLabel className="text-base" />
-                                <Select.ItemIndicator />
-                              </View>
-                            </Select.Item>
-                          ))}
-                        </Select.Content>
-                      </Select.Portal>
-                    </Select>
-                  )}
-                />
-                <FieldError>{errors.groupType?.message}</FieldError>
-              </TextField>
-            </View>
+              <View className="flex-1">
+                <TextField
+                  isRequired
+                  isInvalid={!!errors.groupType}
+                >
+                  <Label>{t("modal.add_group.type_label")}</Label>
+                  <Controller
+                    control={control}
+                    name="groupType"
+                    render={({ field: { onChange, value } }) => (
+                      <Select
+                        value={GROUP_TYPES.find((t) => t.value === value) as any}
+                        onValueChange={(opt: any) => opt && onChange(opt.value)}
+                      >
+                        <Select.Trigger>
+                          <View className="flex-row items-center gap-3">
+                            <IconSymbol
+                              name={
+                                GROUP_TYPES.find((t) => t.value === value)
+                                  ?.icon as any
+                              }
+                              size={20}
+                              color={accent}
+                            />
+                            <Select.Value
+                              className="text-[15px] font-medium"
+                              placeholder={t("modal.add_group.type_label")}
+                            />
+                            <Select.TriggerIndicator />
+                          </View>
+                        </Select.Trigger>
+                        <Select.Portal>
+                          <Select.Overlay className="bg-black/20" />
+                          <Select.Content
+                            presentation="popover"
+                            placement="bottom"
+                            width={250}
+                          >
+                            {GROUP_TYPES.map((type) => (
+                              <Select.Item
+                                key={type.value}
+                                value={type.value}
+                                label={t(`group_types.${type.value}`)}
+                              >
+                                <View className="flex-row items-center gap-3">
+                                  <IconSymbol
+                                    name={type.icon as any}
+                                    size={18}
+                                    color={accent}
+                                  />
+                                  <Select.ItemLabel className="text-base" />
+                                  <Select.ItemIndicator />
+                                </View>
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select.Portal>
+                      </Select>
+                    )}
+                  />
+                  <FieldError>{errors.groupType?.message}</FieldError>
+                </TextField>
+              </View>
             </View>
 
             <View className="flex-1">
-            <View className="flex-1">
-              <TextField
-                isRequired
-                isInvalid={!!errors.currency}
-              >
-                <Label>{t("modal.add_group.currency_label")}</Label>
-                <Controller
-                  control={control}
-                  name="currency"
-                  render={({ field: { onChange, value } }) => (
-                    <Select
-                      value={CURRENCIES.find((c) => c.value === value) as any}
-                      onValueChange={(opt: any) => opt && onChange(opt.value)}
-                    >
-                      <Select.Trigger>
-                        <View className="flex-row items-center gap-3">
-                          <AppText className="font-bold text-accent">
-                            {CURRENCIES.find((c) => c.value === value)?.symbol}
-                          </AppText>
-                          <Select.Value
-                            className="text-[15px] font-medium"
-                            placeholder={t("modal.add_group.currency_label")}
-                          />
-                          <Select.TriggerIndicator />
-                        </View>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Overlay className="bg-black/20" />
-                        <Select.Content
-                          presentation="popover"
-                          placement="bottom"
-                          className="rounded-2xl bg-surface border border-border/10"
-                          width={250}
-                        >
-                          {CURRENCIES.map((curr) => (
-                            <Select.Item
-                              key={curr.value}
-                              value={curr.value}
-                              label={curr.label}
-                            >
-                              <View className="flex-row items-center gap-3">
-                                <AppText className="font-bold text-accent text-lg w-6">
-                                  {curr.symbol}
-                                </AppText>
-                                <Select.ItemLabel className="text-base" />
-                                <Select.ItemIndicator />
-                              </View>
-                            </Select.Item>
-                          ))}
-                        </Select.Content>
-                      </Select.Portal>
-                    </Select>
-                  )}
-                />
-                <FieldError>{errors.currency?.message}</FieldError>
-              </TextField>
-            </View>
+              <View className="flex-1">
+                <TextField
+                  isRequired
+                  isInvalid={!!errors.currency}
+                >
+                  <Label>{t("modal.add_group.currency_label")}</Label>
+                  <Controller
+                    control={control}
+                    name="currency"
+                    render={({ field: { onChange, value } }) => (
+                      <Select
+                        value={CURRENCIES.find((c) => c.value === value) as any}
+                        onValueChange={(opt: any) => opt && onChange(opt.value)}
+                      >
+                        <Select.Trigger>
+                          <View className="flex-row items-center gap-3">
+                            <AppText className="font-bold text-accent">
+                              {CURRENCIES.find((c) => c.value === value)?.symbol}
+                            </AppText>
+                            <Select.Value
+                              className="text-[15px] font-medium"
+                              placeholder={t("modal.add_group.currency_label")}
+                            />
+                            <Select.TriggerIndicator />
+                          </View>
+                        </Select.Trigger>
+                        <Select.Portal>
+                          <Select.Overlay className="bg-black/20" />
+                          <Select.Content
+                            presentation="popover"
+                            placement="bottom"
+                            className="rounded-2xl bg-surface border border-border/10"
+                            width={250}
+                          >
+                            {CURRENCIES.map((curr) => (
+                              <Select.Item
+                                key={curr.value}
+                                value={curr.value}
+                                label={curr.label}
+                              >
+                                <View className="flex-row items-center gap-3">
+                                  <AppText className="font-bold text-accent text-lg w-6">
+                                    {curr.symbol}
+                                  </AppText>
+                                  <Select.ItemLabel className="text-base" />
+                                  <Select.ItemIndicator />
+                                </View>
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select.Portal>
+                      </Select>
+                    )}
+                  />
+                  <FieldError>{errors.currency?.message}</FieldError>
+                </TextField>
+              </View>
             </View>
           </View>
         </View>

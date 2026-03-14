@@ -44,13 +44,11 @@ export function ConfirmDialog({
             )}
           </View>
           <View className="flex-row justify-end gap-3">
-            <Dialog.Close asChild>
-              <Button variant="ghost">
-                <Button.Label className="font-semibold text-muted">
-                  {cancelLabel}
-                </Button.Label>
-              </Button>
-            </Dialog.Close>
+            <Button variant="ghost" onPress={() => onOpenChange(false)}>
+              <Button.Label className="font-semibold text-muted">
+                {cancelLabel}
+              </Button.Label>
+            </Button>
             <Button
               variant={variant === "danger" ? "danger" : "primary"}
               onPress={handleConfirm}

@@ -39,6 +39,7 @@
         },
         "general": {
             "dark_mode": "Dark Mode",
+            "light_mode": "Light Mode",
             "notifications": "Notifications",
             "currency": "Currency"
         },
@@ -159,7 +160,9 @@
                 "participants_required": "Please select at least one participant",
                 "title_required": "Please enter description",
                 "amount_required": "Please enter amount",
-                "amount_min": "Amount must be greater than 0"
+                "amount_min": "Amount must be greater than 0",
+                "amount_min_value": "Minimum amount is %{amount}",
+                "amount_max": "Maximum amount is %{amount}"
             }
         },
         "payment_confirm": {

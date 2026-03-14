@@ -11,7 +11,7 @@ import { FlashList } from "@shopify/flash-list";
 import { cn, Input, Spinner, Tabs, TextField, useThemeColor } from "heroui-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
-import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
+import Animated, { FadeIn, FadeInUp, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const FILTERS = [
@@ -168,7 +168,7 @@ const formatTimeAgo = (dateString: string, t: (key: string, options?: any) => st
   return date.toLocaleDateString("vi-VN");
 };
 
-type ActivityListItem = 
+type ActivityListItem =
   | { type: "header"; title: string; id: string }
   | { type: "activity"; data: any; id: string };
 
@@ -265,10 +265,10 @@ export default function ActivityScreen() {
   const renderItem = useCallback(({ item, index }: { item: ActivityListItem; index: number }) => {
     if (item.type === "header") {
       return (
-        <Animated.View 
-        entering={FadeInDown.delay(1000 + index * 100).springify()}
-        exiting={FadeOut.duration(200)}
-        className="mb-3"
+        <Animated.View
+          entering={FadeIn.delay(index * 50).duration(400)}
+          exiting={FadeOut.duration(200)}
+          className="mb-3"
         >
           <AppText className="text-xl font-bold text-foreground mb-5 px-6 mt-8">
             {item.title}
@@ -287,7 +287,7 @@ export default function ActivityScreen() {
     );
     const categoryConfig = activity.metadata.category
       ? CATEGORY_CONFIG[activity.metadata.category as string] ||
-        CATEGORY_CONFIG.other
+      CATEGORY_CONFIG.other
       : activityIcon;
 
     let amount: string | undefined;
@@ -300,9 +300,9 @@ export default function ActivityScreen() {
     }
 
     return (
-      <Animated.View 
-        className="mb-4" 
-        entering={FadeInDown.delay(1000 + index * 100).springify()}
+      <Animated.View
+        className="mb-4"
+        entering={FadeInUp.delay(index * 50).duration(500)}
         exiting={FadeOut.duration(200)}
       >
         <ActivityItem
@@ -352,12 +352,12 @@ export default function ActivityScreen() {
         <View className="px-6 mb-6">
           <TextField className="bg-default/5 rounded-2xl overflow-hidden">
             <View className="justify-center">
-            <Input
-              placeholder={t("activity.search_placeholder")}
-              className="text-base pl-12 h-14"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
+              <Input
+                placeholder={t("activity.search_placeholder")}
+                className="text-base pl-12 h-14"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
               <View className="absolute left-4" pointerEvents="none">
                 <IconSymbol name="magnifyingglass" size={20} color={muted} />
               </View>
