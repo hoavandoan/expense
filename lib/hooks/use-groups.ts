@@ -102,10 +102,11 @@ export const useJoinGroup = () => {
 
   return useMutation({
     mutationFn: async (inviteCodeOrId: string) => {
-      return apiClient<string>("/groups/join", {
+      const response = await apiClient<{ groupId: string }>("/groups/join", {
         method: "POST",
         body: JSON.stringify({ inviteCodeOrId }),
       });
+      return response.groupId;
     },
     onSuccess: (groupId) => {
       queryClient.invalidateQueries({ queryKey: groupsQueryOptions.queryKey });
@@ -206,6 +207,49 @@ export const useUpdateGroup = () => {
     onSettled: (_, __, { groupId }) => {
       queryClient.invalidateQueries({ queryKey: groupsQueryOptions.queryKey });
       queryClient.invalidateQueries({ queryKey: groupQueryOptions(groupId).queryKey });
+    },
+  });
+};
+
+/**
+ * Remove a member from a group (owner/admin only)
+ */
+export const useRemoveMember = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ groupId, userId }: { groupId: string; userId: string }) => {
+      return apiClient(`/groups/${groupId}`, {
+        method: "DELETE",
+        body: JSON.stringify({ action: "remove-member", userId }),
+      });
+    },
+    onMutate: async ({ groupId, userId }) => {
+      const detailKey = groupQueryOptions(groupId).queryKey;
+      await queryClient.cancelQueries({ queryKey: detailKey });
+
+      const previousDetail = queryClient.getQueryData<GroupWithDetails>(detailKey);
+
+      if (previousDetail) {
+        const detail = previousDetail as any;
+        queryClient.setQueryData(detailKey, {
+          ...detail,
+          group_members: detail.group_members?.filter(
+            (m: any) => m.user_id !== userId
+          ),
+        });
+      }
+
+      return { previousDetail };
+    },
+    onError: (err, { groupId }, context) => {
+      if (context?.previousDetail) {
+        queryClient.setQueryData(groupQueryOptions(groupId).queryKey, context.previousDetail);
+      }
+    },
+    onSettled: (_, __, { groupId }) => {
+      queryClient.invalidateQueries({ queryKey: groupQueryOptions(groupId).queryKey });
+      queryClient.invalidateQueries({ queryKey: groupsQueryOptions.queryKey });
     },
   });
 };

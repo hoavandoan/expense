@@ -620,6 +620,12 @@
         "no_members_title": "No members",
         "no_members_desc": "Add members to group",
         "remove_member_temp": "Confirm remove member not configured",
+        "remove_member_dialog_title": "Remove Member",
+        "remove_member_dialog_desc": "Are you sure you want to remove %{name} from the group?",
+        "remove_member_confirm": "Remove",
+        "remove_member_success_title": "Member Removed",
+        "remove_member_success_desc": "%{name} has been removed from the group",
+        "remove_member_error_title": "Cannot Remove",
         "leave_btn": "Leave group",
         "leave_dialog_title": "Leave Group",
         "leave_dialog_desc": "Are you sure you want to leave group \"%{name}\"? You will not be able to view or edit expenses in this group."

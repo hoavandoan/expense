@@ -202,6 +202,7 @@ export default function LoginScreen() {
             <View className="flex-1 h-px bg-divider/20" />
           </View> */}
 
+          {/* TODO: Enable after Apple Developer Program enrollment
           <Button
             className="h-14 rounded-2xl bg-black dark:bg-white"
             onPress={handleAppleLogin}
@@ -213,6 +214,7 @@ export default function LoginScreen() {
               </Button.Label>
             </View>
           </Button>
+          */}
 
           <Button
             variant="secondary"

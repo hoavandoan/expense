@@ -21,9 +21,12 @@ export async function GET(request: Request, { id }: { id: string }) {
       `)
             .eq('id', id)
             .order('created_at', { ascending: false, referencedTable: 'expenses' })
-            .single();
+            .maybeSingle();
 
         if (error) throw error;
+        if (!data) {
+            return Response.json({ error: 'Group not found' }, { status: 404 });
+        }
 
         // Transform for client
         const group = {
@@ -101,8 +104,85 @@ export async function DELETE(request: Request, { id }: { id: string }) {
     try {
         const { supabase, user } = await getServerSupabase(request);
 
-        // This could be leaving a group or deleting it
-        // Check if user is owner
+        // Parse body to determine action
+        const body = await request.json().catch(() => ({}));
+        const action = body.action;
+
+        // Remove a member from group (owner/admin only)
+        if (action === 'remove-member') {
+            const { userId } = body;
+
+            if (!userId) {
+                return Response.json(
+                    { error: 'userId is required' },
+                    { status: 400 }
+                );
+            }
+
+            if (userId === user.id) {
+                return Response.json(
+                    { error: 'Cannot remove yourself. Use leave group instead.' },
+                    { status: 400 }
+                );
+            }
+
+            // Check requesting user's role
+            const { data: requestingMember } = await supabase
+                .from('group_members')
+                .select('role')
+                .eq('group_id', id)
+                .eq('user_id', user.id)
+                .single();
+
+            if (!requestingMember) {
+                return Response.json(
+                    { error: 'You are not a member of this group' },
+                    { status: 403 }
+                );
+            }
+
+            const isOwnerOrAdmin = requestingMember.role === 'owner' || requestingMember.role === 'admin';
+            if (!isOwnerOrAdmin) {
+                return Response.json(
+                    { error: 'Only owner or admin can remove members' },
+                    { status: 403 }
+                );
+            }
+
+            // Check target member exists and is not owner
+            const { data: targetMember } = await supabase
+                .from('group_members')
+                .select('role')
+                .eq('group_id', id)
+                .eq('user_id', userId)
+                .single();
+
+            if (!targetMember) {
+                return Response.json(
+                    { error: 'Member not found in this group' },
+                    { status: 404 }
+                );
+            }
+
+            if (targetMember.role === 'owner') {
+                return Response.json(
+                    { error: 'Cannot remove the group owner' },
+                    { status: 403 }
+                );
+            }
+
+            const { error: deleteError } = await supabase
+                .from('group_members')
+                .delete()
+                .eq('group_id', id)
+                .eq('user_id', userId);
+
+            if (deleteError) throw deleteError;
+
+            return new Response(null, { status: 204 });
+        }
+
+        // Default: leave group or delete group
         const { data: member } = await supabase
             .from('group_members')
             .select('role')
@@ -111,18 +191,19 @@ export async function DELETE(request: Request, { id }: { id: string }) {
             .single();
 
         if (member?.role === 'owner') {
-            // Delete group (logic can be more complex involves deleting all related data if not cascaded)
-            const { error } = await supabase.from('groups').delete().eq('id', id);
-            if (error) throw error;
-        } else {
-            // Leave group
-            const { error } = await supabase
-                .from('group_members')
-                .delete()
-                .eq('group_id', id)
-                .eq('user_id', user.id);
-            if (error) throw error;
+            return Response.json(
+                { error: 'Owner cannot leave the group. Transfer ownership first or delete the group.' },
+                { status: 403 }
+            );
         }
+
+        // Leave group (non-owner only)
+        const { error } = await supabase
+            .from('group_members')
+            .delete()
+            .eq('group_id', id)
+            .eq('user_id', user.id);
+        if (error) throw error;
 
         return new Response(null, { status: 204 });
     } catch (error: any) {

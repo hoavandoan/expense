@@ -31,6 +31,7 @@ export {
   useGroups,
   useJoinGroup,
   useLeaveGroup,
+  useRemoveMember,
   useUpdateGroup
 } from "./use-groups";
 export {

@@ -6,7 +6,7 @@ import { ErrorState } from "@/components/ui/error-state";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ModalHeader } from "@/components/ui/modal-header";
 import { ShareQRSheet } from "@/components/ui/share-qr-sheet";
-import { useGroup, useLeaveGroup, useUpdateGroup } from "@/lib/hooks";
+import { useGroup, useLeaveGroup, useRemoveMember, useUpdateGroup } from "@/lib/hooks";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import * as Clipboard from "expo-clipboard";
@@ -39,6 +39,8 @@ export default function GroupSettingsScreen() {
   const { user } = useAuthStore();
   const surface = useThemeColor("surface");
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<any>(null);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
@@ -46,6 +48,7 @@ export default function GroupSettingsScreen() {
   const { data: group, isLoading, error, refetch } = useGroup(id as string);
   const updateGroup = useUpdateGroup();
   const leaveGroup = useLeaveGroup();
+  const removeMember = useRemoveMember();
   const { toast } = useToast();
 
   const groupData = group as any;
@@ -79,6 +82,38 @@ export default function GroupSettingsScreen() {
         actionLabel: t("retry"),
         onActionPress: ({ hide }) => hide(),
       });
+    }
+  };
+
+  const handleRemoveMember = async () => {
+    if (!group || !memberToRemove) return;
+
+    try {
+      await removeMember.mutateAsync({
+        groupId: group.id,
+        userId: memberToRemove.user_id,
+      });
+      toast.show({
+        label: t("group_settings.remove_member_success_title"),
+        description: t("group_settings.remove_member_success_desc", {
+          name: memberToRemove.user?.name || t("group_detail.member"),
+        }),
+        variant: "success",
+        icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
+        actionLabel: t("common.ok"),
+        onActionPress: ({ hide }) => hide(),
+      });
+    } catch (error: any) {
+      toast.show({
+        label: t("group_settings.remove_member_error_title"),
+        description: error.message || t("error_processing_request"),
+        variant: "danger",
+        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        actionLabel: t("retry"),
+        onActionPress: ({ hide }) => hide(),
+      });
+    } finally {
+      setMemberToRemove(null);
     }
   };
 
@@ -361,12 +396,8 @@ export default function GroupSettingsScreen() {
                         {canRemove && (
                           <Button
                             onPress={() => {
-                              // TODO: Implement remove member
-                              toast.show({
-                                label: t("group_settings.remove_member_temp"),
-                                variant: "warning",
-                                icon: <IconSymbol name="exclamationmark.triangle.fill" size={20} color={warning} />,
-                              });
+                              setMemberToRemove(member);
+                              setShowRemoveDialog(true);
                             }}
                             variant="danger-soft"
                             isIconOnly
@@ -387,12 +418,14 @@ export default function GroupSettingsScreen() {
           </View>
 
           {/* Danger Zone */}
-          <View>
-            <Button variant="danger" onPress={() => setShowLeaveDialog(true)}>
-              <IconSymbol name="arrow.right.square" size={20} color={surface} />
-              <Button.Label>{t("group_settings.leave_btn")}</Button.Label>
-            </Button>
-          </View>
+          {!isOwner && (
+            <View>
+              <Button variant="danger" onPress={() => setShowLeaveDialog(true)}>
+                <IconSymbol name="arrow.right.square" size={20} color={surface} />
+                <Button.Label>{t("group_settings.leave_btn")}</Button.Label>
+              </Button>
+            </View>
+          )}
         </View>
       </ScreenScrollView>
 
@@ -406,6 +439,23 @@ export default function GroupSettingsScreen() {
         variant="danger"
         isLoading={leaveGroup.isPending}
         onConfirm={handleLeaveGroup}
+      />
+
+      <ConfirmDialog
+        isOpen={showRemoveDialog}
+        onOpenChange={(open) => {
+          setShowRemoveDialog(open);
+          if (!open) setMemberToRemove(null);
+        }}
+        title={t("group_settings.remove_member_dialog_title")}
+        description={t("group_settings.remove_member_dialog_desc", {
+          name: memberToRemove?.user?.name || t("group_detail.member"),
+        })}
+        confirmLabel={t("group_settings.remove_member_confirm")}
+        cancelLabel={t("common.cancel")}
+        variant="danger"
+        isLoading={removeMember.isPending}
+        onConfirm={handleRemoveMember}
       />
 
       <ShareQRSheet

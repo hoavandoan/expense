@@ -620,6 +620,12 @@
         "no_members_title": "Chưa có thành viên",
         "no_members_desc": "Thêm thành viên vào nhóm",
         "remove_member_temp": "Xác nhận xóa thành viên chưa được cấu hình",
+        "remove_member_dialog_title": "Xóa thành viên",
+        "remove_member_dialog_desc": "Bạn có chắc muốn xóa %{name} khỏi nhóm?",
+        "remove_member_confirm": "Xóa",
+        "remove_member_success_title": "Đã xóa thành viên",
+        "remove_member_success_desc": "%{name} đã bị xóa khỏi nhóm",
+        "remove_member_error_title": "Không thể xóa",
         "leave_btn": "Rời nhóm",
         "leave_dialog_title": "Rời nhóm",
         "leave_dialog_desc": "Bạn có chắc chắn muốn rời nhóm \"%{name}\"? Bạn sẽ không thể xem hoặc chỉnh sửa các khoản chi trong nhóm này."
