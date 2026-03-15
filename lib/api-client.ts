@@ -1,7 +1,9 @@
 
 import { useAuthStore } from './stores/auth-store';
 
-const API_BASE_URL = '/api'; // Expo Router API routes are relative to the root
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL
+    ? `${process.env.EXPO_PUBLIC_API_URL}/api`
+    : '/api';
 
 interface RequestOptions extends RequestInit {
     params?: Record<string, string>;
