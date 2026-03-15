@@ -12,10 +12,9 @@ import { useRouter } from "expo-router";
 import {
   Avatar,
   Card,
-  Input,
   PressableFeedback,
+  SearchField,
   Spinner,
-  TextField,
   useThemeColor
 } from "heroui-native";
 import React, { useCallback, useMemo, useState } from "react";
@@ -209,29 +208,17 @@ export default function SearchScreen() {
 
       {/* Search Bar */}
       <View className="px-6 py-4">
-        <TextField>
-          <View className="justify-center">
-            <Input
+        <SearchField value={searchQuery} onChange={setSearchQuery}>
+          <SearchField.Group>
+            <SearchField.SearchIcon />
+            <SearchField.Input
               placeholder={t('search.placeholder', { defaultValue: 'Tìm nhóm, bạn bè, khoản chi...' })}
-              placeholderTextColor={muted}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              className="bg-surface border border-border/10 rounded-2xl pl-12 h-16 text-foreground"
               autoFocus
+              style={{ fontSize: 16 }}
             />
-            <View className="absolute left-4" pointerEvents="none">
-              <IconSymbol name="magnifyingglass" size={18} color={muted} />
-            </View>
-            {searchQuery.length > 0 && (
-              <PressableFeedback
-                onPress={() => setSearchQuery("")}
-                className="absolute right-4 w-8 h-8 items-center justify-center"
-              >
-                <IconSymbol name="xmark.circle.fill" size={20} color={muted} />
-              </PressableFeedback>
-            )}
-          </View>
-        </TextField>
+            <SearchField.ClearButton />
+          </SearchField.Group>
+        </SearchField>
       </View>
 
       {/* Search Content */}

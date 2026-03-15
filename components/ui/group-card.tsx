@@ -110,7 +110,7 @@ export const GroupCard: FC<GroupCardProps> = ({
           <Card
             variant="default"
             className={cn(
-              "flex-1 relative p-0 rounded-[] border border-border/10 overflow-hidden shadow-lg",
+              "flex-1 relative p-0 overflow-hidden shadow-lg",
               className
             )}
             style={{

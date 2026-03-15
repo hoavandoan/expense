@@ -6,180 +6,200 @@ import { File, Paths } from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as Sharing from "expo-sharing";
 import {
-	BottomSheet,
-	Button,
-	Separator,
-	useThemeColor,
-	useToast,
+  BottomSheet,
+  Button,
+  Separator,
+  useThemeColor,
+  useToast,
 } from "heroui-native";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 // import { BottomSheetBlurOverlay } from "../bottom-sheet-blur-overlay";
 
 interface ShareQRSheetProps {
-	isOpen: boolean;
-	onOpenChange: (open: boolean) => void;
-	groupName: string;
-	inviteCode: string;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  groupName: string;
+  inviteCode: string;
 }
 
 export function ShareQRSheet({
-	                             isOpen,
-	                             onOpenChange,
-	                             groupName,
-	                             inviteCode,
-                             }: ShareQRSheetProps) {
-	const { t } = useTranslation();
-	const { toast } = useToast();
-	const accent = useThemeColor("accent");
-	const insets = useSafeAreaInsets();
-	const qrRef = useRef<any>(null);
+  isOpen,
+  onOpenChange,
+  groupName,
+  inviteCode,
+}: ShareQRSheetProps) {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const accent = useThemeColor("accent");
+  const insets = useSafeAreaInsets();
+  const qrRef = useRef<any>(null);
+  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	// Format the share content
-	const qrValue = `expense://join-group/${inviteCode}`;
+  useEffect(() => {
+    return () => {
+      if (dismissTimerRef.current) {
+        clearTimeout(dismissTimerRef.current);
+      }
+    };
+  }, []);
 
-	const handleWriteQR = async (data: string): Promise<string> => {
-		// Strip prefix if exists: data:image/png;base64,
-		const base64Data = data.includes(",") ? data.split(",")[1] : data;
-		const binaryData = new Uint8Array(decode(base64Data));
+  // Format the share content
+  const qrValue = `expense://join-group/${inviteCode}`;
 
-		const file = new File(Paths.cache, `qr-${inviteCode}.png`);
-		await file.write(binaryData);
-		return file.uri;
-	};
+  const handleWriteQR = async (data: string): Promise<string> => {
+    // Strip prefix if exists: data:image/png;base64,
+    const base64Data = data.includes(",") ? data.split(",")[1] : data;
+    const binaryData = new Uint8Array(decode(base64Data));
 
-	const handleSaveQR = async () => {
-		try {
-			if (!qrRef.current) return;
+    const file = new File(Paths.cache, `qr-${inviteCode}.png`);
+    await file.write(binaryData);
+    return file.uri;
+  };
 
-			qrRef.current.toDataURL(async (data: string) => {
-				try {
-					const fileUri = await handleWriteQR(data);
+  const handleSaveQR = async () => {
+    try {
+      if (!qrRef.current) return;
 
-					// Request write-only permissions as a safety measure
-					const { status } = await MediaLibrary.requestPermissionsAsync(true);
-					if (status !== "granted") {
-						// If denied, fallback to Sharing
-						handleShareQR();
-						return;
-					}
+      qrRef.current.toDataURL(async (data: string) => {
+        try {
+          const fileUri = await handleWriteQR(data);
 
-					await MediaLibrary.saveToLibraryAsync(fileUri);
-					toast.show({
-						label: t("share_qr.save_success_title"),
-						description: t("share_qr.save_success_desc"),
-						variant: "success",
-					});
-				} catch (innerError: any) {
-					console.log("Save error:", innerError);
-					handleShareQR();
-				}
-			});
-		} catch (error: any) {
-			toast.show({
-				label: t("error"),
-				description: t("share_qr.process_error"),
-				variant: "danger",
-			});
-		}
-	};
+          // Request write-only permissions as a safety measure
+          const { status } = await MediaLibrary.requestPermissionsAsync(true);
+          if (status !== "granted") {
+            // If denied, fallback to Sharing
+            handleShareQR();
+            return;
+          }
 
-	const handleShareQR = async () => {
-		try {
-			if (!qrRef.current) return;
+          await MediaLibrary.saveToLibraryAsync(fileUri);
+          toast.show({
+            label: t("share_qr.save_success_title"),
+            description: t("share_qr.save_success_desc"),
+            variant: "success",
+          });
+        } catch (innerError: any) {
+          console.log("Save error:", innerError);
+          handleShareQR();
+        }
+      });
+    } catch (error: any) {
+      toast.show({
+        label: t("error"),
+        description: t("share_qr.process_error"),
+        variant: "danger",
+      });
+    }
+  };
 
-			qrRef.current.toDataURL(async (data: string) => {
-				try {
-					const fileUri = await handleWriteQR(data);
+  const handleShareQR = async () => {
+    try {
+      if (!qrRef.current) return;
 
-					await Sharing.shareAsync(fileUri, {
-						mimeType: "image/png",
-						dialogTitle: t("share_qr.share_dialog_title", { name: groupName }),
-					});
-				} catch (innerError: any) {
-					toast.show({
-						label: t("error"),
-						description: t("share_qr.share_error"),
-						variant: "danger",
-					});
-				}
-			});
-		} catch (error: any) {
-			toast.show({
-				label: t("error"),
-				description: t("share_qr.process_error"),
-				variant: "danger",
-			});
-		}
-	};
+      qrRef.current.toDataURL(async (data: string) => {
+        try {
+          const fileUri = await handleWriteQR(data);
 
-	return (
-		<BottomSheet isOpen={isOpen} onOpenChange={onOpenChange}>
-			<BottomSheet.Portal>
-				<BottomSheet.Overlay />
-				<BottomSheet.Content
-					enableDynamicSizing={true}
-					detached={true}
-					className="mx-4"
-					backgroundClassName="rounded-[32px]"
-					bottomInset={insets.bottom + 12}
-					contentContainerClassName="items-center pb-12 pt-4"
-				>
-					<View className="w-full px-6 items-center">
-						<AppText className="text-xl font-bold mb-1 text-center">
-							{t("share_qr.title")}
-						</AppText>
-						<AppText className="text-muted text-sm mb-8 text-center px-4">
-							{t("share_qr.description", { name: groupName })}
-						</AppText>
+          // Close the BottomSheet first so the native share sheet renders on top
+          onOpenChange(false);
+          // Wait for the dismiss animation to complete before presenting the native share sheet
+          const DISMISS_ANIMATION_DURATION_MS = 300;
+          await new Promise<void>((resolve) => {
+            dismissTimerRef.current = setTimeout(() => {
+              dismissTimerRef.current = null;
+              resolve();
+            }, DISMISS_ANIMATION_DURATION_MS);
+          });
 
-						<View className="bg-white p-6 rounded-3xl shadow-sm border border-border/10 mb-8">
-							<QRCode
-								value={qrValue}
-								size={220}
-								getRef={(ref) => (qrRef.current = ref)}
-								quietZone={10}
-							/>
-						</View>
+          await Sharing.shareAsync(fileUri, {
+            mimeType: "image/png",
+            dialogTitle: t("share_qr.share_dialog_title", { name: groupName }),
+          });
+        } catch (innerError: any) {
+          toast.show({
+            label: t("error"),
+            description: t("share_qr.share_error"),
+            variant: "danger",
+          });
+        }
+      });
+    } catch (error: any) {
+      toast.show({
+        label: t("error"),
+        description: t("share_qr.process_error"),
+        variant: "danger",
+      });
+    }
+  };
 
-						<View className="bg-surface-secondary px-6 py-3 rounded-2xl mb-8 flex-row items-center gap-3 border border-divider/5">
-							<AppText className="text-muted font-bold text-xs tracking-widest uppercase">
-								{t("share_qr.invite_code_label")}
-							</AppText>
-							<AppText className="text-lg font-mono tracking-tighter">
-								{inviteCode}
-							</AppText>
-						</View>
+  return (
+    <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange}>
+      <BottomSheet.Portal>
+        <BottomSheet.Overlay />
+        <BottomSheet.Content
+          enableDynamicSizing={true}
+          detached={true}
+          className="mx-4"
+          backgroundClassName="rounded-[32px]"
+          bottomInset={insets.bottom + 12}
+          contentContainerClassName="items-center pb-12 pt-4"
+        >
+          <View className="w-full px-6 items-center">
+            <AppText className="text-xl font-bold mb-1 text-center">
+              {t("share_qr.title")}
+            </AppText>
+            <AppText className="text-muted text-sm mb-8 text-center px-4">
+              {t("share_qr.description", { name: groupName })}
+            </AppText>
 
-						<Separator className="mb-6 w-full opacity-10" />
+            <View className="bg-white p-6 rounded-3xl shadow-sm border border-border/10 mb-8">
+              <QRCode
+                value={qrValue}
+                size={220}
+                getRef={(ref) => (qrRef.current = ref)}
+                quietZone={10}
+              />
+            </View>
 
-						<View className="flex-row gap-4 w-full">
-							<Button
-								variant="secondary"
-								className="flex-1 rounded-2xl h-14"
-								onPress={handleSaveQR}
-							>
-								<IconSymbol
-									name="camera.fill"
-									size={20}
-									color={useThemeColor("foreground")}
-								/>
-								<Button.Label className="font-bold">{t("share_qr.save_btn")}</Button.Label>
-							</Button>
-							<Button
-								variant="primary"
-								className="flex-1 rounded-2xl h-14"
-								onPress={handleShareQR}
-							>
-								<IconSymbol name="square.and.arrow.up" size={20} color="white" />
-								<Button.Label className="font-bold">{t("share_qr.share_btn")}</Button.Label>
-							</Button>
-						</View>
-					</View>
-				</BottomSheet.Content>
-			</BottomSheet.Portal>
-		</BottomSheet>
-	);
+            <View className="bg-surface-secondary px-6 py-3 rounded-2xl mb-8 flex-row items-center gap-3">
+              <AppText className="text-muted font-bold text-xs tracking-widest uppercase">
+                {t("share_qr.invite_code_label")}
+              </AppText>
+              <AppText className="text-lg font-mono tracking-tighter">
+                {inviteCode}
+              </AppText>
+            </View>
+
+            <Separator className="mb-6 w-full opacity-10" />
+
+            <View className="flex-row gap-4 w-full">
+              <Button
+                variant="secondary"
+                className="flex-1 rounded-2xl h-14"
+                onPress={handleSaveQR}
+              >
+                <IconSymbol
+                  name="camera.fill"
+                  size={20}
+                  color={useThemeColor("accent")}
+                />
+                <Button.Label className="font-bold">{t("share_qr.save_btn")}</Button.Label>
+              </Button>
+              <Button
+                variant="primary"
+                className="flex-1 rounded-2xl h-14"
+                onPress={handleShareQR}
+              >
+                <IconSymbol name="square.and.arrow.up" size={20} color="white" />
+                <Button.Label className="font-bold">{t("share_qr.share_btn")}</Button.Label>
+              </Button>
+            </View>
+          </View>
+        </BottomSheet.Content>
+      </BottomSheet.Portal>
+    </BottomSheet>
+  );
 }

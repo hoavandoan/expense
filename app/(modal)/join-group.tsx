@@ -8,9 +8,10 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import {
   Button,
-  Input,
-  PressableFeedback,
+  cn,
+  InputGroup,
   Spinner,
+  Tabs,
   TextField,
   useThemeColor,
   useToast
@@ -22,6 +23,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming } fr
 export default function JoinGroupScreen() {
   const router = useRouter();
   const [inviteCode, setInviteCode] = useState("");
+  const [activeTab, setActiveTab] = useState<'code' | 'qr'>('code');
   const [permission, requestPermission] = useCameraPermissions();
   const [isScanning, setIsScanning] = useState(true);
   const [torch, setTorch] = useState(false);
@@ -31,16 +33,19 @@ export default function JoinGroupScreen() {
   const accent = useThemeColor("accent");
   const success = useThemeColor("success");
   const danger = useThemeColor("danger");
+  const muted = useThemeColor("muted");
 
   const scanLineValue = useSharedValue(0);
 
   useEffect(() => {
+    if (activeTab !== 'qr') return;
+
     scanLineValue.value = withRepeat(
       withTiming(1, { duration: 2500 }),
       -1,
       true
     );
-  }, []);
+  }, [activeTab]);
 
   const animatedLineStyle = useAnimatedStyle(() => ({
     top: `${scanLineValue.value * 100}%`,
@@ -150,18 +155,60 @@ export default function JoinGroupScreen() {
     }
   };
 
-  if (!permission) {
-    return (
-      <View className="flex-1 bg-background items-center justify-center p-6">
-        <Spinner size="lg" color={accent} />
+  const renderCodeTab = () => (
+    <View className="mb-8">
+      <View className="flex-row gap-2">
+        <TextField isRequired className="flex-1">
+          <AppText className="mb-3 ml-1 text-sm font-medium">
+            {t('modal.join_group.enter_code_label')}
+          </AppText>
+          <AppText className="mb-3 ml-1 text-xs text-muted">
+            {t('modal.join_group.enter_code_desc')}
+          </AppText>
+          <InputGroup>
+            <InputGroup.Prefix>
+              <IconSymbol name="link" size={18} color="gray" />
+            </InputGroup.Prefix>
+            <InputGroup.Input
+              placeholder={t('modal.join_group.code_placeholder')}
+              className="px-4 text-foreground"
+              placeholderTextColor="gray"
+              value={inviteCode}
+              onChangeText={(text: string) => setInviteCode(text.toUpperCase())}
+              autoCapitalize="characters"
+              style={{ fontSize: 16 }}
+            />
+            <InputGroup.Suffix>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="rounded-xl"
+                onPress={handlePaste}
+              >
+                <View className="flex-row items-center gap-1.5">
+                  <IconSymbol name="doc.on.clipboard" size={16} color="gray" />
+                  <AppText className="text-xs font-bold">{t('modal_layout.paste', { defaultValue: 'Dán' })}</AppText>
+                </View>
+              </Button>
+            </InputGroup.Suffix>
+          </InputGroup>
+        </TextField>
       </View>
-    );
-  }
+    </View>
+  );
 
-  if (!permission.granted) {
-    return (
-      <View className="flex-1 bg-background items-center justify-center p-6">
-        <View className="bg-surface p-8 rounded-3xl border border-border/10 items-center w-full">
+  const renderQrTab = () => {
+    if (!permission) {
+      return (
+        <View className="aspect-square w-full rounded-3xl bg-surface items-center justify-center mb-8">
+          <Spinner size="lg" color={accent} />
+        </View>
+      );
+    }
+
+    if (!permission.granted) {
+      return (
+        <View className="w-full rounded-3xl bg-surface border border-border/10 items-center p-8 mb-8">
           <View className="w-20 h-20 bg-accent/10 rounded-full items-center justify-center mb-6">
             <IconSymbol name="camera.fill" size={40} color={accent} />
           </View>
@@ -179,120 +226,115 @@ export default function JoinGroupScreen() {
             <Button.Label className="font-bold">{t('modal.join_group.grant_permission')}</Button.Label>
           </Button>
         </View>
+      );
+    }
+
+    return (
+      <View className="aspect-square w-full rounded-3xl overflow-hidden bg-black relative shadow-2xl mb-8">
+        <CameraView
+          style={StyleSheet.absoluteFill}
+          facing="back"
+          onBarcodeScanned={onBarCodeScanned}
+          barcodeScannerSettings={{
+            barcodeTypes: ["qr"],
+          }}
+          enableTorch={torch}
+        />
+
+        <View className="absolute inset-0 items-center justify-center pointer-events-none">
+          <View className="w-64 h-64 border-2 border-accent/50 rounded-3xl overflow-hidden relative" style={{ borderStyle: "dashed" }}>
+            <Animated.View
+              className="absolute w-full h-0.5 bg-accent/60"
+              style={animatedLineStyle}
+            />
+          </View>
+        </View>
+
+        {/* Corner Markers */}
+        <View className="absolute top-12 left-12 w-10 h-10 border-t-4 border-l-4 border-accent rounded-tl-2xl" />
+        <View className="absolute top-12 right-12 w-10 h-10 border-t-4 border-r-4 border-accent rounded-tr-2xl" />
+        <View className="absolute bottom-12 left-12 w-10 h-10 border-b-4 border-l-4 border-accent rounded-bl-2xl" />
+        <View className="absolute bottom-12 right-12 w-10 h-10 border-b-4 border-r-4 border-accent rounded-br-2xl" />
+
+        <View className="absolute bottom-20 w-full flex-row justify-center gap-8">
+          <View className="items-center">
+            <TouchableOpacity
+              onPress={handlePickImage}
+              className="w-14 h-14 rounded-full bg-black/40 items-center justify-center border border-white/20"
+            >
+              <IconSymbol name="photo.on.rectangle" size={24} color="white" />
+            </TouchableOpacity>
+            {/* <AppText className="text-white text-[10px] text-center mt-2 font-bold uppercase">
+              {t('modal.join_group.gallery')}
+            </AppText> */}
+          </View>
+          <View className="items-center">
+            <TouchableOpacity
+              onPress={() => setTorch(!torch)}
+              className={`w-14 h-14 rounded-full ${torch ? "bg-accent" : "bg-black/40"
+                } items-center justify-center border border-white/20`}
+            >
+              <IconSymbol
+                name="flashlight.on.fill"
+                size={24}
+                color="white"
+              />
+            </TouchableOpacity>
+            {/* <AppText className="text-white text-[10px] text-center mt-2 font-bold uppercase">
+              {t('modal.join_group.flash')}
+            </AppText> */}
+          </View>
+        </View>
       </View>
     );
-  }
+  };
 
   return (
     <View className="flex-1 bg-background">
       <ScreenScrollView withKeyboardAvoidingView>
-        <View className="items-center mb-10 mt-6">
+        <View className="items-center mb-6 mt-6">
           <AppText className="text-3xl font-bold mb-3">{t('modal.join_group.title')}</AppText>
           <AppText className="text-muted text-center leading-relaxed text-base">
             {t('modal.join_group.subtitle')}
           </AppText>
         </View>
 
-        {/* QR Scanner */}
-        <View className="aspect-square w-full rounded-3xl overflow-hidden bg-black relative shadow-2xl mb-12">
-          <CameraView
-            style={StyleSheet.absoluteFill}
-            facing="back"
-            onBarcodeScanned={onBarCodeScanned}
-            barcodeScannerSettings={{
-              barcodeTypes: ["qr"],
-            }}
-            enableTorch={torch}
-          />
-
-          <View className="absolute inset-0 items-center justify-center pointer-events-none">
-            <View className="w-64 h-64 border-2 border-accent/50 rounded-3xl overflow-hidden relative" style={{ borderStyle: "dashed" }}>
-              <Animated.View
-                className="absolute w-full h-0.5 bg-accent/60"
-                style={animatedLineStyle}
-              />
-            </View>
-          </View>
-
-          {/* Corner Markers */}
-          <View className="absolute top-12 left-12 w-10 h-10 border-t-4 border-l-4 border-accent rounded-tl-2xl" />
-          <View className="absolute top-12 right-12 w-10 h-10 border-t-4 border-r-4 border-accent rounded-tr-2xl" />
-          <View className="absolute bottom-12 left-12 w-10 h-10 border-b-4 border-l-4 border-accent rounded-bl-2xl" />
-          <View className="absolute bottom-12 right-12 w-10 h-10 border-b-4 border-r-4 border-accent rounded-br-2xl" />
-
-          <View className="absolute bottom-12 w-full flex-row justify-center gap-8">
-            <View className="items-center">
-              <TouchableOpacity
-                onPress={handlePickImage}
-                className="w-14 h-14 rounded-full bg-black/40 items-center justify-center border border-white/20"
-              >
-                <IconSymbol name="photo.on.rectangle" size={24} color="white" />
-              </TouchableOpacity>
-              <AppText className="text-white text-[10px] text-center mt-2 font-bold uppercase">
-                {t('modal.join_group.gallery')}
-              </AppText>
-            </View>
-            <View className="items-center">
-              <TouchableOpacity
-                onPress={() => setTorch(!torch)}
-                className={`w-14 h-14 rounded-full ${torch ? "bg-accent" : "bg-black/40"
-                } items-center justify-center border border-white/20`}
-              >
-                <IconSymbol
-                  name="flashlight.on.fill"
-                  size={24}
-                  color="white"
-                />
-              </TouchableOpacity>
-              <AppText className="text-white text-[10px] text-center mt-2 font-bold uppercase">
-                {t('modal.join_group.flash')}
-              </AppText>
-            </View>
-          </View>
+        {/* Tab Selector */}
+        <View className="flex-row justify-center mb-8">
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) => setActiveTab(v as 'code' | 'qr')}
+            variant="primary"
+            className="bg-surface-secondary rounded-full p-1"
+          >
+            <Tabs.List>
+              <Tabs.Indicator className="bg-accent shadow-none" />
+              <Tabs.Trigger value="code" className="px-6 py-2 rounded-full">
+                {({ isSelected }) => (
+                  <View className="flex-row items-center gap-1.5">
+                    <IconSymbol name="link" size={14} color={isSelected ? 'white' : muted} />
+                    <Tabs.Label className={cn("font-bold text-[13px]", isSelected ? "text-white" : "text-foreground")}>
+                      {t('modal.join_group.tab_code')}
+                    </Tabs.Label>
+                  </View>
+                )}
+              </Tabs.Trigger>
+              <Tabs.Trigger value="qr" className="px-6 py-2 rounded-full">
+                {({ isSelected }) => (
+                  <View className="flex-row items-center gap-1.5">
+                    <IconSymbol name="qrcode" size={14} color={isSelected ? 'white' : muted} />
+                    <Tabs.Label className={cn("font-bold text-[13px]", isSelected ? "text-white" : "text-foreground")}>
+                      {t('modal.join_group.tab_qr')}
+                    </Tabs.Label>
+                  </View>
+                )}
+              </Tabs.Trigger>
+            </Tabs.List>
+          </Tabs>
         </View>
 
-        <View className="flex-row items-center gap-4 mb-8">
-          <View className="flex-1 h-[1px] bg-border/10" />
-          <AppText className="text-muted font-bold text-xs tracking-widest uppercase">{t('modal.join_group.or')}</AppText>
-          <View className="flex-1 h-[1px] bg-border/10" />
-        </View>
-
-        <View className="mb-8">
-          <View className="flex-row gap-2">
-            <TextField isRequired className="flex-1">
-              <AppText className="mb-3 ml-1 text-sm font-medium">
-                {t('modal.join_group.enter_code_label')}
-              </AppText>
-              <AppText className="mb-3 ml-1 text-xs text-muted">
-                {t('modal.join_group.enter_code_desc')}
-              </AppText>
-              <View className="justify-center">
-                <Input
-                  placeholder={t('modal.join_group.code_placeholder')}
-                  className="bg-surface border border-border/10 h-16 rounded-2xl pl-12 pr-20 text-foreground"
-                  placeholderTextColor="gray"
-                  value={inviteCode}
-                  onChangeText={(text: string) => setInviteCode(text.toUpperCase())}
-                  autoCapitalize="characters"
-                />
-                <View className="absolute left-4" pointerEvents="none">
-                  <IconSymbol name="link" size={18} color="gray" />
-                </View>
-                <View className="absolute right-4">
-                  <PressableFeedback
-                    className="bg-surface-secondary px-4 py-2 rounded-xl border border-border/10"
-                    onPress={handlePaste}
-                  >
-                    <View className="flex-row items-center gap-1.5">
-                      <IconSymbol name="doc.on.clipboard" size={14} color="gray" />
-                      <AppText className="text-xs font-bold">{t('modal_layout.paste', { defaultValue: 'Dán' })}</AppText>
-                    </View>
-                  </PressableFeedback>
-                </View>
-              </View>
-            </TextField>
-          </View>
-        </View>
+        {/* Tab Content */}
+        {activeTab === 'code' ? renderCodeTab() : renderQrTab()}
 
         <Button
           size="lg"
@@ -308,14 +350,13 @@ export default function JoinGroupScreen() {
           </View>
         </Button>
 
-        <PressableFeedback className="mt-8 self-center">
+        {/* <PressableFeedback className="mt-8 self-center">
           <View className="flex-row items-center gap-2">
             <IconSymbol name="questionmark.circle" size={18} color="gray" />
             <AppText className="text-muted font-medium">{t('modal.join_group.how_to_find')}</AppText>
           </View>
-        </PressableFeedback>
+        </PressableFeedback> */}
       </ScreenScrollView>
     </View>
   );
 }
-

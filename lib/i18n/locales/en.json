@@ -95,8 +95,10 @@
             }
         },
         "join_group": {
-            "title": "Scan QR Code",
-            "subtitle": "Point camera at group QR code to\njoin instantly.",
+            "title": "Join Group",
+            "subtitle": "Choose a method to join your group.",
+            "tab_code": "Enter code",
+            "tab_qr": "Scan QR",
             "camera_permission_title": "Camera Access",
             "camera_permission_desc": "We need camera access so you can scan QR codes to join groups quickly.",
             "grant_permission": "Grant access",

@@ -94,12 +94,12 @@ export default function GroupDetailScreen() {
   // Calculate optimized debts for Summary tab
   const optimizedDebts = useMemo(() => {
     if (!membersWithBalanceRaw) return [];
-    
+
     const balanceRecord: Record<string, number> = {};
     membersWithBalanceRaw.forEach((m: any) => {
       balanceRecord[m.userId] = m.balance;
     });
-    
+
     return assignDebtsOptimized(balanceRecord);
   }, [membersWithBalanceRaw]);
 
@@ -188,7 +188,7 @@ export default function GroupDetailScreen() {
   );
 
   const assigneeUser = activeAssignment && groupData?.group_members?.find(
-      (m: any) => m.user_id === activeAssignment.assigneeUserId
+    (m: any) => m.user_id === activeAssignment.assigneeUserId
   )?.user;
 
   return (
@@ -416,88 +416,88 @@ export default function GroupDetailScreen() {
 
           {/* Pending Settlements */}
           <PendingSettlements groupId={id as string} />
-          
+
           {/* Assignment Requests (Shown to Admin/Owner) */}
           {isOwnerOrAdmin && (
-            <PendingRequestsList 
-                groupId={id as string} 
-                isAdminOrOwner={isOwnerOrAdmin} 
+            <PendingRequestsList
+              groupId={id as string}
+              isAdminOrOwner={isOwnerOrAdmin}
             />
           )}
 
           {/* Debt Assignment Status / Controls */}
           {(isOwnerOrAdmin || activeAssignment?.status === 'active') && (
             <View className="mb-8">
-               <View className="flex-row items-center justify-between mb-3">
-                 <AppText className="text-xl font-bold text-foreground">
-                   {t("group_detail.debt_assignment_title")}
-                 </AppText>
-                 {isOwnerOrAdmin && activeAssignment?.status === 'active' && (
-                    <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        onPress={() => setIsDisableConfirmOpen(true)}
-                        isDisabled={isDisablingAssignment}
-                    >
-                        <Button.Label className="text-danger font-bold text-xs">{t("group_detail.disable_feature")}</Button.Label>
-                    </Button>
-                 )}
-               </View>
+              <View className="flex-row items-center justify-between mb-3">
+                <AppText className="text-xl font-bold text-foreground">
+                  {t("group_detail.debt_assignment_title")}
+                </AppText>
+                {isOwnerOrAdmin && activeAssignment?.status === 'active' && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onPress={() => setIsDisableConfirmOpen(true)}
+                    isDisabled={isDisablingAssignment}
+                  >
+                    <Button.Label className="text-danger font-bold text-xs">{t("group_detail.disable_feature")}</Button.Label>
+                  </Button>
+                )}
+              </View>
 
-               <Card className="p-4 rounded-2xl bg-surface border border-border/10">
-                 {activeAssignment?.status === 'active' ? (
-                   <View className="flex-row items-center">
-                     <Avatar size="md" className="mr-3" alt={assigneeUser?.name || 'Assignee'}>
-                        {assigneeUser?.avatar_url ? (
-                           <Avatar.Image source={{ uri: assigneeUser.avatar_url }} asChild>
-                              <Image source={{ uri: assigneeUser.avatar_url }} style={{ width: '100%', height: '100%' }} />
-                           </Avatar.Image>
-                        ) : (
-                           <Avatar.Fallback className="bg-primary/20">
-                              <AppText className="font-bold text-primary">{assigneeUser?.name?.charAt(0)}</AppText>
-                           </Avatar.Fallback>
-                        )}
-                     </Avatar>
-                     <View className="flex-1">
-                       <AppText className="font-bold">{assigneeUser?.name || 'Unknown'}</AppText>
-                       <AppText className="text-xs text-muted">Đang nhận tất cả khoản nợ</AppText>
-                     </View>
-                     {isOwnerOrAdmin && (
-                        <Button 
-                            size="sm" 
-                            variant="ghost" 
-                            onPress={() => setAssigneeSelectorVisible(true)}
-                        >
-                            <Button.Label className="text-primary font-bold">Thay đổi</Button.Label>
-                        </Button>
-                     )}
-                   </View>
-                 ) : (
-                   <View className="flex-row items-center justify-between">
-                     <View>
-                        <AppText className="font-semibold text-muted">{t("group_detail.no_assignee")}</AppText>
-                        <AppText className="text-xs text-muted mt-1">{t("group_detail.assignee_hint")}</AppText>
-                     </View>
-                     {isOwnerOrAdmin ? (
-                        <Button 
-                            size="sm" 
-                            variant="primary" 
-                            onPress={() => setAssigneeSelectorVisible(true)}
-                        >
-                            <Button.Label className="text-white font-bold">{t("group_detail.setup")}</Button.Label>
-                        </Button>
-                     ) : (
-                        <Button 
-                            size="sm" 
-                            variant="ghost"
-                            onPress={() => setCreateRequestVisible(true)}
-                        >
-                             <Button.Label className="text-primary font-bold">{t("group_detail.propose")}</Button.Label>
-                        </Button>
-                     )}
-                   </View>
-                 )}
-               </Card>
+              <Card className="p-4 rounded-2xl bg-surface border border-border/10">
+                {activeAssignment?.status === 'active' ? (
+                  <View className="flex-row items-center">
+                    <Avatar size="md" className="mr-3" alt={assigneeUser?.name || 'Assignee'}>
+                      {assigneeUser?.avatar_url ? (
+                        <Avatar.Image source={{ uri: assigneeUser.avatar_url }} asChild>
+                          <Image source={{ uri: assigneeUser.avatar_url }} style={{ width: '100%', height: '100%' }} />
+                        </Avatar.Image>
+                      ) : (
+                        <Avatar.Fallback className="bg-primary/20">
+                          <AppText className="font-bold text-primary">{assigneeUser?.name?.charAt(0)}</AppText>
+                        </Avatar.Fallback>
+                      )}
+                    </Avatar>
+                    <View className="flex-1">
+                      <AppText className="font-bold">{assigneeUser?.name || 'Unknown'}</AppText>
+                      <AppText className="text-xs text-muted">Đang nhận tất cả khoản nợ</AppText>
+                    </View>
+                    {isOwnerOrAdmin && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onPress={() => setAssigneeSelectorVisible(true)}
+                      >
+                        <Button.Label className="text-primary font-bold">Thay đổi</Button.Label>
+                      </Button>
+                    )}
+                  </View>
+                ) : (
+                  <View className="flex-row items-center justify-between">
+                    <View>
+                      <AppText className="font-semibold text-muted">{t("group_detail.no_assignee")}</AppText>
+                      <AppText className="text-xs text-muted mt-1">{t("group_detail.assignee_hint")}</AppText>
+                    </View>
+                    {isOwnerOrAdmin ? (
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        onPress={() => setAssigneeSelectorVisible(true)}
+                      >
+                        <Button.Label className="text-white font-bold">{t("group_detail.setup")}</Button.Label>
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onPress={() => setCreateRequestVisible(true)}
+                      >
+                        <Button.Label className="text-primary font-bold">{t("group_detail.propose")}</Button.Label>
+                      </Button>
+                    )}
+                  </View>
+                )}
+              </Card>
             </View>
           )}
 
@@ -569,9 +569,9 @@ export default function GroupDetailScreen() {
                     <AppText className="text-xl font-bold text-foreground">
                       {showDetailedDebts ? t("group_detail.debt_details") : t("group_detail.settlement_suggestions")}
                     </AppText>
-                    <Button 
-                      size="sm" 
-                      variant="ghost" 
+                    <Button
+                      size="sm"
+                      variant="ghost"
                       onPress={() => setShowDetailedDebts(!showDetailedDebts)}
                     >
                       <Button.Label className="text-accent font-bold text-sm">
@@ -579,7 +579,7 @@ export default function GroupDetailScreen() {
                       </Button.Label>
                     </Button>
                   </View>
-                  
+
                   <View className="gap-4">
                     {showDetailedDebts ? (
                       individualDebts.length === 0 ? (
@@ -590,7 +590,7 @@ export default function GroupDetailScreen() {
                         individualDebts.map((debt: any) => {
                           const fromMember = memberMap.get(debt.fromId);
                           const toMember = memberMap.get(debt.toId);
-                          
+
                           return (
                             <Card
                               key={debt.id}
@@ -640,7 +640,7 @@ export default function GroupDetailScreen() {
                         optimizedDebts.map((debt, index) => {
                           const fromMember = memberMap.get(debt.from);
                           const toMember = memberMap.get(debt.to);
-                        
+
                           return (
                             <Card
                               key={index}
@@ -662,7 +662,7 @@ export default function GroupDetailScreen() {
                                       {debt.from === user?.id ? t("group_card.you") : fromMember?.name}
                                     </AppText>
                                   </View>
-                                  
+
                                   <View className="flex-1 items-center px-4">
                                     <View className="w-full h-[1px] bg-divider/20 relative items-center justify-center">
                                       <View className="px-2 bg-surface">
@@ -701,7 +701,7 @@ export default function GroupDetailScreen() {
           </View>
         </View>
       </AnimatedScrollView>
-      
+
       {/* Modals */}
       <AssigneeSelector
         isVisible={assigneeSelectorVisible}
@@ -710,7 +710,7 @@ export default function GroupDetailScreen() {
         members={membersWithBalance}
         currentAssigneeId={activeAssignment?.assigneeUserId}
       />
-      
+
       <CreateRequestModal
         isVisible={createRequestVisible}
         onClose={() => setCreateRequestVisible(false)}

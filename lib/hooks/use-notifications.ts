@@ -57,9 +57,10 @@ export const useMarkNotificationAsRead = () => {
       const previousNotifications = queryClient.getQueryData<Notification[]>(NOTIFICATIONS_KEY);
 
       // Optimistically update the specific notification
-      queryClient.setQueriesData<Notification[]>({ queryKey: NOTIFICATIONS_KEY }, (old) =>
-        old?.map((n) => n.id === notificationId ? { ...n, isRead: true, readAt: new Date().toISOString() } : n)
-      );
+      queryClient.setQueriesData<Notification[]>({ queryKey: NOTIFICATIONS_KEY }, (old) => {
+        if (!Array.isArray(old)) return old;
+        return old.map((n) => n.id === notificationId ? { ...n, isRead: true, readAt: new Date().toISOString() } : n);
+      });
 
       // Also invalidate/update unread count
       const previousCount = queryClient.getQueryData<number>([...NOTIFICATIONS_KEY, 'unread-count']);
@@ -100,9 +101,10 @@ export const useMarkAllNotificationsAsRead = () => {
       const previousNotifications = queryClient.getQueryData<Notification[]>(NOTIFICATIONS_KEY);
 
       // Optimistically update all notifications
-      queryClient.setQueriesData<Notification[]>({ queryKey: NOTIFICATIONS_KEY }, (old) =>
-        old?.map((n) => ({ ...n, isRead: true, readAt: new Date().toISOString() }))
-      );
+      queryClient.setQueriesData<Notification[]>({ queryKey: NOTIFICATIONS_KEY }, (old) => {
+        if (!Array.isArray(old)) return old;
+        return old.map((n) => ({ ...n, isRead: true, readAt: new Date().toISOString() }));
+      });
 
       // Reset unread count to 0
       const previousCount = queryClient.getQueryData<number>([...NOTIFICATIONS_KEY, 'unread-count']);
@@ -144,9 +146,10 @@ export const useDeleteNotification = () => {
       const wasUnread = target && !target.isRead;
 
       // Optimistically remove from all notification queries
-      queryClient.setQueriesData<Notification[]>({ queryKey: NOTIFICATIONS_KEY }, (old) =>
-        old?.filter((n) => n.id !== notificationId)
-      );
+      queryClient.setQueriesData<Notification[]>({ queryKey: NOTIFICATIONS_KEY }, (old) => {
+        if (!Array.isArray(old)) return old;
+        return old.filter((n) => n.id !== notificationId);
+      });
 
       let previousCount: number | undefined;
       if (wasUnread) {

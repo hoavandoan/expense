@@ -35,7 +35,7 @@ export const HomeHeader = ({ user, isAuthenticated, unreadCount = 0 }: HomeHeade
             <Avatar
               size="md"
               alt="User profile"
-              className="bg-surface size-12 shadow-sm"
+              className="bg-surface shadow-sm"
             >
               {isAuthenticated && user?.avatarUrl ? (
                 <Avatar.Image source={{ uri: user.avatarUrl }} asChild>

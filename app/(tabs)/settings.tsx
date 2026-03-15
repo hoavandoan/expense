@@ -200,7 +200,7 @@ export default function SettingsScreen() {
                 </ListGroup.ItemContent>
                 <ListGroup.ItemSuffix />
               </ListGroup.Item>
-              <Separator className="mx-4" />
+              <Separator className="mx-4 bg-separator/40" />
               <ListGroup.Item>
                 <ListGroup.ItemPrefix>
                   <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#F5A62320' }}>
@@ -212,7 +212,7 @@ export default function SettingsScreen() {
                 </ListGroup.ItemContent>
                 <ListGroup.ItemSuffix />
               </ListGroup.Item>
-              <Separator className="mx-4" />
+              <Separator className="mx-4 bg-separator/40" />
               <ListGroup.Item>
                 <ListGroup.ItemPrefix>
                   <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#0070F320' }}>
@@ -286,7 +286,7 @@ export default function SettingsScreen() {
                   </Switch>
                 </ListGroup.ItemSuffix>
               </ListGroup.Item>
-              <Separator className="mx-4" />
+              <Separator className="mx-4 bg-separator/40" />
               <ListGroup.Item>
                 <ListGroup.ItemPrefix>
                   <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#9455D320' }}>
@@ -305,7 +305,7 @@ export default function SettingsScreen() {
                   </Switch>
                 </ListGroup.ItemSuffix>
               </ListGroup.Item>
-              <Separator className="mx-4" />
+              <Separator className="mx-4 bg-separator/40" />
               <ListGroup.Item onPress={handleLanguageChange}>
                 <ListGroup.ItemPrefix>
                   <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#17C96420' }}>
@@ -323,7 +323,7 @@ export default function SettingsScreen() {
                   </View>
                 </ListGroup.ItemSuffix>
               </ListGroup.Item>
-              <Separator className="mx-4" />
+              <Separator className="mx-4 bg-separator/40" />
               <ListGroup.Item>
                 <ListGroup.ItemPrefix>
                   <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#F5A62320' }}>
@@ -361,7 +361,7 @@ export default function SettingsScreen() {
                 </ListGroup.ItemContent>
                 <ListGroup.ItemSuffix />
               </ListGroup.Item>
-              <Separator className="mx-4" />
+              <Separator className="mx-4 bg-separator/40" />
               <ListGroup.Item>
                 <ListGroup.ItemPrefix>
                   <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#0070F320' }}>
@@ -373,7 +373,7 @@ export default function SettingsScreen() {
                 </ListGroup.ItemContent>
                 <ListGroup.ItemSuffix />
               </ListGroup.Item>
-              <Separator className="mx-4" />
+              <Separator className="mx-4 bg-separator/40" />
               <ListGroup.Item>
                 <ListGroup.ItemPrefix>
                   <View className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: '#06B6D420' }}>

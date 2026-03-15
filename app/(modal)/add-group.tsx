@@ -146,6 +146,7 @@ export default function AddGroupScreen() {
                   placeholder={t("modal.add_group.name_placeholder")}
                   value={value}
                   onChangeText={onChange}
+                  style={{ fontSize: 16 }}
                 />
               )}
             />
@@ -162,6 +163,7 @@ export default function AddGroupScreen() {
                   placeholder={t("modal.add_group.desc_placeholder")}
                   value={value}
                   onChangeText={onChange}
+                  style={{ fontSize: 16 }}
                 />
               )}
             />

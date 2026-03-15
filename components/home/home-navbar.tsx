@@ -25,7 +25,7 @@ export const HomeNavbar = ({ user, isAuthenticated, unreadCount = 0 }: HomeNavba
             onPress={() => router.push("/settings")}
             className="rounded-full"
           >
-            <Avatar size="sm" alt="User profile" className="bg-surface size-8">
+            <Avatar size="sm" alt="User profile" className="bg-surface">
               {isAuthenticated && user?.avatarUrl ? (
                 <Avatar.Image source={{ uri: user.avatarUrl }} asChild>
                   <Image

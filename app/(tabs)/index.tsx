@@ -54,7 +54,14 @@ export default function HomeScreen() {
         headerMaxHeight={HOME_HEADER_HEIGHT}
         disableScale={true}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor={accent} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor={accent}
+            style={{ transform: [{ translateY: insets.top }] }}
+          />
+        }
         renderTopNavBarComponent={() => (
           <HomeNavbar
             user={user}

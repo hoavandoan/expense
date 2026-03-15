@@ -1,4 +1,3 @@
-import { ActivityItem } from "@/components/activity-item";
 import { AppText } from "@/components/app-text";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
@@ -6,12 +5,12 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { CATEGORY_CONFIG } from "@/constants";
 import { useRecentActivity, useTranslation } from "@/lib/hooks";
 import { useAuthStore } from "@/lib/stores/auth-store";
+import type { ActivityLog } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
-import { cn, Input, Spinner, Tabs, TextField, useThemeColor } from "heroui-native";
+import { Avatar, cn, ListGroup, SearchField, Separator, Spinner, Tabs, useThemeColor } from "heroui-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
-import Animated, { FadeIn, FadeInUp, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const FILTERS = [
@@ -168,9 +167,91 @@ const formatTimeAgo = (dateString: string, t: (key: string, options?: any) => st
   return date.toLocaleDateString("vi-VN");
 };
 
+// --- Memoized Activity Row ---
+
+interface ActivityRowProps {
+  activity: ActivityLog;
+  isLast: boolean;
+  isMe: boolean;
+  t: (key: string, options?: any) => string;
+}
+
+const ActivityRow = React.memo(({ activity, isLast, isMe, t }: ActivityRowProps) => {
+  const muted = useThemeColor("muted");
+  const activityIcon = getActivityIcon(activity.actionType);
+  const { action, subject } = formatActivityAction(activity.actionType, activity.metadata, t);
+  const categoryConfig = activity.metadata.category
+    ? CATEGORY_CONFIG[activity.metadata.category as string] || CATEGORY_CONFIG.other
+    : activityIcon;
+
+  const userName = isMe ? t("activity.you") : activity.user?.name || t("activity.someone");
+  const groupName = activity.group?.name || t("activity.group");
+
+  const amount = activity.metadata.amount
+    ? formatCurrency(activity.metadata.amount as number, activity.group?.currency || "VND")
+    : undefined;
+
+  return (
+    <>
+      <ListGroup.Item>
+        <ListGroup.ItemPrefix>
+          <View className="relative">
+            <Avatar size="sm" alt={userName}>
+              {activity.user?.avatarUrl ? (
+                <Avatar.Image source={{ uri: activity.user.avatarUrl }} />
+              ) : (
+                <Avatar.Fallback className="bg-surface-secondary">
+                  {userName.charAt(0)}
+                </Avatar.Fallback>
+              )}
+            </Avatar>
+            <View
+              className={cn("absolute w-5 h-5 -bottom-0.5 -right-0.5 z-10 rounded-full items-center justify-center bg-surface")}
+            >
+              <IconSymbol name={categoryConfig.icon as any} size={14} color={categoryConfig.color} />
+            </View>
+          </View>
+        </ListGroup.ItemPrefix>
+        <ListGroup.ItemContent>
+          <ListGroup.ItemTitle className="text-[15px]" numberOfLines={2}>
+            <AppText className="font-bold">{userName}</AppText>
+            <AppText className="text-foreground/70"> {action}</AppText>
+            {subject && <AppText className="font-semibold"> {subject}</AppText>}
+          </ListGroup.ItemTitle>
+          <ListGroup.ItemDescription>
+            <View className="flex-row items-center mt-0.5">
+              <IconSymbol name="person.3.fill" size={12} color={muted} />
+              <AppText className="text-muted text-xs ml-1 font-medium">{groupName}</AppText>
+            </View>
+          </ListGroup.ItemDescription>
+        </ListGroup.ItemContent>
+        {amount ? (
+          <ListGroup.ItemSuffix>
+            <AppText
+              className={cn(
+                "text-sm font-semibold",
+                amount.startsWith("+") ? "text-success" : "text-foreground",
+              )}
+            >
+              {amount}
+            </AppText>
+          </ListGroup.ItemSuffix>
+        ) : (
+          <ListGroup.ItemSuffix>
+            <View />
+          </ListGroup.ItemSuffix>
+        )}
+      </ListGroup.Item>
+      {!isLast && <Separator className="mx-4 bg-separator/40" />}
+    </>
+  );
+});
+
+// --- Types ---
+
 type ActivityListItem =
   | { type: "header"; title: string; id: string }
-  | { type: "activity"; data: any; id: string };
+  | { type: "section-group"; activities: ActivityLog[]; id: string };
 
 export default function ActivityScreen() {
   const insets = useSafeAreaInsets();
@@ -254,71 +335,33 @@ export default function ActivityScreen() {
     const flattened: ActivityListItem[] = [];
     groupKeys.forEach((key) => {
       flattened.push({ type: "header", title: key, id: `header-${key}` });
-      groups[key].forEach((activity) => {
-        flattened.push({ type: "activity", data: activity, id: activity.id });
-      });
+      flattened.push({ type: "section-group", activities: groups[key], id: `group-${key}` });
     });
 
     return flattened;
   }, [activities, activeFilter, searchQuery]);
 
-  const renderItem = useCallback(({ item, index }: { item: ActivityListItem; index: number }) => {
+  const renderItem = useCallback(({ item }: { item: ActivityListItem }) => {
     if (item.type === "header") {
       return (
-        <Animated.View
-          entering={FadeIn.delay(index * 50).duration(400)}
-          exiting={FadeOut.duration(200)}
-          className="mb-3"
-        >
-          <AppText className="text-xl font-bold text-foreground mb-5 px-6 mt-8">
-            {item.title}
-          </AppText>
-        </Animated.View>
-      );
-    }
-
-    const { data: activity } = item;
-    const isMe = activity.userId === user?.id;
-    const activityIcon = getActivityIcon(activity.actionType);
-    const { action, subject } = formatActivityAction(
-      activity.actionType,
-      activity.metadata,
-      t
-    );
-    const categoryConfig = activity.metadata.category
-      ? CATEGORY_CONFIG[activity.metadata.category as string] ||
-      CATEGORY_CONFIG.other
-      : activityIcon;
-
-    let amount: string | undefined;
-    if (activity.metadata.amount) {
-      const amountNum = activity.metadata.amount as number;
-      amount = formatCurrency(
-        amountNum,
-        activity.group?.currency || "VND"
+        <AppText className="text-[13px] font-bold text-muted uppercase tracking-widest mb-3 mt-4 ml-1">
+          {item.title}
+        </AppText>
       );
     }
 
     return (
-      <Animated.View
-        className="mb-4"
-        entering={FadeInUp.delay(index * 50).duration(500)}
-        exiting={FadeOut.duration(200)}
-      >
-        <ActivityItem
-          userName={isMe ? t("activity.you") : activity.user?.name || t("activity.someone")}
-          userAvatar={activity.user?.avatarUrl || ""}
-          action={action}
-          subject={subject}
-          groupName={activity.group?.name || t("activity.group")}
-          groupIcon="person.3.fill"
-          amount={amount}
-          typeIcon={categoryConfig.icon}
-          typeColor={categoryConfig.bg}
-          iconColor={categoryConfig.color}
-          isMe={isMe}
-        />
-      </Animated.View>
+      <ListGroup className="mb-4 rounded-2xl">
+        {item.activities.map((activity, index) => (
+          <ActivityRow
+            key={activity.id}
+            activity={activity}
+            isLast={index === item.activities.length - 1}
+            isMe={activity.userId === user?.id}
+            t={t}
+          />
+        ))}
+      </ListGroup>
     );
   }, [user?.id, t]);
 
@@ -350,19 +393,16 @@ export default function ActivityScreen() {
         </AppText>
 
         <View className="px-6 mb-6">
-          <TextField className="bg-default/5 rounded-2xl overflow-hidden">
-            <View className="justify-center">
-              <Input
+          <SearchField value={searchQuery} onChange={setSearchQuery}>
+            <SearchField.Group>
+              <SearchField.SearchIcon />
+              <SearchField.Input
                 placeholder={t("activity.search_placeholder")}
-                className="text-base pl-12 h-14"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
+                style={{ fontSize: 16 }}
               />
-              <View className="absolute left-4" pointerEvents="none">
-                <IconSymbol name="magnifyingglass" size={20} color={muted} />
-              </View>
-            </View>
-          </TextField>
+              <SearchField.ClearButton />
+            </SearchField.Group>
+          </SearchField>
         </View>
 
         <View className="flex-row justify-center px-6">
@@ -405,13 +445,10 @@ export default function ActivityScreen() {
           data={flattenedActivities}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
-          // @ts-expect-error - FlashList types lack full support
-          estimatedItemSize={100}
           getItemType={(item) => item.type}
           onRefresh={refetch}
           refreshing={isRefetching}
           extraData={t}
-          className="px-6"
           ListEmptyComponent={
             <EmptyState
               icon="clock.fill"
@@ -425,7 +462,7 @@ export default function ActivityScreen() {
               }
             />
           }
-          contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+          contentContainerClassName="px-6 pb-20"
         />
       )}
     </View>

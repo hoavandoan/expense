@@ -198,6 +198,7 @@ export default function GroupExpensesScreen() {
               value={searchQuery}
               onChangeText={setSearchQuery}
               className="h-12 pl-10"
+              style={{ fontSize: 16 }}
             />
             <View className="absolute left-3" pointerEvents="none">
               <IconSymbol name="magnifyingglass" size={18} color={muted} />

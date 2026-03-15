@@ -129,6 +129,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 multiline
                 numberOfLines={3}
                 className="min-h-[80px]"
+                style={{ fontSize: 16 }}
               />
             </TextField>
           </View>

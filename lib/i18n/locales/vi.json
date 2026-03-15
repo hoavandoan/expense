@@ -95,8 +95,10 @@
             }
         },
         "join_group": {
-            "title": "Quét mã QR",
-            "subtitle": "Di chuyển camera đến mã QR của nhóm để\ntham gia ngay lập tức.",
+            "title": "Tham gia nhóm",
+            "subtitle": "Chọn phương thức để tham gia nhóm của bạn.",
+            "tab_code": "Nhập mã",
+            "tab_qr": "Quét QR",
             "camera_permission_title": "Quyền Truy Cập Camera",
             "camera_permission_desc": "Chúng tôi cần quyền truy cập camera để bạn có thể quét mã QR tham gia nhóm nhanh chóng.",
             "grant_permission": "Cấp quyền camera",

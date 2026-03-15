@@ -1,15 +1,13 @@
-import { ActivityItem } from "@/components/activity-item";
 import { AppText } from "@/components/app-text";
 import { EmptyState } from "@/components/ui/empty-state";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { CATEGORY_CONFIG } from "@/constants";
 import { useTranslation } from "@/lib/hooks";
 import { formatCurrency } from "@/lib/utils";
-import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
-import { PressableFeedback, Skeleton } from "heroui-native";
-import React, { useCallback } from "react";
+import { Avatar, cn, ListGroup, PressableFeedback, Separator, Skeleton, useThemeColor } from "heroui-native";
+import React from "react";
 import { View } from "react-native";
-import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
 
 interface RecentActivityProps {
   expenses: any[] | null;
@@ -17,40 +15,72 @@ interface RecentActivityProps {
   userId?: string;
 }
 
+// --- Memoized Row ---
+
+interface RecentActivityRowProps {
+  item: any;
+  isLast: boolean;
+  isMe: boolean;
+  userName: string;
+}
+
+const RecentActivityRow = React.memo(({ item, isLast, isMe, userName }: RecentActivityRowProps) => {
+  const muted = useThemeColor("muted");
+  const { t } = useTranslation();
+  const categoryConfig = CATEGORY_CONFIG[item.category] || CATEGORY_CONFIG.other;
+  const groupName = item.group?.name || t('home.recent_activity.group');
+  const amount = formatCurrency(item.amount, item.group?.currency || "VND");
+
+  return (
+    <>
+      <ListGroup.Item>
+        <ListGroup.ItemPrefix>
+          <View className="relative">
+            <Avatar size="sm" alt={userName}>
+              {item.paid_by_user?.avatar_url ? (
+                <Avatar.Image source={{ uri: item.paid_by_user.avatar_url }} />
+              ) : (
+                <Avatar.Fallback className="bg-surface-secondary">
+                  {userName.charAt(0)}
+                </Avatar.Fallback>
+              )}
+            </Avatar>
+            <View
+              className={cn("absolute w-5 h-5 -bottom-0.5 -right-0.5 z-10 rounded-full items-center justify-center bg-surface")}
+            >
+              <IconSymbol name={categoryConfig.icon as any} size={14} color={categoryConfig.color} />
+            </View>
+          </View>
+        </ListGroup.ItemPrefix>
+        <ListGroup.ItemContent>
+          <ListGroup.ItemTitle className="text-[15px]" numberOfLines={2}>
+            <AppText className="font-bold">{userName}</AppText>
+            <AppText className="text-foreground/70"> {t('home.recent_activity.added')}</AppText>
+            <AppText className="font-semibold"> {item.title}</AppText>
+          </ListGroup.ItemTitle>
+          <ListGroup.ItemDescription>
+            <View className="flex-row items-center mt-0.5">
+              <IconSymbol name="person.3.fill" size={12} color={muted} />
+              <AppText className="text-muted text-xs ml-1 font-medium">{groupName}</AppText>
+            </View>
+          </ListGroup.ItemDescription>
+        </ListGroup.ItemContent>
+        <ListGroup.ItemSuffix>
+          <AppText className="text-sm font-semibold text-foreground">
+            {amount}
+          </AppText>
+        </ListGroup.ItemSuffix>
+      </ListGroup.Item>
+      {!isLast && <Separator className="mx-4 bg-separator/40" />}
+    </>
+  );
+});
+
+// --- Main Component ---
+
 export const RecentActivity = ({ expenses, isLoading, userId }: RecentActivityProps) => {
   const router = useRouter();
   const { t } = useTranslation();
-
-  const renderItem = useCallback(({ item, index }: { item: any, index: number }) => {
-    const categoryConfig = CATEGORY_CONFIG[item.category] || CATEGORY_CONFIG.other;
-    const isMe = item.paid_by === userId;
-
-    return (
-      <Animated.View
-        entering={FadeInUp.delay(index * 50).duration(500)}
-        exiting={FadeOut.duration(200)}
-        className="mb-3"
-      >
-        <ActivityItem
-          userName={isMe ? t('home.you') : item.paid_by_user?.name || t('home.someone')}
-          userAvatar={item.paid_by_user?.avatar_url || ""}
-          action={t('home.recent_activity.added')}
-          subject={item.title}
-          groupName={item.group?.name || t('home.recent_activity.group')}
-          groupIcon="person.3.fill"
-          amount={formatCurrency(
-            item.amount,
-            item.group?.currency || "VND"
-          )}
-          status=""
-          typeIcon={categoryConfig.icon}
-          typeColor={categoryConfig.bg}
-          iconColor={categoryConfig.color}
-          isMe={isMe}
-        />
-      </Animated.View>
-    );
-  }, [userId, t]);
 
   if (isLoading) {
     return (
@@ -68,7 +98,7 @@ export const RecentActivity = ({ expenses, isLoading, userId }: RecentActivityPr
   }
 
   return (
-    <View className="px-6 mb-6" style={{ height: (expenses?.length || 0) > 0 ? (expenses!.length * 104) + 40 : 200 }}>
+    <View className="px-6 mb-6">
       <View className="flex-row items-center justify-between mb-4">
         <AppText className="text-lg font-bold">{t('home.recent_activity.title')}</AppText>
         <PressableFeedback onPress={() => router.push("/activity")}>
@@ -79,15 +109,21 @@ export const RecentActivity = ({ expenses, isLoading, userId }: RecentActivityPr
       </View>
 
       {expenses && expenses.length > 0 ? (
-        <FlashList
-          data={expenses}
-          renderItem={renderItem}
-          // @ts-expect-error - estimatedItemSize exists on FlashList but sometimes has type issues
-          estimatedItemSize={92}
-          keyExtractor={(item) => item.id}
-          scrollEnabled={false}
-          extraData={t}
-        />
+        <ListGroup className="rounded-2xl">
+          {expenses.map((item, index) => {
+            const isMe = item.paid_by === userId;
+            const userName = isMe ? t('home.you') : item.paid_by_user?.name || t('home.someone');
+            return (
+              <RecentActivityRow
+                key={item.id}
+                item={item}
+                isLast={index === expenses.length - 1}
+                isMe={isMe}
+                userName={userName}
+              />
+            );
+          })}
+        </ListGroup>
       ) : (
         <EmptyState
           icon="clock.fill"

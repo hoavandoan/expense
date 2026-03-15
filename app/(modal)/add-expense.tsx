@@ -478,6 +478,7 @@ export default function AddExpenseScreen() {
                       onChangeText={handleAmountChange}
                       keyboardType="numeric"
                       className="bg-surface h-16 rounded-2xl px-4 text-2xl font-bold text-center"
+                      style={{ fontSize: 24 }}
                     />
                     <InputGroup.Suffix isDecorative className="mr-4">
                       <AppText className="text-muted text-xl font-bold">
@@ -508,6 +509,7 @@ export default function AddExpenseScreen() {
                   placeholder={t("modal.add_expense.desc_placeholder")}
                   value={value}
                   onChangeText={onChange}
+                  style={{ fontSize: 16 }}
                 />
               )}
             />

@@ -185,8 +185,8 @@ export default function GroupSettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-2 ml-1">
               {t("group_settings.info_label")}
             </AppText>
-            <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
-              <View className="p-4">
+            <Card className="p-2 rounded-2xl overflow-hidden bg-surface">
+              <View className="p-2">
                 {isEditingName && canEdit ? (
                   <View className="gap-3">
                     <TextField>
@@ -195,6 +195,7 @@ export default function GroupSettingsScreen() {
                         onChangeText={setEditedName}
                         placeholder={t("group_settings.name_label")}
                         autoFocus
+                        style={{ fontSize: 16 }}
                       />
                     </TextField>
                     <View className="flex-row gap-3">
@@ -251,7 +252,7 @@ export default function GroupSettingsScreen() {
                 )}
               </View>
               <Separator className="bg-border/10" />
-              <View className="p-4">
+              <View className="p-2">
                 <AppText className="text-muted text-xs mb-1">{t("group_settings.invite_code_label")}</AppText>
                 <View className="flex-row items-center justify-between">
                   <AppText className="text-base font-semibold font-mono">
@@ -286,9 +287,9 @@ export default function GroupSettingsScreen() {
             <AppText className="text-[12px] font-bold text-muted uppercase tracking-widest mb-2 ml-1">
               {t("group_settings.share_label")}
             </AppText>
-            <Card className="rounded-2xl border border-border/10 overflow-hidden bg-surface">
+            <Card className="p-2 rounded-2xl overflow-hidden bg-surface">
               <PressableFeedback onPress={() => setIsShareSheetOpen(true)}>
-                <View className="p-4 flex-row items-center gap-4">
+                <View className="p-2 flex-row items-center gap-4">
                   <View className="bg-white p-2 rounded-xl border border-border/10">
                     <QRCode
                       value={`expense://join-group/${groupData.invite_code}`}
@@ -346,17 +347,17 @@ export default function GroupSettingsScreen() {
 
                   return (
                     <View key={member.id || idx}>
-                      <View className="p-4 flex-row items-center justify-between">
+                      <View className="p-3 flex-row items-center justify-between">
                         <View className="flex-row items-center gap-3 flex-1">
                           {memberUser.avatar_url ? (
-                            <Avatar size="md" alt={memberUser.name || ""}>
+                            <Avatar size="sm" alt={memberUser.name || ""}>
                               <Avatar.Image
                                 source={{ uri: memberUser.avatar_url }}
                               />
                             </Avatar>
                           ) : (
                             <Avatar
-                              size="md"
+                              size="sm"
                               alt={memberUser.name || ""}
                               className="bg-accent/10"
                             >
@@ -408,7 +409,7 @@ export default function GroupSettingsScreen() {
                         )}
                       </View>
                       {idx < members.length - 1 && (
-                        <Separator className="bg-border/10" />
+                        <Separator />
                       )}
                     </View>
                   );
@@ -421,7 +422,7 @@ export default function GroupSettingsScreen() {
           {!isOwner && (
             <View>
               <Button variant="danger" onPress={() => setShowLeaveDialog(true)}>
-                <IconSymbol name="arrow.right.square" size={20} color={surface} />
+                <IconSymbol name="arrow.right.square" size={20} color={'white'} />
                 <Button.Label>{t("group_settings.leave_btn")}</Button.Label>
               </Button>
             </View>

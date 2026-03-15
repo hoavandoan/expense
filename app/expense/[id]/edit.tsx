@@ -352,6 +352,7 @@ export default function EditExpenseScreen() {
                     value={value}
                     onChangeText={onChange}
                     className="bg-surface border border-border/10 h-14 rounded-2xl px-4"
+                    style={{ fontSize: 16 }}
                   />
                   {errors.title && (
                     <FieldError className="ml-1 mt-1">
@@ -381,6 +382,7 @@ export default function EditExpenseScreen() {
                       }}
                       keyboardType="numeric"
                       className="bg-surface border border-border/10 h-14 rounded-2xl px-4 pr-16"
+                      style={{ fontSize: 16 }}
                     />
                     <View className="absolute right-4 top-0 bottom-0 justify-center">
                       <AppText className="text-muted font-semibold">
@@ -555,6 +557,7 @@ export default function EditExpenseScreen() {
                     multiline
                     numberOfLines={4}
                     className="min-h-[100px] py-4 bg-surface border border-border/10 rounded-2xl px-4"
+                    style={{ fontSize: 16 }}
                   />
                 </TextField>
               )}
