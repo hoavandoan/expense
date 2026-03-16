@@ -1,5 +1,5 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '../api-client';
+import * as debtAssignmentRequestsService from '../services/debt-assignment-requests-service';
 import type { DebtAssignmentRequest } from '../types';
 import { groupActivityQueryOptions } from './use-activity';
 import { debtAssignmentQueryOptions } from './use-debt-assignments';
@@ -7,7 +7,7 @@ import { groupQueryOptions } from './use-groups';
 
 export const pendingAssignmentRequestsQueryOptions = (groupId: string | null) => queryOptions({
     queryKey: ['debt-assignment-requests', groupId],
-    queryFn: () => apiClient<DebtAssignmentRequest[]>(`/debt-assignment-requests?groupId=${groupId}`),
+    queryFn: () => debtAssignmentRequestsService.fetchPendingRequests(groupId!),
     enabled: !!groupId,
 });
 
@@ -23,10 +23,7 @@ export const useCreateAssignmentRequest = () => {
             groupId: string;
             proposedAssigneeUserId: string;
             reason?: string;
-        }) => apiClient<DebtAssignmentRequest>('/debt-assignment-requests', {
-            method: 'POST',
-            body: JSON.stringify(input),
-        }),
+        }) => debtAssignmentRequestsService.createRequest(input),
         onMutate: async (newRequest) => {
             const queryKey = pendingAssignmentRequestsQueryOptions(newRequest.groupId).queryKey;
             await queryClient.cancelQueries({ queryKey });
@@ -36,13 +33,12 @@ export const useCreateAssignmentRequest = () => {
             const optimisticRequest: DebtAssignmentRequest = {
                 id: Date.now().toString(),
                 groupId: newRequest.groupId,
-                fromUserId: '', // Current user, filled by server
-                toUserId: newRequest.proposedAssigneeUserId,
-                amount: 0, // This logic seems to be about assignment rather than debt amount in this specific hook
-                reason: (newRequest.reason ?? null) as string | null,
+                requestedByUserId: '',
+                proposedAssigneeUserId: newRequest.proposedAssigneeUserId,
+                reason: newRequest.reason,
                 status: 'pending',
                 createdAt: new Date().toISOString(),
-                respondedAt: null,
+                updatedAt: new Date().toISOString(),
             };
 
             queryClient.setQueryData<DebtAssignmentRequest[]>(queryKey, (old) => [optimisticRequest, ...(old || [])]);
@@ -70,10 +66,7 @@ export const useApproveAssignmentRequest = () => {
             groupId: string;
             proposedAssigneeUserId: string;
             reason?: string;
-        }) => apiClient<DebtAssignmentRequest>('/debt-assignment-requests', {
-            method: 'PATCH',
-            body: JSON.stringify({ ...input, status: 'approved' }),
-        }),
+        }) => debtAssignmentRequestsService.approveRequest(input),
         onMutate: async ({ requestId, groupId }) => {
             const queryKey = pendingAssignmentRequestsQueryOptions(groupId).queryKey;
             await queryClient.cancelQueries({ queryKey });
@@ -81,7 +74,7 @@ export const useApproveAssignmentRequest = () => {
             const previousRequests = queryClient.getQueryData<DebtAssignmentRequest[]>(queryKey);
 
             queryClient.setQueryData<DebtAssignmentRequest[]>(queryKey, (old) =>
-                old?.map((r) => r.id === requestId ? { ...r, status: 'approved' as const, respondedAt: new Date().toISOString() } : r)
+                old?.map((r) => r.id === requestId ? { ...r, status: 'approved' as const, reviewedAt: new Date().toISOString() } : r)
             );
 
             return { previousRequests };
@@ -108,10 +101,7 @@ export const useRejectAssignmentRequest = () => {
             requestId: string;
             groupId: string;
             reviewNotes?: string;
-        }) => apiClient<DebtAssignmentRequest>('/debt-assignment-requests', {
-            method: 'PATCH',
-            body: JSON.stringify({ ...input, status: 'rejected' }),
-        }),
+        }) => debtAssignmentRequestsService.rejectRequest(input),
         onMutate: async ({ requestId, groupId }) => {
             const queryKey = pendingAssignmentRequestsQueryOptions(groupId).queryKey;
             await queryClient.cancelQueries({ queryKey });
@@ -119,7 +109,7 @@ export const useRejectAssignmentRequest = () => {
             const previousRequests = queryClient.getQueryData<DebtAssignmentRequest[]>(queryKey);
 
             queryClient.setQueryData<DebtAssignmentRequest[]>(queryKey, (old) =>
-                old?.map((r) => r.id === requestId ? { ...r, status: 'rejected' as const, respondedAt: new Date().toISOString() } : r)
+                old?.map((r) => r.id === requestId ? { ...r, status: 'rejected' as const, reviewedAt: new Date().toISOString() } : r)
             );
 
             return { previousRequests };
@@ -135,4 +125,3 @@ export const useRejectAssignmentRequest = () => {
         },
     });
 };
-

@@ -1,5 +1,5 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "../api-client";
+import * as groupsService from "../services/groups-service";
 import { useAuthStore } from "../stores/auth-store";
 import type { Group, GroupType, GroupWithDetails } from "../types";
 import { generateInviteCode } from "../utils/format";
@@ -7,12 +7,12 @@ import { recentExpensesQueryOptions } from "./use-expenses";
 
 export const groupsQueryOptions = queryOptions({
   queryKey: ["groups"],
-  queryFn: () => apiClient<Group[]>("/groups"),
+  queryFn: () => groupsService.fetchGroups(),
 });
 
 export const groupQueryOptions = (groupId: string | null) => queryOptions({
   queryKey: ["group", groupId],
-  queryFn: () => apiClient<GroupWithDetails>(`/groups/${groupId}`),
+  queryFn: () => groupsService.fetchGroup(groupId!),
   enabled: !!groupId,
 });
 
@@ -54,10 +54,7 @@ export const useCreateGroup = () => {
     }) => {
       const inviteCode = generateInviteCode();
 
-      return apiClient<Group>("/groups", {
-        method: "POST",
-        body: JSON.stringify({ ...input, inviteCode }),
-      });
+      return groupsService.createGroup({ ...input, inviteCode });
     },
     onMutate: async (newGroupInput) => {
       const queryKey = groupsQueryOptions.queryKey;
@@ -102,11 +99,7 @@ export const useJoinGroup = () => {
 
   return useMutation({
     mutationFn: async (inviteCodeOrId: string) => {
-      const response = await apiClient<{ groupId: string }>("/groups/join", {
-        method: "POST",
-        body: JSON.stringify({ inviteCodeOrId }),
-      });
-      return response.groupId;
+      return groupsService.joinGroup(inviteCodeOrId);
     },
     onSuccess: (groupId) => {
       queryClient.invalidateQueries({ queryKey: groupsQueryOptions.queryKey });
@@ -124,9 +117,7 @@ export const useLeaveGroup = () => {
 
   return useMutation({
     mutationFn: async (groupId: string) => {
-      return apiClient(`/groups/${groupId}`, {
-        method: "DELETE",
-      });
+      return groupsService.leaveGroup(groupId);
     },
     onMutate: async (groupId) => {
       const queryKey = groupsQueryOptions.queryKey;
@@ -166,10 +157,7 @@ export const useUpdateGroup = () => {
       name?: string;
       description?: string;
     }) => {
-      return apiClient<Group>(`/groups/${groupId}`, {
-        method: "PATCH",
-        body: JSON.stringify(updates),
-      });
+      return groupsService.updateGroup(groupId, updates);
     },
     onMutate: async ({ groupId, ...updates }) => {
       const listKey = groupsQueryOptions.queryKey;
@@ -219,10 +207,7 @@ export const useRemoveMember = () => {
 
   return useMutation({
     mutationFn: async ({ groupId, userId }: { groupId: string; userId: string }) => {
-      return apiClient(`/groups/${groupId}`, {
-        method: "DELETE",
-        body: JSON.stringify({ action: "remove-member", userId }),
-      });
+      return groupsService.removeMember(groupId, userId);
     },
     onMutate: async ({ groupId, userId }) => {
       const detailKey = groupQueryOptions(groupId).queryKey;
@@ -253,4 +238,3 @@ export const useRemoveMember = () => {
     },
   });
 };
-

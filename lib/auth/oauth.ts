@@ -144,7 +144,7 @@ export const signInWithGoogle = async () => {
                     // 1. setSession() in store
                     // 2. fetchProfile()
                     // 3. queryClient.invalidateQueries()
-                    const { error: sessionError } = await supabase.auth.setSession({
+                    const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
                         access_token: tokens.accessToken,
                         refresh_token: tokens.refreshToken,
                     });
@@ -153,6 +153,13 @@ export const signInWithGoogle = async () => {
                         console.warn('setSession error:', sessionError.message);
                         // Even if setSession fails, set user from JWT
                         useAuthStore.getState().setUser(user);
+                    }
+
+                    // Immediately update Zustand before navigation occurs.
+                    // onAuthStateChange fires asynchronously and may not have
+                    // updated the store by the time router.replace runs.
+                    if (sessionData.session) {
+                        useAuthStore.getState().setSession(sessionData.session);
                     }
 
                     console.log('Session set successfully');
@@ -218,7 +225,7 @@ export const signInWithApple = async () => {
 
                 if (user) {
                     // Await setSession - triggers onAuthStateChange
-                    const { error: sessionError } = await supabase.auth.setSession({
+                    const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
                         access_token: tokens.accessToken,
                         refresh_token: tokens.refreshToken,
                     });
@@ -226,6 +233,13 @@ export const signInWithApple = async () => {
                     if (sessionError) {
                         console.warn('setSession error:', sessionError.message);
                         useAuthStore.getState().setUser(user);
+                    }
+
+                    // Immediately update Zustand before navigation occurs.
+                    // onAuthStateChange fires asynchronously and may not have
+                    // updated the store by the time router.replace runs.
+                    if (sessionData.session) {
+                        useAuthStore.getState().setSession(sessionData.session);
                     }
 
                     console.log('Apple session set successfully');

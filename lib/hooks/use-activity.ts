@@ -1,17 +1,17 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
-import { apiClient } from '../api-client';
+import * as activityService from '../services/activity-service';
 import { useAuthStore } from '../stores/auth-store';
 import type { ActivityLog } from '../types';
 
 export const groupActivityQueryOptions = (groupId: string | null, options?: { limit?: number; actionType?: string }) => queryOptions({
   queryKey: ['activity-log', 'group', groupId, options],
-  queryFn: () => apiClient<ActivityLog[]>(`/activity?groupId=${groupId}${options?.actionType ? `&actionType=${options.actionType}` : ''}${options?.limit ? `&limit=${options.limit}` : ''}`),
+  queryFn: () => activityService.fetchGroupActivity(groupId!, options),
   enabled: !!groupId,
 });
 
 export const recentActivityQueryOptions = (limit = 20) => queryOptions({
   queryKey: ['activity-log', 'recent', limit],
-  queryFn: () => apiClient<ActivityLog[]>(`/activity?limit=${limit}`),
+  queryFn: () => activityService.fetchRecentActivity(limit),
 });
 
 /**

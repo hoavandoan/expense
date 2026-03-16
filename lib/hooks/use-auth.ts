@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
-import { apiClient } from '../api-client';
+import * as profileService from '../services/profile-service';
 import { useAuthStore } from '../stores/auth-store';
 import { supabase } from '../supabase';
 import type { User } from '../types';
@@ -29,7 +29,10 @@ export const useAuth = () => {
     // ACTIONS
     const fetchProfile = useCallback(async () => {
         try {
-            const profile = await apiClient<User>('/profile');
+            const { data: { user: authUser } } = await supabase.auth.getUser();
+            if (!authUser) throw new Error('Not authenticated');
+
+            const profile = await profileService.fetchProfile(authUser.id);
             if (profile) {
                 setUser(profile);
             }
@@ -130,9 +133,9 @@ export const useAuth = () => {
     const updateProfile = async (updates: Partial<User>) => {
         if (!user) throw new Error('Not authenticated');
 
-        const profile = await apiClient<User>('/profile', {
-            method: 'PATCH',
-            body: JSON.stringify(updates),
+        const profile = await profileService.updateProfile(user.id, {
+            name: updates.name,
+            avatarUrl: updates.avatarUrl ?? undefined,
         });
 
         setUser(profile);

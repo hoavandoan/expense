@@ -1,18 +1,18 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '../api-client';
+import * as settlementsService from '../services/settlements-service';
 import { useAuthStore } from '../stores/auth-store';
 import type { Settlement } from '../types';
 import { groupQueryOptions } from './use-groups';
 
 export const settlementsQueryOptions = (groupId: string | null) => queryOptions({
     queryKey: ['settlements', groupId],
-    queryFn: () => apiClient<Settlement[]>(`/settlements?groupId=${groupId}`),
+    queryFn: () => settlementsService.fetchSettlements(groupId!),
     enabled: !!groupId,
 });
 
 export const pendingSettlementsQueryOptions = (groupId: string | null) => queryOptions({
     queryKey: ['pending-settlements', groupId],
-    queryFn: () => apiClient<Settlement[]>(`/settlements?groupId=${groupId}&pendingOnly=true`),
+    queryFn: () => settlementsService.fetchPendingSettlements(groupId!),
     enabled: !!groupId,
 });
 
@@ -50,10 +50,7 @@ export const useCreateSettlement = () => {
             toUserId: string;
             amount: number;
             note?: string;
-        }) => apiClient<Settlement>('/settlements', {
-            method: 'POST',
-            body: JSON.stringify(input),
-        }),
+        }) => settlementsService.createSettlement(input),
         onMutate: async (newSettlementInput) => {
             const { groupId } = newSettlementInput;
             const queryKey = settlementsQueryOptions(groupId).queryKey;
@@ -103,10 +100,8 @@ export const useCompleteSettlement = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ settlementId, groupId }: { settlementId: string; groupId: string }) => apiClient<Settlement>('/settlements', {
-            method: "PATCH",
-            body: JSON.stringify({ settlementId, status: "completed" }),
-        }),
+        mutationFn: ({ settlementId, groupId }: { settlementId: string; groupId: string }) =>
+            settlementsService.updateSettlementStatus(settlementId, 'completed'),
         onMutate: async ({ settlementId, groupId }) => {
             const queryKey = settlementsQueryOptions(groupId).queryKey;
             const pendingQueryKey = pendingSettlementsQueryOptions(groupId).queryKey;
@@ -148,10 +143,8 @@ export const useRejectSettlement = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ settlementId, groupId }: { settlementId: string; groupId: string }) => apiClient<Settlement>('/settlements', {
-            method: "PATCH",
-            body: JSON.stringify({ settlementId, status: "rejected" }),
-        }),
+        mutationFn: ({ settlementId, groupId }: { settlementId: string; groupId: string }) =>
+            settlementsService.updateSettlementStatus(settlementId, 'rejected'),
         onMutate: async ({ settlementId, groupId }) => {
             const queryKey = settlementsQueryOptions(groupId).queryKey;
             const pendingQueryKey = pendingSettlementsQueryOptions(groupId).queryKey;
@@ -184,4 +177,3 @@ export const useRejectSettlement = () => {
         },
     });
 };
-
