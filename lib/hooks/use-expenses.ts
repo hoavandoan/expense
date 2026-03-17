@@ -7,7 +7,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import * as expensesService from "../services/expenses-service";
-import { useAuthStore } from "../stores/auth-store";
+import { useAuth } from '@/contexts/auth-context';
 import type { Expense, ExpenseCategory, ExpenseSplit } from "../types";
 import { groupQueryOptions, groupsQueryOptions } from "./use-groups";
 
@@ -79,7 +79,7 @@ export const infiniteExpensesQueryOptions = (params: expensesService.ExpensesFil
  * Fetch recent expenses across all user's groups
  */
 export const useRecentExpenses = (limit = 5) => {
-  const session = useAuthStore((state) => state.session);
+  const { session } = useAuth();
   return useQuery({
     ...recentExpensesQueryOptions(limit),
     enabled: !!session,

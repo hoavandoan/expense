@@ -5,8 +5,8 @@ import { ErrorState } from "@/components/ui/error-state";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
 import { CATEGORY_CONFIG } from "@/constants";
+import { useAuth } from '@/contexts/auth-context';
 import { useDeleteExpense, useExpense, useTranslation } from "@/lib/hooks";
-import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatCurrency } from "@/lib/utils";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -50,7 +50,7 @@ export default function ExpenseDetailScreen() {
   const accent = useThemeColor("accent");
   const danger = useThemeColor("danger");
   const success = useThemeColor("success");
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const { data: expense, isLoading, error, refetch } = useExpense(id as string);

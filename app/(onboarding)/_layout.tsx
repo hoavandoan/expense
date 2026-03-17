@@ -1,9 +1,9 @@
-import { useAuthStore } from '@/lib/stores/auth-store';
+import { useAuth } from '@/contexts/auth-context';
 import { Redirect, Stack } from 'expo-router';
 import React from 'react';
 
 export default function OnboardingLayout() {
-  const { isAuthenticated, isLoading } = useAuthStore();
+  const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return null;

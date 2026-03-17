@@ -14,18 +14,18 @@ import {
   useTotalBalanceAcrossGroups,
   useUnreadNotificationsCount,
 } from "@/lib/hooks";
-import { useAuthStore } from "@/lib/stores/auth-store";
 import { useThemeColor } from "heroui-native";
 import React, { useState } from "react";
 import { RefreshControl, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from '@/contexts/auth-context';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const [showBalance, setShowBalance] = useState(true);
 
   // Auth state from Zustand
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated } = useAuth();
 
   // Fetch data with React Query hooks
   const { data: groups, isPending: isLoadingGroups, refetch: refetchGroups } = useGroups();

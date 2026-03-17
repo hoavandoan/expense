@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as notificationsService from '../services/notifications-service';
-import { useAuthStore } from '../stores/auth-store';
+import { useAuth } from '@/contexts/auth-context';
 import type { Notification } from '../types';
 
 const NOTIFICATIONS_KEY = ['notifications'];
@@ -22,7 +22,7 @@ export const unreadCountQueryOptions = () => queryOptions({
  * Fetch all notifications for the current user
  */
 export const useNotifications = (options?: { limit?: number; unreadOnly?: boolean }) => {
-  const session = useAuthStore((state) => state.session);
+  const { session } = useAuth();
   return useQuery({
     ...notificationsQueryOptions(options),
     enabled: !!session,
@@ -33,7 +33,7 @@ export const useNotifications = (options?: { limit?: number; unreadOnly?: boolea
  * Fetch unread notifications count
  */
 export const useUnreadNotificationsCount = () => {
-  const session = useAuthStore((state) => state.session);
+  const { session } = useAuth();
   return useQuery({
     ...unreadCountQueryOptions(),
     enabled: !!session,

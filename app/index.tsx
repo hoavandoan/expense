@@ -1,9 +1,9 @@
-import { useAuthStore } from '@/lib/stores/auth-store';
+import { useAuth } from '@/contexts/auth-context';
 import { Redirect } from 'expo-router';
 import React from 'react';
 
 export default function Index() {
-  const { isAuthenticated, isLoading, hasCompletedOnboarding } = useAuthStore();
+  const { isAuthenticated, isLoading, hasCompletedOnboarding } = useAuth();
 
   // Tránh nhấp nháy UI trong lúc đang load session
   if (isLoading) {

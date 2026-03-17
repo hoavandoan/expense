@@ -1,7 +1,7 @@
 import { FAB } from '@/components/ui/fab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useAuth } from '@/contexts/auth-context';
 import { useTranslation } from '@/lib/hooks';
-import { useAuthStore } from '@/lib/stores/auth-store';
 import { BlurView } from 'expo-blur';
 import { Redirect, Tabs, useRouter } from 'expo-router';
 import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
   const { t } = useTranslation();
-  const { isAuthenticated, isLoading } = useAuthStore();
+  const { isAuthenticated, isLoading } = useAuth();
   const accent = useThemeColor('accent');
   const foreground = useThemeColor('foreground');
   const surface = useThemeColor('surface');

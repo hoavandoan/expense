@@ -2,8 +2,8 @@ import { AppText } from "@/components/app-text";
 import { ScreenScrollView } from "@/components/screen-scroll-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { EXPENSE_CATEGORIES } from "@/constants";
+import { useAuth } from '@/contexts/auth-context';
 import { useCreateExpense, useGroup, useGroups, useTranslation } from "@/lib/hooks";
-import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatCurrency, formatNumber, uploadImage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
@@ -109,7 +109,7 @@ export default function AddExpenseScreen() {
   const danger = useThemeColor("danger");
 
   const { t } = useTranslation();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const { data: groups, isLoading: isLoadingGroups } = useGroups();
   const createExpense = useCreateExpense();
 

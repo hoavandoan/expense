@@ -1,7 +1,7 @@
 import { LoginBottomSheet } from "@/components/auth/LoginBottomSheet";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { AppThemeProvider } from "@/contexts/app-theme-context";
-import { useAuth } from "@/lib/hooks";
+import { AuthProvider, useAuth } from "@/contexts/auth-context";
 import {
   IBMPlexSans_400Regular,
   IBMPlexSans_500Medium,
@@ -18,7 +18,7 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { HeroUINativeConfig, HeroUINativeProvider } from "heroui-native";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -62,23 +62,6 @@ const queryClient = new QueryClient({
   },
 });
 
-function AuthListener() {
-  const { initializeAuth, setupAuthListener } = useAuth();
-
-  useEffect(() => {
-    // 1. Initial session check
-    initializeAuth();
-
-    // 2. Setup real-time listener
-    const subscription = setupAuthListener();
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [initializeAuth, setupAuthListener]);
-
-  return null;
-}
 
 function AppContent() {
   const { isLoginSheetOpen, setLoginSheetOpen } = useAuth();
@@ -119,7 +102,6 @@ function AppContent() {
         },
       }}
     >
-      <AuthListener />
       <Stack
         screenOptions={{
           headerShown: false,
@@ -158,11 +140,13 @@ export default function RootLayout() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ErrorBoundary>
           <QueryClientProvider client={queryClient}>
-            <KeyboardProvider>
-              <AppThemeProvider>
-                <AppContent />
-              </AppThemeProvider>
-            </KeyboardProvider>
+            <AuthProvider>
+              <KeyboardProvider>
+                <AppThemeProvider>
+                  <AppContent />
+                </AppThemeProvider>
+              </KeyboardProvider>
+            </AuthProvider>
           </QueryClientProvider>
         </ErrorBoundary>
       </GestureHandlerRootView>

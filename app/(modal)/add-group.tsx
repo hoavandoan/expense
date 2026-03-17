@@ -2,8 +2,8 @@ import { AppText } from "@/components/app-text";
 import { ScreenScrollView } from "@/components/screen-scroll-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { CURRENCIES, GROUP_TYPES } from "@/constants";
+import { useAuth } from '@/contexts/auth-context';
 import { useCreateGroup, useTranslation } from "@/lib/hooks";
-import { useAuthStore } from "@/lib/stores/auth-store";
 import { uploadImage } from "@/lib/utils/storage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
@@ -40,7 +40,7 @@ export default function AddGroupScreen() {
   const { t } = useTranslation();
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const createGroup = useCreateGroup();
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);

@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as groupsService from "../services/groups-service";
-import { useAuthStore } from "../stores/auth-store";
+import { useAuth } from '@/contexts/auth-context';
 import type { Group, GroupType, GroupWithDetails } from "../types";
 import { generateInviteCode } from "../utils/format";
 import { recentExpensesQueryOptions } from "./use-expenses";
@@ -20,7 +20,7 @@ export const groupQueryOptions = (groupId: string | null) => queryOptions({
  * Fetch all groups for the current user
  */
 export const useGroups = () => {
-  const session = useAuthStore((state) => state.session);
+  const { session } = useAuth();
   return useQuery({
     ...groupsQueryOptions,
     enabled: !!session,
@@ -31,7 +31,7 @@ export const useGroups = () => {
  * Fetch a single group with full details
  */
 export const useGroup = (groupId: string | null) => {
-  const session = useAuthStore((state) => state.session);
+  const { session } = useAuth();
   return useQuery({
     ...groupQueryOptions(groupId),
     enabled: !!session && !!groupId,

@@ -9,7 +9,6 @@ import {
   useTranslation,
   useUpdateExpense,
 } from "@/lib/hooks";
-import { useAuthStore } from "@/lib/stores/auth-store";
 import {
   formatCurrency,
   parseFormattedNumber,
@@ -78,7 +77,7 @@ export default function EditExpenseScreen() {
   const accent = useThemeColor("accent");
   const success = useThemeColor("success");
   const danger = useThemeColor("danger");
-  const { user } = useAuthStore();
+  const { user } = useAuth();
 
   const { data: expense, isLoading } = useExpense(id as string);
   const expenseData = expense as any;

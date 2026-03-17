@@ -1,5 +1,5 @@
-import { i18n } from '@/lib/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { i18n } from '@/lib/i18n';
 import { getLocales } from 'expo-localization';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';

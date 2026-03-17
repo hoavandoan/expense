@@ -4,8 +4,8 @@ import { ExpenseCard } from "@/components/ui/expense-card";
 import { GroupCard } from "@/components/ui/group-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
+import { useAuth } from '@/contexts/auth-context';
 import { useSearch, useTranslation } from "@/lib/hooks";
-import { useAuthStore } from "@/lib/stores/auth-store";
 import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -33,7 +33,7 @@ export default function SearchScreen() {
   const insets = useSafeAreaInsets();
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
-  const { user: currentUser } = useAuthStore();
+  const { user: currentUser } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 

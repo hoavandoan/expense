@@ -6,9 +6,9 @@ import { ErrorState } from "@/components/ui/error-state";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ModalHeader } from "@/components/ui/modal-header";
 import { ShareQRSheet } from "@/components/ui/share-qr-sheet";
+import { useAuth } from '@/contexts/auth-context';
 import { useGroup, useLeaveGroup, useRemoveMember, useUpdateGroup } from "@/lib/hooks";
 import { useTranslation } from "@/lib/hooks/use-translation";
-import { useAuthStore } from "@/lib/stores/auth-store";
 import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -36,7 +36,7 @@ export default function GroupSettingsScreen() {
   const danger = useThemeColor("danger");
   const success = useThemeColor("success");
   const warning = useThemeColor("warning");
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const surface = useThemeColor("surface");
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);

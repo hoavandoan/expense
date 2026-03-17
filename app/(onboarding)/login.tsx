@@ -2,91 +2,24 @@ import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { signInWithApple, signInWithGoogle } from '@/lib/auth/oauth';
-import { useAuth, useTranslation } from '@/lib/hooks';
+import { useTranslation } from '@/lib/hooks';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { Button, useThemeColor, useToast } from 'heroui-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 
 export default function LoginScreen() {
-  const { t } = useTranslation();
-  const { signInWithEmail, signUpWithEmail } = useAuth();
-  const router = useRouter();
-  const foreground = useThemeColor('foreground');
-  const accent = useThemeColor('accent');
-  const background = useThemeColor('background');
-  const { toast } = useToast();
-  const success = useThemeColor('success');
-  const danger = useThemeColor('danger');
-
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [isSocialLoading, setIsSocialLoading] = useState(false);
 
-  const handleEmailAuth = async () => {
-    if (!email || !password) {
-      toast.show({
-        label: t('onboarding.login.empty_info'),
-        description: t('onboarding.login.empty_info_desc'),
-        variant: 'danger',
-        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: t('common.close', { defaultValue: 'Đóng' }),
-        onActionPress: ({ hide }) => hide(),
-      });
-      return;
-    }
-
-    if (isSignUp && !name) {
-      toast.show({
-        label: t('onboarding.login.missing_info'),
-        description: t('onboarding.login.missing_info_desc'),
-        variant: 'danger',
-        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: t('common.close', { defaultValue: 'Đóng' }),
-        onActionPress: ({ hide }) => hide(),
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      if (isSignUp) {
-        await signUpWithEmail(email, password, name);
-        toast.show({
-          label: t('onboarding.login.signup_success'),
-          description: t('onboarding.login.signup_success_desc'),
-          variant: 'success',
-          icon: <IconSymbol name="checkmark.circle.fill" size={20} color={success} />,
-          actionLabel: 'OK',
-          onActionPress: ({ hide }) => hide(),
-        });
-      } else {
-        await signInWithEmail(email, password);
-        router.replace('/(tabs)');
-      }
-    } catch (error: any) {
-      toast.show({
-        label: t('onboarding.login.auth_error'),
-        description: error.message || t('onboarding.login.auth_error_desc'),
-        variant: 'danger',
-        icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
-        actionLabel: t('common.retry', { defaultValue: 'Thử lại' }),
-        onActionPress: ({ hide }) => hide(),
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { t } = useTranslation();
+  const foreground = useThemeColor('foreground');
+  const { toast } = useToast();
+  const danger = useThemeColor('danger');
 
   const handleAppleLogin = async () => {
     setIsSocialLoading(true);
     try {
       await signInWithApple();
-      router.replace('/(tabs)');
     } catch (error: any) {
       if (!error.message?.includes('hủy') && !error.message?.includes('cancel')) {
         toast.show({
@@ -104,7 +37,6 @@ export default function LoginScreen() {
     setIsSocialLoading(true);
     try {
       await signInWithGoogle();
-      router.replace('/(tabs)');
     } catch (error: any) {
       if (!error.message?.includes('hủy') && !error.message?.includes('cancel')) {
         toast.show({
@@ -124,12 +56,10 @@ export default function LoginScreen() {
         {/* Header */}
         <View className="items-center px-4">
           <AppText className="text-3xl font-bold text-foreground mb-2 text-center">
-            {isSignUp ? t('onboarding.login.create_account') : t('onboarding.login.welcome')}
+            {t('onboarding.login.welcome')}
           </AppText>
           <AppText className="text-base text-muted leading-relaxed text-center">
-            {isSignUp
-              ? t('onboarding.login.signup_desc')
-              : t('onboarding.login.login_desc')}
+            {t('onboarding.login.login_desc')}
           </AppText>
         </View>
 

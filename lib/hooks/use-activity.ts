@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import * as activityService from '../services/activity-service';
-import { useAuthStore } from '../stores/auth-store';
+import { useAuth } from '@/contexts/auth-context';
 import type { ActivityLog } from '../types';
 
 export const groupActivityQueryOptions = (groupId: string | null, options?: { limit?: number; actionType?: string }) => queryOptions({
@@ -21,7 +21,7 @@ export const useGroupActivity = (
   groupId: string | null,
   options?: { limit?: number; actionType?: string }
 ) => {
-  const session = useAuthStore((state) => state.session);
+  const { session } = useAuth();
   return useQuery({
     ...groupActivityQueryOptions(groupId, options),
     enabled: !!session && !!groupId,
@@ -32,7 +32,7 @@ export const useGroupActivity = (
  * Fetch recent activity across all user's groups
  */
 export const useRecentActivity = (limit: number = 20) => {
-  const session = useAuthStore((state) => state.session);
+  const { session } = useAuth();
   return useQuery({
     ...recentActivityQueryOptions(limit),
     enabled: !!session,

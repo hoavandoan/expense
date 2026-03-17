@@ -21,9 +21,9 @@ import {
   useGroup,
   useMembersBalance,
   useUserBalanceInGroup,
+  useAuth
 } from "@/lib/hooks";
 import { useTranslation } from "@/lib/hooks/use-translation";
-import { useAuthStore } from "@/lib/stores/auth-store";
 import { assignDebtsOptimized } from "@/lib/utils/debt-calculator";
 import { formatCurrency } from "@/lib/utils/format";
 import { Image } from "expo-image";
@@ -56,7 +56,7 @@ export default function GroupDetailScreen() {
   const router = useRouter();
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const [assigneeSelectorVisible, setAssigneeSelectorVisible] = useState(false);
   const [createRequestVisible, setCreateRequestVisible] = useState(false);
   const [isDisableConfirmOpen, setIsDisableConfirmOpen] = useState(false);

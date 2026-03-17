@@ -1,8 +1,8 @@
 import { AppText } from '@/components/app-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { SkiaOnboardingBackground } from '@/components/ui/skia-onboarding-background';
+import { useAuth } from '@/contexts/auth-context';
 import { useTranslation } from '@/lib/hooks';
-import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Avatar, Button, useThemeColor } from 'heroui-native';
@@ -16,7 +16,7 @@ export default function WelcomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const accent = useThemeColor('accent');
-  const setOnboardingComplete = useAuthStore((state) => state.setOnboardingComplete);
+  const { setOnboardingComplete } = useAuth();
 
   const handleSkipToLogin = () => {
     setOnboardingComplete();

@@ -1,9 +1,9 @@
 import * as AuthSession from 'expo-auth-session';
+import Constants from 'expo-constants';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
-import { useAuthStore } from '../stores/auth-store';
+
 import { supabase } from '../supabase';
-import type { User } from '../types';
 
 // Ensure browser session closes properly after auth
 WebBrowser.maybeCompleteAuthSession();
@@ -13,168 +13,102 @@ if (Platform.OS === 'ios') {
     void WebBrowser.warmUpAsync();
 }
 
+const IS_EXPO_GO = Constants.appOwnership === 'expo';
+
 /**
- * Get the correct redirect URI for the current platform
+ * Get the correct redirect URI for the current platform.
+ * - Expo Go: uses exp:// scheme (no custom scheme support)
+ * - Dev build / Production: uses splitsmart:// custom scheme
  */
 const getRedirectUri = () => {
-    // Use AuthSession.makeRedirectUri for proper Expo Go compatibility
-    const redirectUri = AuthSession.makeRedirectUri({
+    return AuthSession.makeRedirectUri({
+        ...(!IS_EXPO_GO && { scheme: 'splitsmart' }),
         path: 'auth/callback',
     });
-
-    console.log('Platform:', Platform.OS);
-    console.log('Redirect URI:', redirectUri);
-
-    return redirectUri;
 };
 
 /**
- * Decode JWT token to get user data without calling Supabase
+ * Extract tokens from OAuth callback URL fragment
  */
-const decodeJwt = (token: string): any => {
+const extractTokensFromUrl = (url: string): { accessToken: string; refreshToken: string } | null => {
     try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-            atob(base64)
-                .split('')
-                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                .join('')
-        );
-        return JSON.parse(jsonPayload);
-    } catch (e) {
-        console.error('Error decoding JWT:', e);
+        const hashIndex = url.indexOf('#');
+        if (hashIndex === -1) return null;
+
+        const fragment = url.substring(hashIndex + 1);
+        const params = new URLSearchParams(fragment);
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+
+        if (!accessToken || !refreshToken) return null;
+
+        return { accessToken, refreshToken };
+    } catch (error) {
+        console.error('[OAuth] Error extracting tokens:', error);
         return null;
     }
 };
 
 /**
- * Parse user data from JWT payload
+ * Common OAuth flow: open browser, extract tokens, set session.
+ * onAuthStateChange in AuthProvider handles the rest (fetchProfile, navigation).
  */
-const parseUserFromJwt = (payload: any): User | null => {
-    if (!payload) return null;
+const performOAuthFlow = async (provider: 'google' | 'apple'): Promise<void> => {
+    const redirectUri = getRedirectUri();
+    console.log('[OAuth] redirectUri:', redirectUri);
 
-    const metadata = payload.user_metadata || {};
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+            redirectTo: redirectUri,
+            skipBrowserRedirect: true,
+        },
+    });
 
-    return {
-        id: payload.sub,
-        email: payload.email || '',
-        name: metadata.full_name || metadata.name || payload.email?.split('@')[0] || '',
-        avatarUrl: metadata.avatar_url || metadata.picture || null,
-        createdAt: new Date(payload.iat * 1000).toISOString(),
-    };
-};
+    if (error) throw error;
+    if (!data.url) throw new Error('No OAuth URL returned');
 
-/**
- * Extract tokens from OAuth callback URL
- */
-const extractTokensFromUrl = (url: string): { accessToken: string; refreshToken: string } | null => {
-    try {
-        const hashIndex = url.indexOf('#');
-        if (hashIndex !== -1) {
-            const fragment = url.substring(hashIndex + 1);
-            const params = new URLSearchParams(fragment);
-            const accessToken = params.get('access_token');
-            const refreshToken = params.get('refresh_token');
-
-            if (accessToken && refreshToken) {
-                return { accessToken, refreshToken };
-            }
+    const result = await WebBrowser.openAuthSessionAsync(
+        data.url,
+        redirectUri,
+        {
+            showInRecents: true,
+            preferEphemeralSession: false,
         }
-        return null;
-    } catch (e) {
-        console.error('Error extracting tokens:', e);
-        return null;
+    );
+
+    console.log("result", result);
+
+    if (result.type === 'cancel') {
+        throw new Error('Đăng nhập đã bị hủy');
+    }
+
+    if (result.type !== 'success' || !result.url) {
+        throw new Error('Đăng nhập thất bại');
+    }
+
+    const tokens = extractTokensFromUrl(result.url);
+    if (!tokens) {
+        throw new Error('Không thể lấy thông tin xác thực');
+    }
+
+    // setSession triggers onAuthStateChange → SIGNED_IN → fetchProfile
+    const { error: sessionError } = await supabase.auth.setSession({
+        access_token: tokens.accessToken,
+        refresh_token: tokens.refreshToken,
+    });
+
+    if (sessionError) {
+        throw sessionError;
     }
 };
 
 /**
  * Initiate Google Sign-In flow
  */
-export const signInWithGoogle = async () => {
+export const signInWithGoogle = async (): Promise<void> => {
     try {
-        const redirectUri = getRedirectUri();
-
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: redirectUri,
-                skipBrowserRedirect: true,
-            },
-        });
-
-        if (error) {
-            console.error('OAuth error:', error);
-            throw error;
-        }
-
-        if (!data.url) {
-            throw new Error('No OAuth URL returned');
-        }
-
-        console.log('Opening OAuth URL...');
-
-        const result = await WebBrowser.openAuthSessionAsync(
-            data.url,
-            redirectUri,
-            {
-                showInRecents: true,
-                preferEphemeralSession: false,
-            }
-        );
-
-        console.log('WebBrowser result:', result.type);
-
-        if (result.type === 'success' && result.url) {
-            console.log('OAuth callback received');
-
-            const tokens = extractTokensFromUrl(result.url);
-
-            if (tokens) {
-                console.log('Tokens extracted');
-
-                // Decode JWT to get user data directly
-                const payload = decodeJwt(tokens.accessToken);
-                const user = parseUserFromJwt(payload);
-
-                if (user) {
-                    console.log('User parsed from JWT:', user.email);
-
-                    // Await setSession - this triggers onAuthStateChange which handles:
-                    // 1. setSession() in store
-                    // 2. fetchProfile()
-                    // 3. queryClient.invalidateQueries()
-                    const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-                        access_token: tokens.accessToken,
-                        refresh_token: tokens.refreshToken,
-                    });
-
-                    if (sessionError) {
-                        console.warn('setSession error:', sessionError.message);
-                        // Even if setSession fails, set user from JWT
-                        useAuthStore.getState().setUser(user);
-                    }
-
-                    // Immediately update Zustand before navigation occurs.
-                    // onAuthStateChange fires asynchronously and may not have
-                    // updated the store by the time router.replace runs.
-                    if (sessionData.session) {
-                        useAuthStore.getState().setSession(sessionData.session);
-                    }
-
-                    console.log('Session set successfully');
-                    return { user, session: { access_token: tokens.accessToken } };
-                }
-            }
-
-            throw new Error('Không thể lấy thông tin người dùng');
-        }
-
-        if (result.type === 'cancel') {
-            throw new Error('Đăng nhập đã bị hủy');
-        }
-
-        throw new Error('Đăng nhập thất bại');
+        await performOAuthFlow('google');
     } catch (err) {
         if (err instanceof Error && err.message.includes('User cancelled')) {
             throw new Error('Đăng nhập đã bị hủy');
@@ -190,71 +124,9 @@ export const signInWithGoogle = async () => {
 /**
  * Initiate Apple Sign-In flow
  */
-export const signInWithApple = async () => {
+export const signInWithApple = async (): Promise<void> => {
     try {
-        const redirectUri = getRedirectUri();
-
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'apple',
-            options: {
-                redirectTo: redirectUri,
-                skipBrowserRedirect: true,
-            },
-        });
-
-        if (error) throw error;
-        if (!data.url) throw new Error('No OAuth URL returned');
-
-        const result = await WebBrowser.openAuthSessionAsync(
-            data.url,
-            redirectUri,
-            {
-                showInRecents: true,
-                preferEphemeralSession: false,
-            }
-        );
-
-        console.log('WebBrowser result:', result.type);
-
-        if (result.type === 'success' && result.url) {
-            const tokens = extractTokensFromUrl(result.url);
-
-            if (tokens) {
-                const payload = decodeJwt(tokens.accessToken);
-                const user = parseUserFromJwt(payload);
-
-                if (user) {
-                    // Await setSession - triggers onAuthStateChange
-                    const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-                        access_token: tokens.accessToken,
-                        refresh_token: tokens.refreshToken,
-                    });
-
-                    if (sessionError) {
-                        console.warn('setSession error:', sessionError.message);
-                        useAuthStore.getState().setUser(user);
-                    }
-
-                    // Immediately update Zustand before navigation occurs.
-                    // onAuthStateChange fires asynchronously and may not have
-                    // updated the store by the time router.replace runs.
-                    if (sessionData.session) {
-                        useAuthStore.getState().setSession(sessionData.session);
-                    }
-
-                    console.log('Apple session set successfully');
-                    return { user };
-                }
-            }
-
-            throw new Error('Không thể lấy thông tin người dùng');
-        }
-
-        if (result.type === 'cancel') {
-            throw new Error('Đăng nhập đã bị hủy');
-        }
-
-        throw new Error('Đăng nhập thất bại');
+        await performOAuthFlow('apple');
     } catch (err) {
         if (err instanceof Error && err.message.includes('User cancelled')) {
             throw new Error('Đăng nhập đã bị hủy');
@@ -265,14 +137,4 @@ export const signInWithApple = async () => {
             void WebBrowser.coolDownAsync();
         }
     }
-};
-
-/**
- * Sign out user
- */
-export const signOut = async () => {
-    useAuthStore.getState().logout();
-
-    // Try to sign out from Supabase in background
-    supabase.auth.signOut().catch(() => { });
 };

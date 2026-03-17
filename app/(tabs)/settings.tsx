@@ -8,7 +8,8 @@ import {
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { SkiaOnboardingBackground } from "@/components/ui/skia-onboarding-background";
 import { useAppTheme } from "@/contexts/app-theme-context";
-import { useAuth, useTranslation } from "@/lib/hooks";
+import { useAuth } from '@/contexts/auth-context';
+import { useTranslation } from "@/lib/hooks";
 import { useSettingsStore } from "@/lib/stores";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";

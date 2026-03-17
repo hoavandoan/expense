@@ -3,8 +3,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { CATEGORY_CONFIG } from "@/constants";
+import { useAuth } from '@/contexts/auth-context';
 import { useRecentActivity, useTranslation } from "@/lib/hooks";
-import { useAuthStore } from "@/lib/stores/auth-store";
 import type { ActivityLog } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
@@ -259,7 +259,7 @@ export default function ActivityScreen() {
   const muted = useThemeColor("muted");
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const { t } = useTranslation();
 
   const { data: activities, isLoading, error, refetch, isRefetching } = useRecentActivity(50);

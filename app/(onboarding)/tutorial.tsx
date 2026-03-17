@@ -2,8 +2,8 @@ import { AppText } from '@/components/app-text';
 import { CrossPagerView, type CrossPagerViewRef } from '@/components/ui/cross-pager-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { SkiaOnboardingBackground } from '@/components/ui/skia-onboarding-background';
+import { useAuth } from '@/contexts/auth-context';
 import { useTranslation } from '@/lib/hooks';
-import { useAuthStore } from '@/lib/stores/auth-store';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Avatar, Button, cn, useThemeColor } from 'heroui-native';
@@ -204,7 +204,7 @@ export default function TutorialScreen() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const accent = useThemeColor('accent');
   const pagerRef = useRef<CrossPagerViewRef>(null);
-  const setOnboardingComplete = useAuthStore((state) => state.setOnboardingComplete);
+  const { setOnboardingComplete } = useAuth();
   const slides = useMemo(() => getSlides(t), [t]);
 
   const handleComplete = () => {

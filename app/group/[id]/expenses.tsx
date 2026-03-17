@@ -5,8 +5,8 @@ import { ExpenseCard } from "@/components/ui/expense-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StickyHeader } from "@/components/ui/sticky-header";
 import { EXPENSE_CATEGORIES } from "@/constants";
+import { useAuth } from '@/contexts/auth-context';
 import { useGroup, useInfiniteExpenses, useTranslation } from "@/lib/hooks";
-import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatDate } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -49,7 +49,7 @@ export default function GroupExpensesScreen() {
   const insets = useSafeAreaInsets();
   const accent = useThemeColor("accent");
   const muted = useThemeColor("muted");
-  const { user } = useAuthStore();
+  const { user } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);

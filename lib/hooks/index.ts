@@ -1,5 +1,4 @@
 export { useGroupActivity, useRecentActivity } from "./use-activity";
-export { useAuth } from "./use-auth";
 export {
   useApproveAssignmentRequest,
   useCreateAssignmentRequest,

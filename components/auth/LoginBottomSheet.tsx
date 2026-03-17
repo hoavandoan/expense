@@ -1,10 +1,13 @@
-import { useAuth, useTranslation } from '@/lib/hooks';
+import { signInWithGoogle } from '@/lib/auth/oauth';
+import { useTranslation } from '@/lib/hooks';
 import { Ionicons } from '@expo/vector-icons';
-import { BottomSheet, Button, Separator, useThemeColor } from 'heroui-native';
-import React from 'react';
+import { useRouter } from 'expo-router';
+import { BottomSheet, Button, Separator, useThemeColor, useToast } from 'heroui-native';
+import React, { useState } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../app-text';
+import { IconSymbol } from '../ui/icon-symbol';
 
 interface LoginBottomSheetProps {
   isOpen: boolean;
@@ -12,38 +15,41 @@ interface LoginBottomSheetProps {
 }
 
 /**
- * LoginBottomSheet component provides authentication options via Google and Apple.
- * It uses HeroUI Native BottomSheet for a premium mobile experience.
+ * LoginBottomSheet component provides authentication options.
+ * Uses HeroUI Native BottomSheet for a premium mobile experience.
  */
 export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps) => {
-  const { setUser } = useAuth();
   const { t } = useTranslation();
-  const background = useThemeColor('background');
   const foreground = useThemeColor('foreground');
+  const danger = useThemeColor('danger');
   const insets = useSafeAreaInsets();
+  const { toast } = useToast();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAppleLogin = () => {
-    // Mock login for demo
-    setUser({
-      id: 'mock-apple-id',
-      name: 'Apple User',
-      email: 'apple@example.com',
-      avatarUrl: 'https://i.pravatar.cc/150?u=apple',
-      createdAt: new Date().toISOString(),
-    });
-    onOpenChange(false);
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      await signInWithGoogle();
+    } catch (error: any) {
+      if (!error.message?.includes('hủy') && !error.message?.includes('cancel')) {
+        toast.show({
+          label: error.message || t('onboarding.login.google_fail'),
+          variant: 'danger',
+          icon: <IconSymbol name="xmark.circle.fill" size={20} color={danger} />,
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    // Mock login for demo
-    setUser({
-      id: 'mock-google-id',
-      name: 'Google User',
-      email: 'google@example.com',
-      avatarUrl: 'https://i.pravatar.cc/150?u=google',
-      createdAt: new Date().toISOString(),
+  // TODO: signInWithApple — enable after Apple Developer Program enrollment
+  const handleAppleLogin = async () => {
+    toast.show({
+      label: 'Apple Sign-In chưa khả dụng',
+      variant: 'warning',
     });
-    onOpenChange(false);
   };
 
   return (
@@ -68,10 +74,12 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
 
           {/* Login Options */}
           <View className="gap-4">
-            <Button
+            {/* TODO: Enable after Apple Developer Program enrollment */}
+            {/* <Button
               size="lg"
               className="bg-black dark:bg-white"
               onPress={handleAppleLogin}
+              isDisabled={isLoading}
             >
               <View className="flex-row items-center gap-3">
                 <Ionicons
@@ -86,12 +94,13 @@ export const LoginBottomSheet = ({ isOpen, onOpenChange }: LoginBottomSheetProps
                   {t('auth.login.continue_with_apple')}
                 </Button.Label>
               </View>
-            </Button>
+            </Button> */}
 
             <Button
               variant="secondary"
               size="lg"
               onPress={handleGoogleLogin}
+              isDisabled={isLoading}
             >
               <View className="flex-row items-center gap-3">
                 <Ionicons name="logo-google" size={20} color={foreground} />

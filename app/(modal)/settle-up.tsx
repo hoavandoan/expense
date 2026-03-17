@@ -1,8 +1,8 @@
 import { AppText } from '@/components/app-text';
 import { ScreenScrollView } from '@/components/screen-scroll-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useAuth } from '@/contexts/auth-context';
 import { useCreateSettlement, useDebtAssignment, useGroup, useTranslation } from '@/lib/hooks';
-import { useAuthStore } from '@/lib/stores/auth-store';
 import { assignDebtsOptimized, assignDebtsWithAssignee } from '@/lib/utils/debt-calculator';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -27,7 +27,7 @@ export default function SettleUpScreen() {
   const [selectedDebt, setSelectedDebt] = useState<DebtItem | null>(null);
 
   const { t } = useTranslation();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const { data: group, isLoading } = useGroup(params.groupId || null);
   const { data: activeAssignment } = useDebtAssignment(params.groupId || null);
   const createSettlement = useCreateSettlement();
