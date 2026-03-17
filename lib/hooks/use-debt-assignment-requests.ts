@@ -19,6 +19,7 @@ export const useCreateAssignmentRequest = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
+        mutationKey: ['create-assignment-request'],
         mutationFn: (input: {
             groupId: string;
             proposedAssigneeUserId: string;
@@ -61,6 +62,7 @@ export const useApproveAssignmentRequest = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
+        mutationKey: ['approve-assignment-request'],
         mutationFn: (input: {
             requestId: string;
             groupId: string;
@@ -97,6 +99,7 @@ export const useRejectAssignmentRequest = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
+        mutationKey: ['reject-assignment-request'],
         mutationFn: (input: {
             requestId: string;
             groupId: string;

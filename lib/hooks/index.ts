@@ -57,4 +57,5 @@ export {
   useSettlements
 } from "./use-settlements";
 export { useTranslation } from "./use-translation";
+export { useNetworkStatus } from "./use-network-status";
 

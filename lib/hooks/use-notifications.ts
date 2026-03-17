@@ -47,6 +47,7 @@ export const useMarkNotificationAsRead = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['mark-notification-read'],
     mutationFn: (notificationId: string) => notificationsService.markNotificationRead(notificationId),
     onMutate: async (notificationId) => {
       await queryClient.cancelQueries({ queryKey: NOTIFICATIONS_KEY });
@@ -88,6 +89,7 @@ export const useMarkAllNotificationsAsRead = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['mark-all-notifications-read'],
     mutationFn: () => notificationsService.markAllNotificationsRead(),
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: NOTIFICATIONS_KEY });
@@ -127,6 +129,7 @@ export const useDeleteNotification = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['delete-notification'],
     mutationFn: (notificationId: string) => notificationsService.deleteNotification(notificationId),
     onMutate: async (notificationId) => {
       await queryClient.cancelQueries({ queryKey: NOTIFICATIONS_KEY });

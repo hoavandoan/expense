@@ -45,6 +45,7 @@ export const useCreateGroup = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['create-group'],
     mutationFn: async (input: {
       name: string;
       description?: string;
@@ -98,6 +99,7 @@ export const useJoinGroup = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['join-group'],
     mutationFn: async (inviteCodeOrId: string) => {
       return groupsService.joinGroup(inviteCodeOrId);
     },
@@ -116,6 +118,7 @@ export const useLeaveGroup = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['leave-group'],
     mutationFn: async (groupId: string) => {
       return groupsService.leaveGroup(groupId);
     },
@@ -149,6 +152,7 @@ export const useUpdateGroup = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['update-group'],
     mutationFn: async ({
       groupId,
       ...updates
@@ -206,6 +210,7 @@ export const useRemoveMember = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['remove-member'],
     mutationFn: async ({ groupId, userId }: { groupId: string; userId: string }) => {
       return groupsService.removeMember(groupId, userId);
     },

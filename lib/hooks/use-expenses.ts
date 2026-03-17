@@ -114,6 +114,7 @@ export const useCreateExpense = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['create-expense'],
     mutationFn: async (input: {
       groupId: string;
       title: string;
@@ -204,6 +205,7 @@ export const useUpdateExpense = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['update-expense'],
     mutationFn: async ({
       expenseId,
       groupId,
@@ -279,6 +281,7 @@ export const useDeleteExpense = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['delete-expense'],
     mutationFn: async ({
       expenseId,
     }: {

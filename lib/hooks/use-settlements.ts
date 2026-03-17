@@ -1,6 +1,6 @@
+import { useAuth } from '@/contexts/auth-context';
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as settlementsService from '../services/settlements-service';
-import { useAuth } from '@/contexts/auth-context';
 import type { Settlement } from '../types';
 import { groupQueryOptions } from './use-groups';
 
@@ -45,6 +45,7 @@ export const useCreateSettlement = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
+        mutationKey: ['create-settlement'],
         mutationFn: (input: {
             groupId: string;
             toUserId: string;
@@ -100,6 +101,7 @@ export const useCompleteSettlement = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
+        mutationKey: ['complete-settlement'],
         mutationFn: ({ settlementId, groupId }: { settlementId: string; groupId: string }) =>
             settlementsService.updateSettlementStatus(settlementId, 'completed'),
         onMutate: async ({ settlementId, groupId }) => {
@@ -143,6 +145,7 @@ export const useRejectSettlement = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
+        mutationKey: ['reject-settlement'],
         mutationFn: ({ settlementId, groupId }: { settlementId: string; groupId: string }) =>
             settlementsService.updateSettlementStatus(settlementId, 'rejected'),
         onMutate: async ({ settlementId, groupId }) => {

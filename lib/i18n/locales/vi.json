@@ -672,5 +672,13 @@
         "save": "Lưu thay đổi",
         "retry": "Thử lại",
         "ok": "OK"
+    },
+    "offline": {
+        "banner": "Đang ngoại tuyến",
+        "bannerSubtitle": "Dữ liệu có thể chưa được cập nhật",
+        "pendingSync": "%{count} thay đổi chờ đồng bộ",
+        "syncComplete": "Đã đồng bộ thành công",
+        "syncFailed": "Đồng bộ thất bại, sẽ thử lại",
+        "requiresConnection": "Tính năng này yêu cầu kết nối mạng"
     }
 }

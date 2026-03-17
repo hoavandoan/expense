@@ -64,8 +64,6 @@ export const fetchGroup = async (groupId: string): Promise<GroupWithDetails> => 
         .order('created_at', { ascending: false, referencedTable: 'expenses' })
         .maybeSingle();
 
-    console.log("dataaaa", data)
-
     if (error) throw error;
     if (!data) throw new Error('Group not found');
 

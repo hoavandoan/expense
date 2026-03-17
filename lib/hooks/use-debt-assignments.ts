@@ -18,6 +18,7 @@ export const useSetDebtAssignment = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
+        mutationKey: ['set-debt-assignment'],
         mutationFn: (input: {
             groupId: string;
             assigneeUserId: string;
@@ -35,6 +36,7 @@ export const useDisableDebtAssignment = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
+        mutationKey: ['disable-debt-assignment'],
         mutationFn: (groupId: string) => debtAssignmentsService.disableDebtAssignment(groupId),
         onSuccess: (_, groupId) => {
             queryClient.invalidateQueries({ queryKey: debtAssignmentQueryOptions(groupId).queryKey });

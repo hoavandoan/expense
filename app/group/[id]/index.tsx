@@ -15,13 +15,13 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ExpenseCard } from "@/components/ui/expense-card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { PendingSettlements } from "@/components/ui/pending-settlements";
+import { useAuth } from "@/contexts/auth-context";
 import {
   useDebtAssignment,
   useDisableDebtAssignment,
   useGroup,
   useMembersBalance,
   useUserBalanceInGroup,
-  useAuth
 } from "@/lib/hooks";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { assignDebtsOptimized } from "@/lib/utils/debt-calculator";
